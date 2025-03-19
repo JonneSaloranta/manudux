@@ -21,7 +21,7 @@ class Property(models.Model):
 class Location(models.Model):
     name = models.CharField(max_length=255)
     description = models.TextField(blank=True, null=True)
-    property = models.ForeignKey(Property, on_delete=models.CASCADE)
+    property = models.ForeignKey(Property, on_delete=models.CASCADE, blank=True, null=True, related_name='locations')
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     activated = models.BooleanField(default=True)
@@ -37,7 +37,7 @@ class Location(models.Model):
 class Appliance(models.Model):
     name = models.CharField(max_length=255)
     description = models.TextField(blank=True, null=True)
-    location = models.ForeignKey(Location, on_delete=models.CASCADE)
+    location = models.ForeignKey(Location, on_delete=models.CASCADE, blank=True, null=True, related_name='appliances')
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     activated = models.BooleanField(default=True)
