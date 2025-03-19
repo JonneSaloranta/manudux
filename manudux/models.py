@@ -48,3 +48,18 @@ class Appliance(models.Model):
     class Meta:
         verbose_name = "Appliance"
         verbose_name_plural = "Appliances"
+        
+class Part(models.Model):
+    name = models.CharField(max_length=255)
+    description = models.TextField(blank=True, null=True)
+    appliance = models.ForeignKey(Appliance, on_delete=models.CASCADE, blank=True, null=True, related_name='parts')
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    activated = models.BooleanField(default=True)
+
+    def __str__(self):
+        return self.name
+    
+    class Meta:
+        verbose_name = "Part"
+        verbose_name_plural = "Parts"
