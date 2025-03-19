@@ -63,3 +63,30 @@ class Part(models.Model):
     class Meta:
         verbose_name = "Part"
         verbose_name_plural = "Parts"
+
+class Generator(Appliance):
+    fuel = models.CharField(max_length=255, blank=True, null=True)
+    kw = models.FloatField(default=0, blank=True, null=True)
+
+    def __str__(self):
+        return self.name
+    
+    class Meta:
+        verbose_name = "Generator"
+        verbose_name_plural = "Generators"
+
+class Stock(models.Model):
+    name = models.CharField(max_length=255)
+    description = models.TextField(blank=True, null=True)
+    part = models.ForeignKey(Part, on_delete=models.CASCADE, blank=True, null=True, related_name='stocks')
+    quantity = models.IntegerField(default=0, blank=True, null=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    activated = models.BooleanField(default=True)
+
+    def __str__(self):
+        return self.name
+    
+    class Meta:
+        verbose_name = "Stock"
+        verbose_name_plural = "Stocks"
