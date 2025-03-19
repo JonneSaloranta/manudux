@@ -31,3 +31,14 @@ Manudux is a simple and easy-to-use tool for creating and managing documentation
     - Streamlined documentation process.
     - Improved organization and accessibility of information.
     - Enhanced maintenance and inventory management.
+
+## Development
+
+env file:
+
+```yaml
+SECRET_KEY=your_django_secret_key_for_manudux # or generate one
+DEBUG=True # or False, defaults to False if not set
+ALLOWED_HOSTS=localhost,192.162.2.10 # or your host
+TIME_ZONE=UTC # or your timezone. Optional, defaults to UTC if not set
+```
