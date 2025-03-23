@@ -1,9 +1,31 @@
-<div class="container">
+{% load i18n %}
+{% load static %}
+
+<div class="navbar">
     <nav>
-        <ul>
-            <li><a href="{% url 'manudux:index' %}">Home</a></li>
-            {# <li><a href="{% url 'manudux:about' %}">About</a></li> #}
-            {# <li><a href="{% url 'manudux:contact' %}">Contact</a></li> #}
+        <div class="nav-logo">
+            <a href="{% url 'manudux:index' %}">Manudux</a>
+        </div>
+
+        <ul class="nav-links">
+            <li><a href="{% url 'manudux:index' %}">{% trans "Home" %}</a></li>
+            <li><a href="{% url 'manudux:properties' %}">{% trans "Properties" %}</a></li>
+            <li><a href="#">{% trans "Guides" %}</a></li>
         </ul>
+
+        <div class="nav-user">
+            {% if user.is_authenticated %}
+            {% if user.is_staff %}
+            <a href="{% url 'admin:index' %}" class="admin-link">{% trans "Admin Dashboard" %}</a>
+            {% endif %}
+            <span class="user-name">Hi, {{ user.username }}!</span>
+            <form action="{% url 'logout' %}" method="post">
+                {% csrf_token %}
+                <button type="submit" class="logout-btn">Log Out</button>
+            </form>
+            {% else %}
+            <a href="{% url 'login' %}" class="login-btn">Log In</a>
+            {% endif %}
+        </div>
     </nav>
 </div>
