@@ -16,3 +16,12 @@ def property_detail(request, pk):
     property = get_object_or_404(Property, pk=pk)
     locations = property.locations.all()  # Using related_name for efficient querying
     return render(request, 'manudux/property.html', {'property': property, 'locations': locations})
+
+def locations(request):
+    locations = Location.objects.all()
+    return render(request, 'manudux/locations.html', {'locations': locations})
+
+def location_detail(request, pk):
+    location = get_object_or_404(Location, pk=pk)
+    appliances = location.appliances.all()  # Using related_name to fetch appliances
+    return render(request, 'manudux/location.html', {'location': location, 'appliances': appliances})
