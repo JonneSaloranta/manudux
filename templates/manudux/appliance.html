@@ -1,0 +1,13 @@
+{% extends "manudux/base.html" %}
+{% load static %}
+
+{% block content %}
+<div class="container">
+    <h1>Appliance</h1>
+
+    <div class="card">
+        <p>{{appliance.name}} - {{appliance.description}}</p>
+    </div>
+</div>
+
+{% endblock %}
