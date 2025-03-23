@@ -1,0 +1,14 @@
+{% extends "manudux/base.html" %}
+{% load i18n %}
+{% load static %}
+
+{% block content %}
+<div class="container">
+    <h1>{% trans "Property" %}</h1>
+    <p>This is the property page!</p>
+
+    {% include "manudux/property-card.html" %}
+
+</div>
+
+{% endblock %}
