@@ -1,0 +1,15 @@
+{% extends "manudux/base.html" %}
+{% load static %}
+
+{% block content %}
+<div class="container">
+    <h1>Parts</h1>
+
+    <div class="card">
+        {% for part in parts %}
+        <p>{{part.name}} - {{part.description}} <a href="{% url 'manudux:appliance' part.appliance.id %}">View Appliance</a></p>
+        {% endfor %}
+    </div>
+</div>
+
+{% endblock %}
