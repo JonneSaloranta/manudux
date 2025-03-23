@@ -77,7 +77,7 @@ class Part(models.Model):
     name = models.CharField(max_length=255)
     description = models.TextField(blank=True, null=True)
     appliance = models.ForeignKey(
-        Appliance, on_delete=models.CASCADE, related_name='parts'
+        Appliance, on_delete=models.PROTECT, related_name='parts'
     )
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
