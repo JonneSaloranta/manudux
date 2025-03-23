@@ -33,3 +33,12 @@ def parts(request):
 def part_detail(request, pk):
     part = get_object_or_404(Part, pk=pk)
     return render(request, 'manudux/part.html', {'part': part})
+
+def appliances(request):
+    appliances = Appliance.objects.all()
+    return render(request, 'manudux/appliances.html', {'appliances': appliances})
+
+def appliance_detail(request, pk):
+    appliance = get_object_or_404(Appliance, pk=pk)
+    parts = appliance.parts.all()  # Get all parts related to the appliance
+    return render(request, 'manudux/appliance.html', {'appliance': appliance, 'parts': parts})
