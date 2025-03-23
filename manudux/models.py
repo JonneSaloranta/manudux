@@ -1,4 +1,6 @@
 from django.db import models
+from django.contrib.auth.models import User
+from django.utils.translation import gettext_lazy as _
 
 
 class Property(models.Model):
@@ -18,8 +20,8 @@ class Property(models.Model):
         return self.name
 
     class Meta:
-        verbose_name = "Property"
-        verbose_name_plural = "Properties"
+        verbose_name = _("Property")
+        verbose_name_plural = _("Properties")
 
 
 class Location(models.Model):
@@ -37,8 +39,8 @@ class Location(models.Model):
         return f"{self.property.name} - {self.name}"
 
     class Meta:
-        verbose_name = "Location"
-        verbose_name_plural = "Locations"
+        verbose_name = _("Location")
+        verbose_name_plural = _("Locations")
 
 
 class Appliance(models.Model):
@@ -56,8 +58,8 @@ class Appliance(models.Model):
         return self.name
 
     class Meta:
-        verbose_name = "Appliance"
-        verbose_name_plural = "Appliances"
+        verbose_name = _("Appliance")
+        verbose_name_plural = _("Appliances")
 
 
 class Generator(Appliance):
@@ -66,8 +68,8 @@ class Generator(Appliance):
     kw = models.FloatField(default=0, blank=True, null=True)
 
     class Meta:
-        verbose_name = "Generator"
-        verbose_name_plural = "Generators"
+        verbose_name = _("Generator")
+        verbose_name_plural = _("Generators")
 
 
 class Part(models.Model):
@@ -85,8 +87,8 @@ class Part(models.Model):
         return f"{self.name} (for {self.appliance.name})"
 
     class Meta:
-        verbose_name = "Part"
-        verbose_name_plural = "Parts"
+        verbose_name = _("Part")
+        verbose_name_plural = _("Parts")
 
 
 class Stock(models.Model):
@@ -107,8 +109,8 @@ class Stock(models.Model):
             return self.name
 
     class Meta:
-        verbose_name = "Stock"
-        verbose_name_plural = "Stocks"
+        verbose_name = _("Stock")
+        verbose_name_plural = _("Stocks")
 
 
 class StockItem(models.Model):
@@ -130,5 +132,5 @@ class StockItem(models.Model):
         return f"{self.quantity} x {self.part.name} ({self.condition or 'Unknown'}) in {self.stock.name}"
 
     class Meta:
-        verbose_name = "Stock Item"
-        verbose_name_plural = "Stock Items"
+        verbose_name = _("Stock Item")
+        verbose_name_plural = _("Stock Items")
