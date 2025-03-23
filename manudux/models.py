@@ -123,10 +123,10 @@ class StockItem(models.Model):
     ]
     
     stock = models.ForeignKey(
-        Stock, on_delete=models.CASCADE, related_name='stock_items'
+        Stock, on_delete=models.PROTECT, related_name='stock_items'
     )
     part = models.ForeignKey(
-        Part, on_delete=models.CASCADE, related_name='stock_items'
+        Part, on_delete=models.PROTECT, related_name='stock_items'
     )
     quantity = models.PositiveIntegerField(default=0)
     condition = models.CharField(
