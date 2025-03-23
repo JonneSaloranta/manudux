@@ -1,0 +1,16 @@
+{% extends "manudux/base.html" %}
+{% load i18n %}
+{% load static %}
+
+{% block content %}
+<div class="container">
+    <h1>{% trans "Location" %}</h1>
+
+    <h2>{{location.name}}</h2>
+    <p>{{location.property}}</p>
+
+    <a href="{% url 'manudux:property' location.property.id %}">View Property</a>
+
+</div>
+
+{% endblock %}

@@ -1,0 +1,16 @@
+{% load i18n %}
+{% load static %}
+
+<div class="container">
+    <h1>Locations</h1>
+
+    {% if locations %}
+    {% for location in locations %}
+    {{location.name}}
+    <a href="{% url 'manudux:location' location.id %}">View</a>
+    {% endfor %}
+    {% else %}
+    <p>No locations available</p>
+    {% endif %}
+
+</div>
