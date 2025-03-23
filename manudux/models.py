@@ -115,6 +115,13 @@ class Stock(models.Model):
 
 class StockItem(models.Model):
     """Links a part to a specific stock location, tracking quantity and condition."""
+
+    CONDITION_CHOICES = [
+    ('new', _('New')),
+    ('used', _('Used')),
+    ('broken', _('Broken')),
+    ]
+    
     stock = models.ForeignKey(
         Stock, on_delete=models.CASCADE, related_name='stock_items'
     )
