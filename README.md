@@ -1,3 +1,5 @@
+[![Django Tests](https://github.com/JonneSaloranta/manudux/actions/workflows/django-test-ci.yaml/badge.svg)](https://github.com/JonneSaloranta/manudux/actions/workflows/django-test-ci.yaml)
+
 # Manudux
 
 ## What is Manudux?
