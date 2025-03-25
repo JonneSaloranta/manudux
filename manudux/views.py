@@ -1,10 +1,26 @@
 from django.shortcuts import render, get_object_or_404
 from .models import Property, Location, Part, Appliance
 from django.contrib.auth.decorators import login_required, permission_required
+from .forms import PropertyForm, LocationForm
+from django.shortcuts import redirect
+
 
 def index(request):
     context = {}
     return render(request, 'manudux/index.html', context)
+
+def create_property(request):
+    if request.method == 'POST':
+        form = PropertyForm(request.POST, request.FILES)
+        if form.is_valid():
+            form.save()
+            return redirect('manudux:properties')
+    else:
+        form = PropertyForm()
+    context = {
+        'form': form
+        }
+    return render(request, 'manudux/property-create.html', context)
 
 @login_required(login_url='/accounts/login/')
 def properties(request):
