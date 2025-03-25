@@ -76,6 +76,10 @@ def create_location(request):
     }
     return render(request, 'manudux/location-create.html', context)
 
+
+def delete_location(request, pk):
+    return delete_obj(request, pk, Location, 'manudux:locations', 'manudux/location-delete.html', 'location')
+
 def locations(request):
     locations = Location.objects.all()
     return render(request, 'manudux/locations.html', {'locations': locations})
