@@ -33,12 +33,12 @@ jobs:
                   PATCH=$(echo "$LATEST_TAG" | cut -d'.' -f3 | cut -d'-' -f1)
                   PRERELEASE_TYPE="${{ github.event.inputs.prerelease_type }}"
 
-                  # Check if the latest tag is a pre-release
-                  if [[ "$LATEST_TAG" == *"-"* ]]; then
-                    PRERELEASE_NUM=$(echo "$LATEST_TAG" | awk -F'-' '{print $2}' | awk -F'.' '{print $2}')
-                    PRERELEASE_NUM=$((PRERELEASE_NUM + 1))
+                  # Determine new pre-release number
+                  if [[ "$LATEST_TAG" == *"$PRERELEASE_TYPE."* ]]; then
+                      PRERELEASE_NUM=$(echo "$LATEST_TAG" | awk -F'.' '{print $NF}')
+                      PRERELEASE_NUM=$((PRERELEASE_NUM + 1))
                   else
-                    PRERELEASE_NUM=1  # First pre-release of this type
+                      PRERELEASE_NUM=1
                   fi
 
                   # Generate new pre-release tag
@@ -63,3 +63,12 @@ jobs:
               run: |
                   git tag "$NEW_TAG"
                   git push git@github.com:${{ github.repository }}.git "$NEW_TAG"
+
+            - name: Create GitHub Release
+              uses: softprops/action-gh-release@v2
+              with:
+                  tag_name: ${{ env.NEW_TAG }}
+                  prerelease: true
+                  generate_release_notes: true
+              env:
+                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
