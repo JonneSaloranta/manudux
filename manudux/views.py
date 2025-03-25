@@ -105,3 +105,15 @@ def appliance_detail(request, pk):
     appliance = get_object_or_404(Appliance, pk=pk)
     parts = appliance.parts.all()  # Get all parts related to the appliance
     return render(request, 'manudux/appliance.html', {'appliance': appliance, 'parts': parts})
+
+
+
+def delete_obj(request, pk, model, redirect_url, template, context_name):
+    obj = get_object_or_404(model, pk=pk)
+    if request.method == 'POST':
+        obj.delete()
+        return redirect(redirect_url)
+    context = {
+        context_name: obj
+    }
+    return render(request, template, context)
