@@ -24,6 +24,7 @@ body {
   padding: 1rem;
   max-width: 100vw;
 }
+
 .navbar nav {
   display: flex;
   justify-content: space-between;
@@ -31,15 +32,18 @@ body {
   max-width: 1200px;
   margin: auto;
 }
+
 .navbar nav .nav-logo {
   font-size: 2.5rem;
   color: white;
   text-decoration: none;
 }
+
 .navbar nav .nav-logo a {
   color: white;
   text-decoration: none;
 }
+
 .navbar ul {
   list-style: none;
   display: flex;
@@ -47,21 +51,25 @@ body {
   padding: 0;
   margin: 0;
 }
+
 .navbar ul li a {
   text-decoration: none;
   color: white;
   padding: 0.5rem;
   transition: 0.2s;
 }
+
 .navbar ul li a:hover {
   background: rgba(255, 255, 255, 0.2);
   border-radius: 5px;
 }
+
 .navbar .nav-user {
   display: flex;
   gap: 1rem;
   color: #fff;
 }
+
 .navbar .nav-user button {
   background: red;
   color: white;
@@ -69,18 +77,21 @@ body {
   padding: 0.5rem 1rem;
   cursor: pointer;
 }
+
 .navbar .nav-user .admin-link {
   color: white;
   text-decoration: none;
 }
 
 .container {
-  max-width: 1200px;
+  min-width: 120rem;
   margin: 0 auto;
   padding: 0 15px;
   font-size: 2rem;
   display: flex;
   flex-direction: column;
+  align-items: center;
+  margin-bottom: 3rem;
 }
 
 footer {
@@ -92,17 +103,20 @@ footer {
   width: 100%;
   margin-top: auto;
 }
+
 footer .row {
   display: flex;
   justify-content: space-between;
   align-items: center;
   flex-direction: column;
 }
+
 footer .row a {
   color: #fff;
   text-decoration: none;
   padding: 0.5rem;
 }
+
 footer .row a:hover {
   text-decoration: underline;
 }
@@ -122,6 +136,7 @@ footer .row a:hover {
     grid-template-columns: repeat(auto-fit, minmax(25rem, 1fr));
   }
 }
+
 .card {
   background-color: #fff;
   width: 100%;
@@ -133,6 +148,7 @@ footer .row a:hover {
   max-width: 40rem;
   position: relative;
 }
+
 .card:hover {
   box-shadow: 0 0 2rem rgba(0, 0, 0, 0.3);
 }
@@ -159,7 +175,7 @@ footer .row a:hover {
   width: 100%;
   height: 20rem;
   -o-object-fit: cover;
-     object-fit: cover;
+  object-fit: cover;
   border-radius: 15px 15px 0 0;
 }
 
@@ -169,5 +185,8 @@ footer .row a:hover {
   left: 0;
   width: 100%;
   height: 100%;
-  z-index: 1; /* Ensures the link covers the entire card */
-}/*# sourceMappingURL=style.css.map */
+  z-index: 1;
+  /* Ensures the link covers the entire card */
+}
+
+/*# sourceMappingURL=style.css.map */
