@@ -11,7 +11,9 @@
 </div>
 <div class="grid-container">
     {% for property in properties %}
+    {% if property.activated %}
     {% include "manudux/property-card.html" %}
+    {% endif %}
     {% endfor %}
 </div>
 
