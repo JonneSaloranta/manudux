@@ -52,9 +52,14 @@ jobs:
                   git config --global user.name "GitHub Actions"
                   git config --global user.email "github-actions@github.com"
 
+            - name: Setup SSH for GitHub
+              run: |
+                  mkdir -p ~/.ssh
+                  echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_ed25519
+                  chmod 600 ~/.ssh/id_ed25519
+                  ssh-keyscan github.com >> ~/.ssh/known_hosts
+
             - name: Create and push Git tag
-              env:
-                  GITHUB_TOKEN: ${{ secrets.GH_PAT }}
               run: |
                   git tag "$NEW_TAG"
-                  git push https://x-access-token:${GITHUB_TOKEN}@github.com/${{ github.repository }}.git "$NEW_TAG"
+                  git push git@github.com:${{ github.repository }}.git "$NEW_TAG"
