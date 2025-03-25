@@ -1,0 +1,23 @@
+{% extends "manudux/base.html" %}
+{% load i18n %}
+{% load static %}
+
+{% block content %}
+<div class="container">
+    <section>
+        <form action="{% url 'manudux:create-location' %}" method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+
+            {{ form.as_p }}
+            <button>{% trans "Create" %}</button>
+        </form>
+        {% if success %}
+        <p style="color: green; font-weight: bold;">{% trans "Location created successfully" %}</p>
+        {% endif %}
+        {% if error %}
+        <p style="color: red; font-weight: bold;">{% trans "Could not create location" %}</p>
+        {% endif %}
+    </section>
+</div>
+
+{% endblock %}

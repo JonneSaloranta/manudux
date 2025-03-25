@@ -7,9 +7,9 @@
     <h1>{% trans "Location" %}</h1>
 
     <h2>{{location.name}}</h2>
-    <p>{{location.property}}</p>
 
-    <a href="{% url 'manudux:property' location.property.id %}">View Property</a>
+
+    <p>View property: <a href="{% url 'manudux:property' location.property.id %}">{{ location.property }}</a></p>
 
 </div>
 

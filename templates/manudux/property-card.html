@@ -18,7 +18,7 @@
         </div>
 
         {% if property.description %}
-        <div class="card-body">{{ property.description|truncatewords_html:5 }}</div>
+        <div class="card-body">{{ property.description|escape|truncatewords_html:5 }}</div>
         {% else %}
         <div class="card-body">{% trans "No description available" %}</div>
         {% endif %}
