@@ -33,6 +33,31 @@ def property_detail(request, pk):
     locations = property.locations.all()  # Using related_name for efficient querying
     return render(request, 'manudux/property.html', {'property': property, 'locations': locations})
 
+def create_location(request):
+    property_obj = None
+    property_id = request.GET.get('property_id')  # Get property_id from URL parameters
+
+    if property_id:
+        property_obj = get_object_or_404(Property, id=property_id)  # Fetch the property
+
+    if request.method == 'POST':
+        form = LocationForm(request.POST, request.FILES)
+        if form.is_valid():
+            location = form.save(commit=False)
+            if property_obj:
+                location.property = property_obj  # Assign property before saving
+            location.save()
+            return redirect('manudux:property', pk=location.property.id)  # Redirect to property detail
+
+    else:
+        form = LocationForm(initial={'property': property_obj})  # Pre-fill the property field
+
+    context = {
+        'form': form,
+        'property': property_obj,  # Pass the property to the template
+    }
+    return render(request, 'manudux/location-create.html', context)
+
 def locations(request):
     locations = Location.objects.all()
     return render(request, 'manudux/locations.html', {'locations': locations})
