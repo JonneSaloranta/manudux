@@ -6,6 +6,7 @@ from . import views
 urlpatterns = [
     path('', views.index, name='index'),
     path('properties/', views.properties, name='properties'),
+    path('properties/create-property/', views.create_property, name='create-property'),
     path('property/<int:pk>/', views.property_detail, name='property'),
     path('locations/', views.locations, name='locations'),
     path('location/<int:pk>/', views.location_detail, name='location'),
