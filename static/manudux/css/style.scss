@@ -142,11 +142,11 @@ footer {
     border-radius: 15px;
     margin: 1rem;
     box-shadow: 0 0 1rem rgba(0, 0, 0, 0.3);
-    transition: box-shadow 0.3s, transform 0.3s;
+    transition: 0.2s ease-in-out;
     max-width: 40rem;
 
     &:hover {
-        box-shadow: 0 0 2rem rgba(0, 0, 0, 0.3);
+        box-shadow: 0 0 2rem rgba(0, 0, 0, 0.747);
     }
 
     position: relative;

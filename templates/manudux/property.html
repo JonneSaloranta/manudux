@@ -5,10 +5,49 @@
 {% block content %}
 <div class="container">
     <h1>{% trans "Property" %}</h1>
-    <p>This is the property page!</p>
 
-    {% include "manudux/property-card.html" %}
+    <div class="">
 
+        <form action="{% url 'manudux:delete-property' property.id %}" method="post">
+            {% csrf_token %}
+            <input type="submit" value="Delete" class="btn btn-danger" style="background-color: red; cursor: pointer;">
+        </form>
+
+        <a href="{% url 'manudux:edit-property' pk=property.id %}" class="btn btn-primary" style="background-color: aqua;">Edit</a>
+
+        <div class="">
+            {% if not property.image %}
+            <img src="{% static 'manudux/img/placeholder300x200.png'%}" alt="placeholder image">
+            {% else %}
+            <img src="{{ property.image.url }}" alt="real image" height="200">
+            {% endif %}
+        </div>
+
+        <div class="">
+            <h2>{{ property.name }}</h2>
+        </div>
+
+        {% if property.description %}
+        <div class="">{{ property.description|escape|truncatewords_html:5 }}</div>
+        {% else %}
+        <div class="">{% trans "No description available" %}</div>
+        {% endif %}
+
+        <div class="locations">
+            <h2>Locations:</h2>
+            <a href="{% url 'manudux:create-location' %}?property_id={{ property.id }}">Create a Location</a>
+
+            <ul>
+                {% for location in property.locations.all %}
+                <p><a href="{% url 'manudux:location' location.id %}">{{ location.name }}</a></p>
+                {% empty %}
+                <li>No locations available.</li>
+                {% endfor %}
+            </ul>
+        </div>
+
+
+    </div>
 </div>
 
 {% endblock %}

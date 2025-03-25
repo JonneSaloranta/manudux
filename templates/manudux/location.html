@@ -7,9 +7,14 @@
     <h1>{% trans "Location" %}</h1>
 
     <h2>{{location.name}}</h2>
-    <p>{{location.property}}</p>
 
-    <a href="{% url 'manudux:property' location.property.id %}">View Property</a>
+    <form action="{% url 'manudux:delete-location' pk=location.id %}" method="post">
+        {% csrf_token %}
+        <input type="submit" value="Delete" class="btn btn-danger" style="background-color: red; cursor: pointer;">
+    </form>
+
+
+    <p>View property: <a href="{% url 'manudux:property' location.property.id %}">{{ location.property }}</a></p>
 
 </div>
 
