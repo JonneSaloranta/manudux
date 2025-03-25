@@ -46,7 +46,14 @@ jobs:
 
                   echo "NEW_TAG=$NEW_TAG" >> $GITHUB_ENV
 
+            - name: Configure Git
+              run: |
+                  git config --global user.name "GitHub Actions"
+                  git config --global user.email "github-actions@github.com"
+
             - name: Create and push Git tag
+              env:
+                  GITHUB_TOKEN: ${{ secrets.GH_PAT }}
               run: |
                   git tag "$NEW_TAG"
-                  git push origin "$NEW_TAG"
+                  git push https://x-access-token:${GITHUB_TOKEN}@github.com/${{ github.repository }}.git "$NEW_TAG"
