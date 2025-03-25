@@ -1,0 +1,25 @@
+{% extends "manudux/base.html" %}
+{% load i18n %}
+{% load static %}
+
+{% block content %}
+
+<div class="container">
+    <div class="container-title">
+        <h1>Locations</h1>
+    </div>
+    <div class="create-button">
+        <a href="{% url 'manudux:create-location' %}">Create a new location</a>
+    </div>
+    <div class="locations">
+        {% if locations %}
+        {% for location in locations %}
+        <p>{{location.name}} <a href="{% url 'manudux:location' location.id %}">View</a></p>
+        {% endfor %}
+        {% else %}
+        <p>No locations available</p>
+        {% endif %}
+    </div>
+</div>
+
+{% endblock content %}

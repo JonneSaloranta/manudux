@@ -13,13 +13,15 @@
 
 <body>
 
-    {% block header %}
+    {% block navbar %}
+    {% include "manudux/navbar.html" %}
     {% endblock %}
 
     {% block content %}
     {% endblock %}
 
     {% block footer %}
+    {% include "manudux/footer.html" %}
     {% endblock %}
 
 </body>

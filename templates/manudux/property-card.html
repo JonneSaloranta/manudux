@@ -1,0 +1,28 @@
+{% load i18n %}
+{% load static %}
+
+<div class="card">
+
+    <div class="card-content">
+
+        <div class="card-image">
+            {% if not property.image %}
+            <img src="{% static 'manudux/img/placeholder300x200.png'%}" alt="placeholder image">
+            {% else %}
+            <img src="{{ property.image.url }}" alt="real image" height="200">
+            {% endif %}
+        </div>
+
+        <div class="card-title">
+            <h2>{{ property.name }}</h2>
+        </div>
+
+        {% if property.description %}
+        <div class="card-body">{{ property.description|escape|truncatewords_html:5 }}</div>
+        {% else %}
+        <div class="card-body">{% trans "No description available" %}</div>
+        {% endif %}
+
+        <a href="{% url 'manudux:property' pk=property.id %}" class="card-link"></a>
+    </div>
+</div>

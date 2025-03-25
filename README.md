@@ -1,6 +1,10 @@
+[![Django Tests](https://github.com/JonneSaloranta/manudux/actions/workflows/django-test-ci.yaml/badge.svg)](https://github.com/JonneSaloranta/manudux/actions/workflows/django-test-ci.yaml)
+
 # Manudux
 
 ## What is Manudux?
+
+Manudux name is derived from the Latin words "manus" (hand) and "dux" (leader), which could be translated as "handguide".
 
 Manudux is a simple and easy-to-use tool for creating and managing documentation for your household or property. It is designed to be used by anyone, regardless of their technical expertise. Manudux is perfect for creating manuals for appliances, electronics, furniture, and more. It is also great for creating maintenance schedules, inventory lists, and other important documents. With Manudux, you can easily organize and access all of your important information in one place.
 
