@@ -1,0 +1,17 @@
+{% extends "manudux/base.html" %}
+{% load i18n %}
+{% load static %}
+
+{% block content %}
+<div class="container">
+    <section>
+        <form action="{% url 'manudux:edit-property' pk=property.id %}" method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+
+            {{ form.as_p }}
+            <button>{% trans "Create" %}</button>
+        </form>
+    </section>
+</div>
+
+{% endblock %}
