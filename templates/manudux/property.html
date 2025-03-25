@@ -5,9 +5,15 @@
 {% block content %}
 <div class="container">
     <h1>{% trans "Property" %}</h1>
-    <p>This is the property page!</p>
 
     <div class="">
+
+        <form action="{% url 'manudux:delete-property' property.id %}" method="post">
+            {% csrf_token %}
+            <input type="submit" value="Delete" class="btn btn-danger" style="background-color: red; cursor: pointer;">
+        </form>
+
+        <a href="{% url 'manudux:edit-property' pk=property.id %}" class="btn btn-primary" style="background-color: aqua;">Edit</a>
 
         <div class="">
             {% if not property.image %}
