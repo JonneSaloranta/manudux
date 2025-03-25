@@ -22,6 +22,24 @@ def create_property(request):
         }
     return render(request, 'manudux/property-create.html', context)
 
+def edit_property(request, pk):
+    property = get_object_or_404(Property, pk=pk)
+    if request.method == 'POST':
+        form = PropertyForm(request.POST, request.FILES, instance=property)
+        if form.is_valid():
+            form.save()
+            return redirect('manudux:property', pk=pk)
+    else:
+        form = PropertyForm(instance=property)
+    context = {
+        'form': form,
+        'property': property
+    }
+    return render(request, 'manudux/property-edit.html', context)
+
+def delete_property(request, pk):
+    return delete_obj(request, pk, Property, 'manudux:properties', 'manudux/property-delete.html', 'property')
+
 @login_required(login_url='/accounts/login/')
 def properties(request):
     properties = Property.objects.all()
