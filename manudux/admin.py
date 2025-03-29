@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import Property, Location, Appliance, Part, Generator, Stock, StockItem
+from .models import Property, Location, Appliance, Part, Generator, Stock, StockItem, PropertyType
 
 @admin.register(Property)
 class PropertyAdmin(admin.ModelAdmin):
@@ -64,3 +64,9 @@ class StockItemAdmin(admin.ModelAdmin):
     ordering = ('stock', 'part', 'created_at', 'updated_at')
     date_hierarchy = 'created_at'
     readonly_fields = ('created_at', 'updated_at')
+
+@admin.register(PropertyType)
+class PropertyTypeAdmin(admin.ModelAdmin):
+    list_display = ('name', 'description')
+    search_fields = ('name', 'description')
+    ordering = ('name',)
