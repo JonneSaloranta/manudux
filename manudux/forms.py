@@ -5,7 +5,7 @@ from django.utils.translation import gettext_lazy as _
 class PropertyForm(ModelForm):
     class Meta:
         model = Property
-        fields = ['name', 'description', 'image', 'address', 'city', 'state', 'zip_code', 'activated']
+        fields = ['name', 'description', 'image', 'address', 'city', 'state', 'zip_code', 'property_type', 'activated']
         labels = {
             'name': _('Property Name'),
             'description': _('Description'),
@@ -14,6 +14,7 @@ class PropertyForm(ModelForm):
             'city': _('City'),
             'state': _('State'),
             'zip_code': _('Zip Code'),
+            'property_type': _('Property Type'),
             'activated': _('Activated)'),
         }
         help_texts = {
@@ -24,6 +25,7 @@ class PropertyForm(ModelForm):
             'city': _('Enter the city of the property.'),
             'state': _('Enter the state of the property.'),
             'zip_code': _('Enter the zip code of the property.'),
+            'property_type': _('Select the type of property.'),
             'activated': _('Check to activate the property.'),
         }
 
