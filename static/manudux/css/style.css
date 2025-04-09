@@ -75,12 +75,25 @@ body {
 }
 
 .container {
-  max-width: 1200px;
+  min-width: 1200px;
   margin: 0 auto;
   padding: 0 15px;
   font-size: 2rem;
   display: flex;
   flex-direction: column;
+  align-items: center;
+}
+.container .property-details {
+  flex-direction: row;
+  justify-content: space-between;
+}
+
+.property-details .timestamps p {
+  padding: 0;
+  margin: 0;
+  font-size: small;
+  color: #333;
+  font-style: italic;
 }
 
 footer {
@@ -170,4 +183,209 @@ footer .row a:hover {
   width: 100%;
   height: 100%;
   z-index: 1; /* Ensures the link covers the entire card */
+}
+
+.guide-list-container {
+  max-width: 130rem;
+  margin: 0 auto;
+  padding: 20px;
+  font-family: Arial, sans-serif;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 20px;
+  overflow-x: hidden;
+  box-sizing: border-box;
+}
+
+.guide-item {
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  padding: 20px;
+  transition: transform 0.3s, box-shadow 0.3s;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: flex-start;
+  width: 100%;
+  box-sizing: border-box;
+  height: 100%;
+  max-width: 100%;
+}
+.guide-item:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+}
+
+.guide-title {
+  font-size: 24px;
+  font-weight: 600;
+  color: #2c3e50;
+  margin-bottom: 10px;
+  width: 100%;
+}
+.guide-title a {
+  text-decoration: none;
+  color: inherit;
+  transition: color 0.2s ease;
+}
+.guide-title a:hover {
+  color: #3498db;
+}
+
+.guide-description {
+  font-size: 16px;
+  color: #7f8c8d;
+  margin-bottom: 15px;
+  width: 100%;
+}
+
+.guide-dates {
+  font-size: 14px;
+  color: #95a5a6;
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
+.guide-dates span {
+  display: block;
+}
+
+.qr-code-section {
+  margin-top: 20px;
+  width: 100%;
+}
+.qr-code-section h3 {
+  font-size: 18px;
+  color: #34495e;
+  margin-bottom: 10px;
+}
+.qr-code-section .qr-code-card {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #ecf0f1;
+  border-radius: 8px;
+  padding: 15px;
+  width: 100%;
+  max-width: 250px;
+  margin: 0 auto;
+  box-sizing: border-box;
+}
+.qr-code-section .qr-code-card .qr-code-img {
+  max-width: 100%;
+  height: auto;
+}
+
+.guide-files-section {
+  margin-top: 20px;
+  width: 100%;
+}
+.guide-files-section h3 {
+  font-size: 18px;
+  color: #34495e;
+  margin-bottom: 10px;
+}
+.guide-files-section .guide-files-list {
+  list-style-type: none;
+  padding-left: 0;
+}
+.guide-files-section .guide-files-list .guide-file-item {
+  margin-bottom: 10px;
+}
+.guide-files-section .guide-files-list .guide-file-item .guide-file-link {
+  font-size: 16px;
+  color: #3498db;
+  text-decoration: none;
+}
+.guide-files-section .guide-files-list .guide-file-item .guide-file-link:hover {
+  text-decoration: underline;
+}
+
+.guide-files-section p {
+  font-size: 16px;
+  color: #7f8c8d;
+}
+
+hr {
+  margin-top: 40px;
+  border: 1px solid #ecf0f1;
+}
+
+@media (max-width: 600px) {
+  .guide-list-container {
+    grid-template-columns: 1fr;
+    padding: 10px;
+  }
+  .guide-item {
+    padding: 15px;
+  }
+  .guide-title {
+    font-size: 20px;
+  }
+  .guide-description {
+    font-size: 14px;
+  }
+  .guide-dates {
+    font-size: 12px;
+  }
+}
+@media (max-width: 900px) {
+  .guide-list-container {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+@media (min-width: 1300px) {
+  .guide-list-container {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+.guide-detail-container {
+  max-width: 130rem;
+  margin: 0 auto;
+  padding: 20px;
+  box-sizing: border-box;
+}
+
+.guide-detail-container h1 {
+  font-size: 2.5rem;
+  color: #34495e;
+  margin-bottom: 15px;
+}
+
+.guide-detail-container h3 {
+  font-size: 1.75rem;
+  color: #2c3e50;
+  margin-top: 20px;
+}
+
+.guide-detail-container ul {
+  padding-left: 20px;
+}
+
+.guide-detail-container p {
+  font-size: 16px;
+  color: #7f8c8d;
+  margin-bottom: 15px;
+}
+
+.guide-detail-container a {
+  text-decoration: none;
+  color: #3498db;
+  font-weight: 500;
+}
+
+.guide-detail-container a:hover {
+  text-decoration: underline;
+}
+
+.guide-detail-container {
+  overflow-x: hidden;
+  padding: 20px;
+}
+
+.guide-detail-container img {
+  max-width: 100%;
+  height: auto;
 }/*# sourceMappingURL=style.css.map */
