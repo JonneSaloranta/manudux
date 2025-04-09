@@ -16,12 +16,12 @@ jobs:
         environment: master_secrets
         env:
             SECRET_KEY: ${{ secrets.SECRET_KEY }}
-            DEBUG: ${{ secrets.DEBUG }}
-            ALLOWED_HOSTS: ${{ secrets.ALLOWED_HOSTS }}
-            TIME_ZONE: ${{ secrets.TIME_ZONE }}
-            INTERNAL_IPS: ${{ secrets.INTERNAL_IPS }}
-            SITE_URL: ${{ secrets.SITE_URL }}
-            ALLOW_REGISTRATION: ${{ secrets.ALLOW_REGISTRATION }}
+            DEBUG: ${{ vars.DEBUG }}
+            ALLOWED_HOSTS: ${{ vars.ALLOWED_HOSTS }}
+            TIME_ZONE: ${{ vars.TIME_ZONE }}
+            INTERNAL_IPS: ${{ vars.INTERNAL_IPS }}
+            SITE_URL: ${{ vars.SITE_URL }}
+            ALLOW_REGISTRATION: ${{ vars.ALLOW_REGISTRATION }}
 
         steps:
             - name: Checkout code
