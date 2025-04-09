@@ -41,6 +41,10 @@ jobs:
             - name: Ensure data directory exists
               run: mkdir -p ./data
 
+            - name: Check if SECRET_KEY is available
+              run: |
+                  echo "SECRET_KEY is $SECRET_KEY"
+
             - name: Run migrations
               run: |
                   source venv/bin/activate
