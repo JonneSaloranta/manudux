@@ -41,9 +41,15 @@ jobs:
             - name: Ensure data directory exists
               run: mkdir -p ./data
 
-            - name: Check if SECRET_KEY is available
+            - name: Export environment variables
               run: |
-                  echo "SECRET_KEY is $SECRET_KEY"
+                  export SECRET_KEY=${{ secrets.SECRET_KEY }}
+                  export DEBUG=${{ secrets.DEBUG }}
+                  export ALLOWED_HOSTS=${{ secrets.ALLOWED_HOSTS }}
+                  export TIME_ZONE=${{ secrets.TIME_ZONE }}
+                  export INTERNAL_IPS=${{ secrets.INTERNAL_IPS }}
+                  export SITE_URL=${{ secrets.SITE_URL }}
+                  export ALLOW_REGISTRATION=${{ secrets.ALLOW_REGISTRATION }}
 
             - name: Run migrations
               run: |
