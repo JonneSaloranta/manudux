@@ -41,23 +41,13 @@ jobs:
             - name: Ensure data directory exists
               run: mkdir -p ./data
 
-            - name: Export environment variables
-              run: |
-                  echo "SECRET_KEY=${{ secrets.SECRET_KEY }}" >> $GITHUB_ENV
-                  echo "DEBUG=${{ secrets.DEBUG }}" >> $GITHUB_ENV
-                  echo "ALLOWED_HOSTS=${{ secrets.ALLOWED_HOSTS }}" >> $GITHUB_ENV
-                  echo "TIME_ZONE=${{ secrets.TIME_ZONE }}" >> $GITHUB_ENV
-                  echo "INTERNAL_IPS=${{ secrets.INTERNAL_IPS }}" >> $GITHUB_ENV
-                  echo "SITE_URL=${{ secrets.SITE_URL }}" >> $GITHUB_ENV
-                  echo "ALLOW_REGISTRATION=${{ secrets.ALLOW_REGISTRATION }}" >> $GITHUB_ENV
-
             - name: Run migrations
               run: |
                   source venv/bin/activate
-                  python manage.py makemigrations
-                  python manage.py migrate
+                  python manage.py makemigrations --noinput
+                  python manage.py migrate --noinput
 
             - name: Run tests
               run: |
                   source venv/bin/activate
-                  python manage.py test
+                  python manage.py test --parallel --noinput
