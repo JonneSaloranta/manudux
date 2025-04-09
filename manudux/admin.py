@@ -1,6 +1,16 @@
 from django.contrib import admin
-
-from .models import Property, Location, Appliance, Part, Generator, Stock, StockItem, PropertyType
+from django.core.files.storage import default_storage
+import os
+from manudux.models.guide_model import Guide
+from manudux.models.property_model import Property
+from manudux.models.guidefile_model import GuideFile
+from manudux.models.guidestep_model import GuideStep
+from manudux.models.location_model import Location
+from manudux.models.property_type_model import PropertyType
+from django.conf import settings
+from django import forms
+from django.urls import path, reverse
+from django.shortcuts import redirect
 
 @admin.register(Property)
 class PropertyAdmin(admin.ModelAdmin):
