@@ -18,7 +18,7 @@ jobs:
             - name: 🔖 Get latest tag
               id: get_latest_tag
               run: |
-                  latest_tag=$(git describe --tags --abbrev=0 || echo "v0.0.0")
+                  latest_tag=$(git describe --tags --abbrev=0 || echo "v1.0.0")
                   echo "latest_tag=$latest_tag" >> "$GITHUB_OUTPUT"
 
             - name: 🆕 Create new tag (optional on master push)
@@ -32,11 +32,12 @@ jobs:
               env:
                   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-            - name: 📝 Generate Changelog
+            - name: 📝 Generate Changelog from Latest Tag
               id: changelog
               uses: mikepenz/release-changelog-builder-action@v4
               with:
                   configuration: ".github/changelog-config.json"
+                  starting_version: ${{ steps.get_latest_tag.outputs.latest_tag }}
               env:
                   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
