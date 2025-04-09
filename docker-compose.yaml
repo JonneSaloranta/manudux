@@ -1,0 +1,29 @@
+version: "3"
+
+services:
+    web:
+        build: .
+        command: /bin/sh /var/manudux/runserver.sh
+        volumes:
+            - .:/var/manudux
+            - manudux_data:/var/manudux/data
+            - manudux_data:/var/manudux/media
+        ports:
+            - "8000:8000"
+        environment:
+            SECRET_KEY: your_django_secret_key_for_manudux
+            DEBUG: "True"
+            ALLOWED_HOSTS: localhost,192.162.2.10
+            INTERNAL_IPS: "127.0.0.1,localhost"
+            TIME_ZONE: Europe/Helsinki
+            SITE_URL: http://manudux.example.com
+            ALLOW_REGISTRATION: "True" # TODO: Implement registration later
+
+        networks:
+            - backend
+
+volumes:
+    manudux_data:
+
+networks:
+    backend:
