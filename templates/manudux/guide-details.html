@@ -1,0 +1,56 @@
+{% extends "manudux/base.html" %}
+{% load i18n %}
+{% load static %}
+
+{% block content %}
+<div class="container">
+    <h1>{{ guide.name }}</h1>
+    <p>{{ guide.description }}</p>
+
+
+    {% for step in guide.steps.all %}
+    <p>{{ step.step_number }}. {{ step.title }}</p>
+    <p>{{ step.description }}</p>
+    {% if step.image %}
+    <img src="{{ step.image.url }}" alt="{{ step.title }}">
+    {% endif %}
+    {% if step.video %}
+    <a href="{{ step.video }}" target="_blank">{% trans "Watch Video" %}</a>
+    {% endif %}
+    {% endfor %}
+
+
+
+    <!--
+        <h3>QR Code:</h3>
+    <div class="card-image">
+        {% if guide.qr_code %}
+        <img src="{{ guide.qr_code.url }}" alt="QR Code for {{ guide.name }}" height="200">
+        {% else %}
+        <p>No QR Code available.</p>
+        {% endif %}
+    </div>
+-->
+    {% if guide.property %}
+    <p>{% trans "Property" %}: {{ guide.property }}</p>
+    {% endif %}
+    {% if guide.location %}
+    <p>Location: {{ guide.location }}</p>
+    {% endif %}
+
+    <h3>{% trans "Guide Files" %}:</h3>
+    <ul>
+        {% for guide_file in guide.guidefile_set.all %}
+        <li>
+            <a href="{{ guide_file.file.url }}" target="_blank">{{ guide_file.name }}</a>
+        </li>
+        {% empty %}
+        <p>{% trans "No files available for this guide" %}.</p>
+        {% endfor %}
+    </ul>
+    <p>{% trans "Created" %}: {{ guide.created_at|date:"d.m.Y H:i" }}</p>
+    <p>{% trans "Updated" %}: {{ guide.updated_at|date:"d.m.Y H:i" }}</p>
+    <hr>
+    <p><a href="{% url 'manudux:guides' %}">{% trans "Back to Guide List" %}</a></p>
+</div>
+{% endblock %}

@@ -8,7 +8,7 @@
         <form action="{% url 'manudux:create-property' %}" method="post" enctype="multipart/form-data">
             {% csrf_token %}
 
-            {{ form.as_p }}
+            {{ form.as_div }}
             <button>{% trans "Create" %}</button>
         </form>
         {% if success %}
