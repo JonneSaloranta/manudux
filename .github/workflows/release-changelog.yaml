@@ -1,0 +1,50 @@
+name: Generate and Publish Release Notes
+
+on:
+    push:
+        branches:
+            - master # Automatically runs on push to master
+    workflow_dispatch: # Allows manual run from GitHub UI
+
+jobs:
+    release:
+        name: Generate Changelog and Release
+        runs-on: ubuntu-latest
+
+        steps:
+            - name: 📥 Checkout code
+              uses: actions/checkout@v4
+
+            - name: 🔖 Get latest tag
+              id: get_latest_tag
+              run: |
+                  latest_tag=$(git describe --tags --abbrev=0 || echo "v0.0.0")
+                  echo "latest_tag=$latest_tag" >> "$GITHUB_OUTPUT"
+
+            - name: 🆕 Create new tag (optional on master push)
+              if: github.event_name == 'push'
+              run: |
+                  new_tag=$(echo "${{ steps.get_latest_tag.outputs.latest_tag }}" | awk -F. -v OFS=. '{$NF += 1 ; print}')
+                  git config user.name "GitHub Actions"
+                  git config user.email "actions@github.com"
+                  git tag "$new_tag"
+                  git push origin "$new_tag"
+              env:
+                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+            - name: 📝 Generate Changelog
+              id: changelog
+              uses: mikepenz/release-changelog-builder-action@v4
+              with:
+                  configuration: ".github/changelog-config.json"
+              env:
+                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+            - name: 🚀 Create GitHub Release
+              uses: softprops/action-gh-release@v2
+              with:
+                  tag_name: ${{ steps.get_latest_tag.outputs.latest_tag }}
+                  name: Release ${{ steps.get_latest_tag.outputs.latest_tag }}
+                  body: ${{ steps.changelog.outputs.changelog }}
+              env:
+                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
