@@ -32,12 +32,11 @@ jobs:
               env:
                   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-            - name: 📝 Generate Changelog from Latest Tag
+            - name: 📝 Generate Changelog
               id: changelog
               uses: mikepenz/release-changelog-builder-action@v4
               with:
                   configuration: ".github/changelog-config.json"
-                  starting_version: ${{ steps.get_latest_tag.outputs.latest_tag }}
               env:
                   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
