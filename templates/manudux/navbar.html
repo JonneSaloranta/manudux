@@ -10,7 +10,7 @@
         <ul class="nav-links">
             <li><a href="{% url 'manudux:index' %}">{% trans "Home" %}</a></li>
             <li><a href="{% url 'manudux:properties' %}">{% trans "Properties" %}</a></li>
-            <li><a href="#">{% trans "Guides" %}</a></li>
+            <li><a href="{% url 'manudux:guides' %}">{% trans "Guides" %}</a></li>
         </ul>
 
         <div class="nav-user">
@@ -18,13 +18,13 @@
             {% if user.is_staff %}
             <a href="{% url 'admin:index' %}" class="admin-link">{% trans "Admin Dashboard" %}</a>
             {% endif %}
-            <span class="user-name">Hi, {{ user.username }}!</span>
+            <span class="user-name">{% trans "Hi" %}, {{ user.username }}!</span>
             <form action="{% url 'logout' %}" method="post">
                 {% csrf_token %}
-                <button type="submit" class="logout-btn">Log Out</button>
+                <button type="submit" class="logout-btn">{% trans "Logout" %}</button>
             </form>
             {% else %}
-            <a href="{% url 'login' %}" class="login-btn">Log In</a>
+            <a href="{% url 'login' %}" class="login-btn">{% trans "Login" %}</a>
             {% endif %}
         </div>
     </nav>

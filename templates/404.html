@@ -1,0 +1,14 @@
+{% extends "manudux/base.html" %}
+{% load i18n %}
+{% load static %}
+
+{% block content %}
+<div class="container">
+    <h1>{% trans "Error" %} 404!</h1>
+    <p>{% trans "Sorry, The page you are looking for doesn`t exist." %} 😢</p>
+
+    <a href="{% url 'manudux:index' %}" class="btn">{% trans "Go back to home!" %}</a>
+
+</div>
+
+{% endblock %}

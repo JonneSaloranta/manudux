@@ -1,0 +1,55 @@
+{% extends "manudux/base.html" %}
+{% load i18n %}
+{% load static %}
+
+{% block content %}
+<div class="guide-list-container">
+    {% for guide in guides %}
+    <div class="guide-item">
+        <h2 class="guide-title">
+            <a href="{% url 'manudux:guide' pk=guide.pk %}" class="guide-link">{{ guide.name }}</a>
+        </h2>
+        <p class="guide-description">{{ guide.description }}</p>
+        <p class="guide-dates">
+            <span class="created-at">{% trans "Created" %}: {{ guide.created_at|date:"d.m.Y H:i" }}</span>
+            <span class="updated-at">{% trans "Updated" %}: {{ guide.updated_at|date:"d.m.Y H:i" }}</span>
+        </p>
+
+
+        <div class="qr-code-section">
+            <h3>{% trans "QR Code" %}:</h3>
+            <div class="qr-code-card">
+                {% if guide.qr_code %}
+                <img src="{{ guide.qr_code.url }}" alt="QR Code for {{ guide.name }}" class="qr-code-img">
+                {% else %}
+                <p>{% trans "No QR Code available." %}</p>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="guide-files-section">
+            <h3>{% trans "Guide Files" %}:</h3>
+            <ul class="guide-files-list">
+                {% if guide.qr_code %}
+                <li class="guide-file-item">
+                    <a href="{{ guide.qr_code.url }}" download="qr_code-{{ guide.pk }}.png" class="guide-file-link">
+                        {% trans "Download QR Code" %}
+                    </a>
+                </li>
+                {% endif %}
+                {% for guide_file in guide.guidefile_set.all %}
+                <li class="guide-file-item">
+                    <a href="{{ guide_file.file.url }}" target="_blank" class="guide-file-link">{{ guide_file.name }}</a>
+                </li>
+                {% empty %}
+                <p>
+                <p>{% trans "No files available for this guide." %}</p>
+                </p>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+    {% endfor %}
+    <hr>
+</div>
+{% endblock %}

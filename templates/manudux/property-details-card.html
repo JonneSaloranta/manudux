@@ -1,0 +1,47 @@
+{% load i18n %}
+{% load static %}
+
+<div class="property-details">
+    {% if property.address %}
+    <p class="">{% trans "Address" %}: {{ property.address }}</p>
+    {% else %}
+    <p class="">{% trans "Address" %}: -</p>
+    {% endif %}
+
+    {% if property.city %}
+    <p class="">{% trans "City" %}: {{ property.city }}</p>
+    {% else %}
+    <p class="">{% trans "City" %}: -</p>
+    {% endif %}
+
+    {% if property.state %}
+    <p class="">{% trans "State" %}: {{ property.state }}</p>
+    {% else %}
+    <p class="">{% trans "State" %}: -</p>
+    {% endif %}
+
+    {% if property.zip_code %}
+    <p class="">{% trans "Zipcode" %}: {{ property.zip_code }}</p>
+    {% else %}
+    <p class="">{% trans "Zipcode" %}: -</p>
+    {% endif %}
+
+    {% if property.property_type %}
+    <p class="">{% trans "Property type" %}: {{ property.property_type }}</p>
+    {% else %}
+    <p class="">{% trans "Property type" %}: -</p>
+    {% endif %}
+    <div class="timestamps">
+        {% if property.created_at %}
+        <p class="">{% trans "Created" %}: {{ property.created_at|date:"d.m.Y H:i" }}</p>
+        {% else %}
+        <p class="">{% trans "Created" %}: -</p>
+        {% endif %}
+
+        {% if property.updated_at %}
+        <p class="">{% trans "Updated" %}: {{ property.updated_at|date:"d.m.Y H:i" }}</p>
+        {% else %}
+        <p class="">{% trans "Updated" %}: -</p>
+        {% endif %}
+    </div>
+</div>

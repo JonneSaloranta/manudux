@@ -1,12 +1,14 @@
 {% extends "manudux/base.html" %}
+{% load i18n %}
 {% load static %}
-{% block title %}Properties{% endblock %}
+
+{% block title %}{% trans "Properties" %}{% endblock %}
 
 {% block content %}
 <div class="container">
-    <h1>Properties</h1>
+    <h1>{% trans "Properties" %}</h1>
 
-    <a href="{% url 'manudux:create-property' %}">Create a new property</a>
+    <a href="{% url 'manudux:create-property' %}">{% trans "Create a new property" %}</a>
 
 </div>
 <div class="grid-container">

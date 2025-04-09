@@ -8,8 +8,8 @@
         <form action="{% url 'manudux:edit-property' pk=property.id %}" method="post" enctype="multipart/form-data">
             {% csrf_token %}
 
-            {{ form.as_p }}
-            <button>{% trans "Create" %}</button>
+            {{ form.as_div }}
+            <button>{% trans "Save" %}</button>
         </form>
     </section>
 </div>

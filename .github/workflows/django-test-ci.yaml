@@ -13,12 +13,15 @@ on:
 jobs:
     test:
         runs-on: ubuntu-latest
-
+        environment: master_secrets
         env:
             SECRET_KEY: ${{ secrets.SECRET_KEY }}
-            DEBUG: ${{ secrets.DEBUG }}
-            ALLOWED_HOSTS: ${{ secrets.ALLOWED_HOSTS }}
-            TIME_ZONE: ${{ secrets.TIME_ZONE }}
+            DEBUG: ${{ vars.DEBUG }}
+            ALLOWED_HOSTS: ${{ vars.ALLOWED_HOSTS }}
+            TIME_ZONE: ${{ vars.TIME_ZONE }}
+            INTERNAL_IPS: ${{ vars.INTERNAL_IPS }}
+            SITE_URL: ${{ vars.SITE_URL }}
+            ALLOW_REGISTRATION: ${{ vars.ALLOW_REGISTRATION }}
 
         steps:
             - name: Checkout code
@@ -35,13 +38,16 @@ jobs:
                   source venv/bin/activate
                   pip install -r requirements.txt
 
+            - name: Ensure data directory exists
+              run: mkdir -p ./data
+
             - name: Run migrations
               run: |
                   source venv/bin/activate
-                  python manage.py makemigrations
-                  python manage.py migrate --run-syncdb
+                  python manage.py makemigrations --noinput
+                  python manage.py migrate --noinput
 
             - name: Run tests
               run: |
                   source venv/bin/activate
-                  python manage.py test
+                  python manage.py test --parallel --noinput

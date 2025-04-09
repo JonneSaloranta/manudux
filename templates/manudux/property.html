@@ -2,18 +2,14 @@
 {% load i18n %}
 {% load static %}
 
+{% block title %}{% trans "Property" %} - {{ property.name }}{% endblock %}
+
 {% block content %}
 <div class="container">
     <h1>{% trans "Property" %}</h1>
 
     <div class="">
 
-        <form action="{% url 'manudux:delete-property' property.id %}" method="post">
-            {% csrf_token %}
-            <input type="submit" value="Delete" class="btn btn-danger" style="background-color: red; cursor: pointer;">
-        </form>
-
-        <a href="{% url 'manudux:edit-property' pk=property.id %}" class="btn btn-primary" style="background-color: aqua;">Edit</a>
 
         <div class="">
             {% if not property.image %}
@@ -27,26 +23,76 @@
             <h2>{{ property.name }}</h2>
         </div>
 
+        {% include "manudux/property-details-card.html" %}
+
+        <hr />
+
+
         {% if property.description %}
         <div class="">{{ property.description|escape|truncatewords_html:5 }}</div>
         {% else %}
-        <div class="">{% trans "No description available" %}</div>
+        <div class="">{% trans "No description available." %}</div>
         {% endif %}
+    </div>
 
-        <div class="locations">
-            <h2>Locations:</h2>
-            <a href="{% url 'manudux:create-location' %}?property_id={{ property.id }}">Create a Location</a>
+    <form action="{% url 'manudux:delete-property' property.id %}" method="post">
+        {% csrf_token %}
+        <input type="submit" value='{% trans "Delete" %}' class="btn btn-danger" style="background-color: red; cursor: pointer;">
+    </form>
 
-            <ul>
-                {% for location in property.locations.all %}
+    <a href="{% url 'manudux:edit-property' pk=property.id %}" class="btn btn-primary" style="background-color: aqua;">{% trans "Edit" %}</a>
+
+    <hr />
+
+    {% if property.get_map %}
+    {{ property.get_map|safe }}
+    {% endif %}
+
+
+    <!--
+    {% if property.google_maps_link %}
+    <a href="{{ property.google_maps_link }}" target="_blank">{% trans "View on Google Maps" %}</a>
+    {% endif %}
+    -->
+
+
+    <!-- Property Guide -->
+    <div class="locations">
+        <h2>{% trans "Guides" %}:</h2>
+        {% if property.guide %}
+        <ul>
+            <li>
+                <p><a href="{% url 'manudux:guide' pk=property.guide.pk %}">{{ property.guide }}</a></p>
+            </li>
+        </ul>
+        {% else %}
+        <p>{% trans "There are no guides at the moment." %}</p>
+        {% endif %}
+    </div>
+
+
+
+    <!-- Location Guides -->
+    <div class="locations">
+        <h2>{% trans "Locations" %}:</h2>
+        <a href="{% url 'manudux:create-location' %}?property_id={{ property.id }}">{% trans "Create a location!" %}</a>
+
+        <ul>
+            {% for location in property.locations.all %}
+            <li>
                 <p><a href="{% url 'manudux:location' location.id %}">{{ location.name }}</a></p>
-                {% empty %}
-                <li>No locations available.</li>
-                {% endfor %}
-            </ul>
-        </div>
-
-
+                <!-- Display guide for each location -->
+                {% if location.guide %}
+                <p><a href="{% url 'manudux:guide' pk=location.guide.pk %}">- {{ location.guide }}</a></p>
+                {% else %}
+                <p>{% trans "No guide available for this location." %}</p>
+                {% endif %}
+            </li>
+            <hr>
+            {% empty %}
+            <li>{% trans "No locations available." %}</li>
+            {% endfor %}
+        </ul>
     </div>
 </div>
 

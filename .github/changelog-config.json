@@ -1,0 +1,18 @@
+{
+    "template": "## 📦 $TITLE ($TAG)\n\n### ✨ Changes\n$CHANGES\n",
+    "change-template": "- $TITLE (#$NUMBER)",
+    "categories": [
+        {
+            "title": "🚀 Features",
+            "labels": ["feature", "enhancement", "feat"]
+        },
+        {
+            "title": "🐛 Bug Fixes",
+            "labels": ["bug", "fix"]
+        },
+        {
+            "title": "🧹 Other",
+            "labels": ["chore", "docs", "refactor"]
+        }
+    ]
+}

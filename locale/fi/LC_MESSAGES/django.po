@@ -1,0 +1,380 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-04-09 18:57+0300\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: core/settings.py:161
+msgid "English"
+msgstr "Englanti"
+
+#: core/settings.py:162
+msgid "Finnish"
+msgstr "Suomi"
+
+#: core/settings.py:163
+msgid "Swedish"
+msgstr "Ruotsi"
+
+#: core/settings.py:164
+msgid "Russian"
+msgstr "Venäjä"
+
+#: manudux/forms.py:21
+msgid "Property Name"
+msgstr "Kiinteistön nimi"
+
+#: manudux/forms.py:22 manudux/forms.py:59
+msgid "Description"
+msgstr "Kuvaus"
+
+#: manudux/forms.py:23
+msgid "Image"
+msgstr "Kuva"
+
+#: manudux/forms.py:24 templates/manudux/property-details-card.html:6
+#: templates/manudux/property-details-card.html:8
+msgid "Address"
+msgstr "Osoite"
+
+#: manudux/forms.py:25 templates/manudux/property-details-card.html:12
+#: templates/manudux/property-details-card.html:14
+msgid "City"
+msgstr "Kaupunki"
+
+#: manudux/forms.py:26 templates/manudux/property-details-card.html:18
+#: templates/manudux/property-details-card.html:20
+msgid "State"
+msgstr "Maakunta"
+
+#: manudux/forms.py:27
+msgid "Zip Code"
+msgstr "Postinumero"
+
+#: manudux/forms.py:28 manudux/models/property_type_model.py:26
+msgid "Property Type"
+msgstr "Kiinteistö tyyppi"
+
+#: manudux/forms.py:29
+msgid "Activated"
+msgstr "Aktivoitu"
+
+#: manudux/forms.py:32
+msgid "Enter the name of the property."
+msgstr "Syötä kiinteistön nimi"
+
+#: manudux/forms.py:33
+msgid "Enter a description of the property."
+msgstr "Syötä kiinteistön kuvaus"
+
+#: manudux/forms.py:34
+msgid "Upload an image of the property."
+msgstr "Lataa kuva kiinteistöstä"
+
+#: manudux/forms.py:35
+msgid "Enter the address of the property."
+msgstr "Syötä kiinteistön osoite"
+
+#: manudux/forms.py:36
+msgid "Enter the city of the property."
+msgstr "Syötä kiinteistön kaupunki"
+
+#: manudux/forms.py:37
+msgid "Enter the state of the property."
+msgstr "Syötä kiinteistön osavaltio"
+
+#: manudux/forms.py:38
+msgid "Enter the zip code of the property."
+msgstr "Syötä kiinteistön postinumero"
+
+#: manudux/forms.py:39
+msgid "Select the type of property."
+msgstr "Valitse kiintestön tyyppi"
+
+#: manudux/forms.py:40
+msgid "Check to activate the property."
+msgstr "Valitse aktivoidaksesi kiinteistö"
+
+#: manudux/forms.py:58
+msgid "Location Name"
+msgstr "Sijainnin nimi"
+
+#: manudux/forms.py:60 manudux/models/property_model.py:87
+#: templates/manudux/guide-details.html:35 templates/manudux/property.html:5
+#: templates/manudux/property.html:9
+msgid "Property"
+msgstr "Kiinteistö"
+
+#: manudux/forms.py:63
+msgid "Enter the name of the location."
+msgstr "Syötä sijainnin nimi"
+
+#: manudux/forms.py:64
+msgid "Enter a description of the location."
+msgstr "Syötä sijainnin kuvaus."
+
+#: manudux/forms.py:65
+msgid "Select the property associated with this location."
+msgstr "Valitse tähän sijaintiin liittyvä kiinteistö."
+
+#: manudux/models/guide_model.py:109
+msgid "Guide"
+msgstr "Ohje"
+
+#: manudux/models/guide_model.py:110 templates/manudux/location.html:20
+#: templates/manudux/navbar.html:13 templates/manudux/property.html:61
+msgid "Guides"
+msgstr "Ohjeet"
+
+#: manudux/models/guidefile_model.py:26
+msgid "Guide file"
+msgstr "Ohje tiedosto"
+
+#: manudux/models/guidefile_model.py:27
+msgid "Guide files"
+msgstr "Ohje tiedostot"
+
+#: manudux/models/guidestep_model.py:48
+msgid "Guide step"
+msgstr "Ohje askel"
+
+#: manudux/models/guidestep_model.py:49
+msgid "Guide steps"
+msgstr "Ohje askeleet"
+
+#: manudux/models/location_model.py:56 templates/manudux/location.html:5
+#: templates/manudux/location.html:9
+msgid "Location"
+msgstr "Sijainti"
+
+#: manudux/models/location_model.py:57 templates/manudux/locations.html:9
+#: templates/manudux/property.html:77
+msgid "Locations"
+msgstr "Sijainnit"
+
+#: manudux/models/property_model.py:88 templates/manudux/navbar.html:12
+#: templates/manudux/properties.html:5 templates/manudux/properties.html:9
+msgid "Properties"
+msgstr "Kiinteistöt"
+
+#: manudux/models/property_type_model.py:27
+msgid "Property Types"
+msgstr "Kiinteistö tyypit"
+
+#: templates/403.html:7 templates/404.html:7
+msgid "Error"
+msgstr "Virhe"
+
+#: templates/403.html:8
+msgid "Sorry, You don't have access to this page."
+msgstr "Pahoittelut, sinulla ei ole oikeutta tälle sivulle."
+
+#: templates/403.html:10 templates/404.html:10
+msgid "Go back to home!"
+msgstr "Mene takaisin etusivulle!"
+
+#: templates/404.html:8
+msgid "Sorry, The page you are looking for doesn`t exist."
+msgstr "Pahoittelut! Sivu, jota etsit ei ole olemassa."
+
+#: templates/manudux/footer.html:5
+msgid "Report an issue!"
+msgstr "Ilmoita ongelmasta!"
+
+#: templates/manudux/footer.html:8
+msgid "Help us develop!"
+msgstr "Auta meitä kehittämään!"
+
+#: templates/manudux/footer.html:11
+msgid "Powered By Manudux!"
+msgstr "Palvelun tarjoaa Manudux!"
+
+#: templates/manudux/guide-details.html:18
+msgid "Watch Video"
+msgstr "Katso video"
+
+#: templates/manudux/guide-details.html:41 templates/manudux/guide-list.html:31
+msgid "Guide Files"
+msgstr "Ohje tiedostot"
+
+#: templates/manudux/guide-details.html:48
+msgid "No files available for this guide"
+msgstr "Ei tiedostoja saatavilla tälle ohjeelle"
+
+#: templates/manudux/guide-details.html:51 templates/manudux/guide-list.html:14
+#: templates/manudux/property-details-card.html:36
+#: templates/manudux/property-details-card.html:38
+msgid "Created"
+msgstr "Luotu"
+
+#: templates/manudux/guide-details.html:52 templates/manudux/guide-list.html:15
+#: templates/manudux/property-details-card.html:42
+#: templates/manudux/property-details-card.html:44
+msgid "Updated"
+msgstr "Päivitetty"
+
+#: templates/manudux/guide-details.html:54
+msgid "Back to Guide List"
+msgstr "Takaisin ohje listaan"
+
+#: templates/manudux/guide-list.html:20
+msgid "QR Code"
+msgstr "QR-koodi"
+
+#: templates/manudux/guide-list.html:25
+msgid "No QR Code available."
+msgstr "Ei QR-koodia saatavilla"
+
+#: templates/manudux/guide-list.html:36
+msgid "Download QR Code"
+msgstr "Lataa QR-koodi"
+
+#: templates/manudux/guide-list.html:46
+msgid "No files available for this guide."
+msgstr "Ei tiedostoja saatavilla tälle ohjeelle."
+
+#: templates/manudux/location-create.html:12
+#: templates/manudux/property-create.html:12
+msgid "Create"
+msgstr "Luo"
+
+#: templates/manudux/location-create.html:15
+msgid "Location created successfully"
+msgstr "Sijainti luotu onnistuneesti"
+
+#: templates/manudux/location-create.html:18
+msgid "Could not create location"
+msgstr "Sijaintia ei voitu luoda"
+
+#: templates/manudux/location.html:29 templates/manudux/property.html:69
+msgid "There are no guides at the moment."
+msgstr "Ohjeita ei ole tällä hetkellä."
+
+#: templates/manudux/location.html:37 templates/manudux/property.html:40
+msgid "Delete"
+msgstr "Poista"
+
+#: templates/manudux/location.html:41
+msgid "View property"
+msgstr "Katso kiinteistö"
+
+#: templates/manudux/locations.html:12
+msgid "Create a new location"
+msgstr "Luo uusi sijainti"
+
+#: templates/manudux/locations.html:17
+msgid "View"
+msgstr "Katso"
+
+#: templates/manudux/locations.html:20
+msgid "No locations available"
+msgstr "Ei sijainteja saatavilla"
+
+#: templates/manudux/navbar.html:11
+msgid "Home"
+msgstr "Etusivu"
+
+#: templates/manudux/navbar.html:19
+msgid "Admin Dashboard"
+msgstr "Hallintapaneeli"
+
+#: templates/manudux/navbar.html:21
+msgid "Hi"
+msgstr "Hei"
+
+#: templates/manudux/navbar.html:24
+msgid "Logout"
+msgstr "Kirjaudu ulos"
+
+#: templates/manudux/navbar.html:27
+msgid "Login"
+msgstr "Kirjaudu sisään"
+
+#: templates/manudux/properties.html:11
+msgid "Create a new property"
+msgstr "Luo uusi kiinteistö"
+
+#: templates/manudux/property-card.html:23
+msgid "No description available"
+msgstr "Ei kuvausta saatavilla"
+
+#: templates/manudux/property-create.html:15
+msgid "Property create successfully"
+msgstr "Kiinteistö luotu onnistuneesti"
+
+#: templates/manudux/property-create.html:18
+msgid "Could not create property"
+msgstr "Kiinteistöä ei voitu luoda"
+
+#: templates/manudux/property-details-card.html:24
+#: templates/manudux/property-details-card.html:26
+msgid "Zipcode"
+msgstr "Postinumero"
+
+#: templates/manudux/property-details-card.html:30
+#: templates/manudux/property-details-card.html:32
+msgid "Property type"
+msgstr "Kiinteistö tyyppi"
+
+#: templates/manudux/property-edit.html:12
+msgid "Save"
+msgstr "Tallenna"
+
+#: templates/manudux/property.html:34
+msgid "No description available."
+msgstr "Ei kuvausta saatavilla"
+
+#: templates/manudux/property.html:43
+msgid "Edit"
+msgstr "Muokkaa"
+
+#: templates/manudux/property.html:54
+msgid "View on Google Maps"
+msgstr "Katso Google Mapsissa"
+
+#: templates/manudux/property.html:78
+msgid "Create a location!"
+msgstr "Luo sijainti!"
+
+#: templates/manudux/property.html:88
+msgid "No guide available for this location."
+msgstr "Ei ohjeita saatavilla tälle sijainnille"
+
+#: templates/manudux/property.html:93
+msgid "No locations available."
+msgstr "Ei sijainteja saatavilla"
+
+#~ msgid "Part"
+#~ msgstr "Osa"
+
+#~ msgid "Parts"
+#~ msgstr "Osat"
+
+#~ msgid "Stock"
+#~ msgstr "Varasto"
+
+#~ msgid "Stocks"
+#~ msgstr "Varastot"
+
+#~ msgid "New"
+#~ msgstr "Uusi"
+
+#~ msgid "Used"
+#~ msgstr "Käytetty"
+
+#~ msgid "Broken"
+#~ msgstr "Rikki"
