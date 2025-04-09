@@ -19,6 +19,9 @@ jobs:
             DEBUG: ${{ secrets.DEBUG }}
             ALLOWED_HOSTS: ${{ secrets.ALLOWED_HOSTS }}
             TIME_ZONE: ${{ secrets.TIME_ZONE }}
+            INTERNAL_IPS: ${{ secrets.INTERNAL_IPS }}
+            SITE_URL: ${{ secrets.SITE_URL }}
+            ALLOW_REGISTRATION: ${{ secrets.ALLOW_REGISTRATION }}
 
         steps:
             - name: Checkout code
