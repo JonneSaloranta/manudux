@@ -1,6 +1,18 @@
-from django.forms import ModelForm
+from django.forms import ModelForm, EmailField, CharField
 from .models import Property, Location
 from django.utils.translation import gettext_lazy as _
+from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth.models import User
+
+
+class RegisterForm(UserCreationForm):
+    email = EmailField(required=True, label = _("Email"))
+    first_name = CharField(label = _("first name"))
+    last_name = CharField(label = _("last name"))
+
+    class Meta:
+        model = User
+        fields = ["username", "email", "first_name", "last_name", "password1", "password2"]
 
 
 class PropertyForm(ModelForm):

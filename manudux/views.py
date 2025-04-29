@@ -4,12 +4,28 @@ from django.contrib.auth.decorators import login_required, permission_required
 from .forms import PropertyForm, LocationForm
 from django.shortcuts import redirect
 from django.conf import settings
+from .forms import RegisterForm
+from django.contrib.auth import login, logout, authenticate
 
 
 def index(request):
     context = {}
     return render(request, "manudux/index.html", context)
 
+def sign_up(request):
+    if request.method == "POST":
+        form = RegisterForm(request.POST)
+        if form.is_valid():
+            user = form.save()
+            login(request, user)
+            return redirect("manudux:index")
+    else:
+        form = RegisterForm()
+
+    context = {
+        'form': form,
+    }
+    return render(request, "registration/signup.html", context=context)
 
 @login_required(login_url=settings.LOGIN_URL)
 def create_property(request):
