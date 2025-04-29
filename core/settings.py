@@ -134,6 +134,15 @@ USE_L10N = True
 
 USE_TZ = True
 
+LOCALE_PATHS = [BASE_DIR / "locale"]
+
+LANGUAGES = [
+    ("en", _("English")),
+    ("fi", _("Finnish")),
+    ("sv", _("Swedish")),
+    ("ru", _("Russian")),
+]
+
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
 
@@ -152,16 +161,6 @@ MEDIA_ROOT = BASE_DIR / "media"
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
+LOGIN_URL = "/accounts/login"
 LOGIN_REDIRECT_URL = "/"
 LOGOUT_REDIRECT_URL = "/"
-
-LOCALE_PATHS = [BASE_DIR / "locale"]
-
-LANGUAGES = [
-    ("en", _("English")),
-    ("fi", _("Finnish")),
-    ("sv", _("Swedish")),
-    ("ru", _("Russian")),
-]
-
-LOGIN_URL = "/accounts/login"
