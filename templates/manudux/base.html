@@ -22,17 +22,14 @@
 </head>
 
 <body>
-
-    {% block navbar %}
     {% include "manudux/navbar.html" %}
-    {% endblock %}
 
-    {% block content %}
-    {% endblock %}
+    <main>
+        {% block content %}
+        {% endblock %}
+        {% include "manudux/footer.html" %}
+    </main>
 
-    {% block footer %}
-    {% include "manudux/footer.html" %}
-    {% endblock %}
 
 </body>
 
