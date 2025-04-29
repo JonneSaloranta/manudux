@@ -5,6 +5,7 @@ from .forms import PropertyForm, LocationForm
 from django.shortcuts import redirect
 from django.conf import settings
 from .forms import RegisterForm
+from django.core.exceptions import PermissionDenied
 from django.contrib.auth import login, logout, authenticate
 
 
@@ -26,6 +27,13 @@ def sign_up(request):
         'form': form,
     }
     return render(request, "registration/signup.html", context=context)
+
+@login_required
+def site_settings(request):
+    if request.user.is_superuser:
+        return render(request, "manudux/site-settings.html")
+    else:
+        raise PermissionDenied()
 
 @login_required(login_url=settings.LOGIN_URL)
 def create_property(request):
