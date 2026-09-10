@@ -1,10 +1,11 @@
-from datetime import date, timedelta
+from datetime import timedelta
 from io import StringIO
 
 from django.contrib.auth.models import User
 from django.core import mail
 from django.core.management import call_command
 from django.test import TestCase, override_settings, tag
+from django.utils import timezone
 
 from manudux.models import MaintenanceTask, Property
 
@@ -26,7 +27,7 @@ class SendMaintenanceRemindersTestCase(TestCase):
         MaintenanceTask.objects.create(
             title="Overdue task",
             property=self.property,
-            due_date=date.today() - timedelta(days=1),
+            due_date=timezone.localdate() - timedelta(days=1),
         )
         User.objects.create_user(username="a", password="pw", email="a@example.com")
         User.objects.create_user(username="b", password="pw", email="b@example.com")
@@ -47,7 +48,7 @@ class SendMaintenanceRemindersTestCase(TestCase):
         MaintenanceTask.objects.create(
             title="Overdue task",
             property=self.property,
-            due_date=date.today() - timedelta(days=1),
+            due_date=timezone.localdate() - timedelta(days=1),
         )
         User.objects.create_user(username="a", password="pw", email="a@example.com")
 

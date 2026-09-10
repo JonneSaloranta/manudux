@@ -1,8 +1,9 @@
-from datetime import date, timedelta
+from datetime import timedelta
 
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 from django.test import TestCase, tag
+from django.utils import timezone
 
 from manudux.models import (
     Appliance,
@@ -27,7 +28,7 @@ class MaintenanceTaskTestCase(TestCase):
         task = MaintenanceTask.objects.create(
             title="Clean filter",
             property=self.property,
-            due_date=date.today() - timedelta(days=1),
+            due_date=timezone.localdate() - timedelta(days=1),
             recurrence_interval_days=30,
         )
 
@@ -35,7 +36,7 @@ class MaintenanceTaskTestCase(TestCase):
         task.refresh_from_db()
 
         self.assertFalse(task.is_done)
-        self.assertEqual(task.due_date, date.today() + timedelta(days=30))
+        self.assertEqual(task.due_date, timezone.localdate() + timedelta(days=30))
         self.assertIsNotNone(task.last_completed_at)
         self.assertEqual(task.logs.count(), 1)
 
@@ -50,7 +51,7 @@ class MaintenanceTaskTestCase(TestCase):
         task = MaintenanceTask.objects.create(
             title="Replace roof",
             property=self.property,
-            due_date=date.today(),
+            due_date=timezone.localdate(),
         )
 
         task.mark_complete(self.user)
@@ -58,14 +59,14 @@ class MaintenanceTaskTestCase(TestCase):
 
         self.assertTrue(task.is_done)
         self.assertEqual(
-            task.due_date, date.today(), msg="one-off due_date should not move"
+            task.due_date, timezone.localdate(), msg="one-off due_date should not move"
         )
         self.assertEqual(task.logs.count(), 1)
 
     @tag("models", "maintenancetask")
     def test_log_survives_task_deletion(self):
         task = MaintenanceTask.objects.create(
-            title="Clean gutters", property=self.property, due_date=date.today()
+            title="Clean gutters", property=self.property, due_date=timezone.localdate()
         )
         task.mark_complete(self.user)
         log_id = task.logs.first().id
@@ -83,7 +84,7 @@ class MaintenanceTaskTestCase(TestCase):
             title="Bad task",
             property=self.other_property,
             location=self.location,
-            due_date=date.today(),
+            due_date=timezone.localdate(),
         )
         with self.assertRaises(ValidationError):
             task.clean()
@@ -94,7 +95,7 @@ class MaintenanceTaskTestCase(TestCase):
             title="Bad task",
             property=self.other_property,
             appliance=self.appliance,
-            due_date=date.today(),
+            due_date=timezone.localdate(),
         )
         with self.assertRaises(ValidationError):
             task.clean()

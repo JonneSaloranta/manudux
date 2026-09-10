@@ -97,7 +97,10 @@ class MaintenanceTask(models.Model):
             )
             self.last_completed_at = now
             if self.recurrence_interval_days:
-                self.due_date = now.date() + timedelta(
+                # localdate(), not now.date(): due_date should roll forward
+                # based on "today" in the configured TIME_ZONE, not the UTC
+                # calendar date, which can differ for hours around midnight.
+                self.due_date = timezone.localdate() + timedelta(
                     days=self.recurrence_interval_days
                 )
             else:

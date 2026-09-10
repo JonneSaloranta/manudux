@@ -1,8 +1,9 @@
-from datetime import date, timedelta
+from datetime import timedelta
 
 from django.contrib.auth.models import User
 from django.test import Client, TestCase, tag
 from django.urls import reverse
+from django.utils import timezone
 
 from manudux.models import MaintenanceTask, Property
 
@@ -18,7 +19,7 @@ class MaintenanceTaskViewsTest(TestCase):
         self.task = MaintenanceTask.objects.create(
             title="Clean gutters",
             property=self.property,
-            due_date=date.today() - timedelta(days=1),
+            due_date=timezone.localdate() - timedelta(days=1),
             recurrence_interval_days=30,
         )
 
@@ -33,7 +34,7 @@ class MaintenanceTaskViewsTest(TestCase):
         MaintenanceTask.objects.create(
             title="Done task",
             property=self.property,
-            due_date=date.today(),
+            due_date=timezone.localdate(),
             is_done=True,
         )
         self.client.login(username="testuser", password="testpassword")
@@ -47,7 +48,7 @@ class MaintenanceTaskViewsTest(TestCase):
         MaintenanceTask.objects.create(
             title="Future task",
             property=self.property,
-            due_date=date.today() + timedelta(days=5),
+            due_date=timezone.localdate() + timedelta(days=5),
         )
         self.client.login(username="testuser", password="testpassword")
         response = self.client.get(
@@ -65,7 +66,7 @@ class MaintenanceTaskViewsTest(TestCase):
             data={
                 "title": "New task",
                 "property": self.property.pk,
-                "due_date": date.today().isoformat(),
+                "due_date": timezone.localdate().isoformat(),
                 "priority": "medium",
             },
         )
@@ -82,7 +83,7 @@ class MaintenanceTaskViewsTest(TestCase):
         self.assertEqual(response.status_code, 302)
 
         self.task.refresh_from_db()
-        self.assertEqual(self.task.due_date, date.today() + timedelta(days=30))
+        self.assertEqual(self.task.due_date, timezone.localdate() + timedelta(days=30))
         self.assertEqual(self.task.logs.count(), 1)
 
     @tag("views", "auth", "maintenance")
@@ -106,17 +107,17 @@ class DashboardTest(TestCase):
         self.overdue = MaintenanceTask.objects.create(
             title="Overdue task",
             property=self.property,
-            due_date=date.today() - timedelta(days=5),
+            due_date=timezone.localdate() - timedelta(days=5),
         )
         self.upcoming = MaintenanceTask.objects.create(
             title="Upcoming task",
             property=self.property,
-            due_date=date.today() + timedelta(days=3),
+            due_date=timezone.localdate() + timedelta(days=3),
         )
         self.far_future = MaintenanceTask.objects.create(
             title="Far future task",
             property=self.property,
-            due_date=date.today() + timedelta(days=60),
+            due_date=timezone.localdate() + timedelta(days=60),
         )
 
     @tag("views", "auth", "dashboard")
