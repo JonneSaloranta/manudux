@@ -5,7 +5,7 @@ from django.core.exceptions import ValidationError
 from django.forms import CharField, EmailField, ModelForm
 from django.utils.translation import gettext_lazy as _
 
-from .models import Appliance, Location, MaintenanceTask, Property
+from .models import Appliance, Location, MaintenanceTask, Property, PropertyDocument
 
 
 class RegisterForm(UserCreationForm):
@@ -37,8 +37,22 @@ class PropertyForm(ModelForm):
             "state",
             "zip_code",
             "property_type",
+            "parcel_number",
+            "year_built",
+            "size_sqm",
+            "lot_size_sqm",
+            "purchase_date",
+            "purchase_price",
+            "estimated_value",
+            "insurance_company",
+            "insurance_policy_number",
+            "insurance_expires",
             "activated",
         ]
+        widgets = {
+            "purchase_date": forms.DateInput(attrs={"type": "date"}),
+            "insurance_expires": forms.DateInput(attrs={"type": "date"}),
+        }
         labels = {
             "name": _("Property Name"),
             "description": _("Description"),
@@ -48,6 +62,16 @@ class PropertyForm(ModelForm):
             "state": _("State"),
             "zip_code": _("Zip Code"),
             "property_type": _("Property Type"),
+            "parcel_number": _("Parcel Number"),
+            "year_built": _("Year Built"),
+            "size_sqm": _("Living Area (m²)"),
+            "lot_size_sqm": _("Lot Size (m²)"),
+            "purchase_date": _("Purchase Date"),
+            "purchase_price": _("Purchase Price"),
+            "estimated_value": _("Estimated Value"),
+            "insurance_company": _("Insurance Company"),
+            "insurance_policy_number": _("Insurance Policy Number"),
+            "insurance_expires": _("Insurance Expires"),
             "activated": _("Activated"),
         }
         help_texts = {
@@ -59,6 +83,7 @@ class PropertyForm(ModelForm):
             "state": _("Enter the state of the property."),
             "zip_code": _("Enter the zip code of the property."),
             "property_type": _("Select the type of property."),
+            "parcel_number": _("The property's registry/parcel identifier."),
             "activated": _("Check to activate the property."),
         }
 
@@ -203,3 +228,19 @@ class MaintenanceCompletionForm(forms.Form):
     cost = forms.DecimalField(
         label=_("Cost"), required=False, max_digits=10, decimal_places=2, min_value=0
     )
+
+
+class PropertyDocumentForm(ModelForm):
+    class Meta:
+        model = PropertyDocument
+        fields = ["name", "category", "file", "notes"]
+        labels = {
+            "name": _("Document Name"),
+            "category": _("Category"),
+            "file": _("File"),
+            "notes": _("Notes"),
+        }
+        help_texts = {
+            "name": _('E.g. "Deed of sale" or "Home insurance policy 2026".'),
+            "file": _("PDF, Word, Excel, or an image scan (max 25MB)."),
+        }

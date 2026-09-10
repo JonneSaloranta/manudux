@@ -6,11 +6,11 @@
 <div class="container">
     <section>
         <div class="form-card">
-            <form action="{{ request.get_full_path }}" method="post">
+            <form action="{% url 'manudux:create-property-document' property_pk=property.id %}" method="post" enctype="multipart/form-data">
                 {% csrf_token %}
 
                 {{ form.as_div }}
-                <button class="btn btn-primary">{% trans "Create" %}</button>
+                <button class="btn btn-primary">{% trans "Upload" %}</button>
             </form>
         </div>
     </section>

@@ -7,10 +7,12 @@
 {% block content %}
 <div class="container">
     <h2>{% trans "Register" %}</h2>
-    <form method="post">
-        {% csrf_token %}
-        {{ form.as_div }}
-        <button type="submit">{% trans "Register" %}</button>
-    </form>
+    <div class="form-card">
+        <form method="post">
+            {% csrf_token %}
+            {{ form.as_div }}
+            <button type="submit" class="btn btn-primary">{% trans "Register" %}</button>
+        </form>
+    </div>
 </div>
 {% endblock %}

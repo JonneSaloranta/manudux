@@ -558,4 +558,93 @@ footer .row a:hover {
   margin: 2rem 0;
 }
 
+.form-card {
+  max-width: 60rem;
+  margin: 2rem auto;
+  padding: 2rem;
+  background-color: var(--color-white);
+  border: 1px solid var(--tetriary-color);
+  border-radius: 1rem;
+}
+.form-card form > div {
+  margin-bottom: 1.5rem;
+}
+.form-card form > div:last-of-type {
+  margin-bottom: 0;
+}
+.form-card label {
+  display: block;
+  margin-bottom: 0.4rem;
+  font-weight: 600;
+  color: var(--primary-color);
+}
+.form-card div:has(> input:required) label::after,
+.form-card div:has(> select:required) label::after,
+.form-card div:has(> textarea:required) label::after {
+  content: " *";
+  color: var(--accent-color);
+}
+.form-card .helptext {
+  margin: 0.25rem 0 0.5rem;
+  font-size: 1.4rem;
+  color: var(--secondary-color);
+}
+.form-card .errorlist {
+  list-style: none;
+  margin: 0.25rem 0 0.5rem;
+  padding: 0;
+  color: var(--danger-color);
+  font-size: 1.4rem;
+  font-weight: 600;
+}
+.form-card div:has(> .errorlist) input,
+.form-card div:has(> .errorlist) select,
+.form-card div:has(> .errorlist) textarea {
+  border-color: var(--danger-color);
+}
+.form-card input[type=text],
+.form-card input[type=email],
+.form-card input[type=password],
+.form-card input[type=number],
+.form-card input[type=date],
+.form-card input[type=url],
+.form-card input[type=tel],
+.form-card select,
+.form-card textarea {
+  width: 100%;
+  min-height: 44px;
+  padding: 0.6em 0.85em;
+  border: 1px solid var(--tetriary-color);
+  border-radius: 0.5em;
+  font: inherit;
+  font-size: 1.6rem;
+  background-color: var(--color-white);
+  color: var(--color-black);
+}
+.form-card input[type=text]:focus-visible,
+.form-card input[type=email]:focus-visible,
+.form-card input[type=password]:focus-visible,
+.form-card input[type=number]:focus-visible,
+.form-card input[type=date]:focus-visible,
+.form-card input[type=url]:focus-visible,
+.form-card input[type=tel]:focus-visible,
+.form-card select:focus-visible,
+.form-card textarea:focus-visible {
+  border-color: var(--accent-color);
+}
+.form-card textarea {
+  min-height: 8rem;
+  resize: vertical;
+}
+.form-card input[type=file] {
+  width: 100%;
+  padding: 0.5em 0;
+}
+.form-card input[type=checkbox] {
+  width: 1.6rem;
+  height: 1.6rem;
+  margin-right: 0.5em;
+  accent-color: var(--primary-color);
+}
+
 /*# sourceMappingURL=style.css.map */

@@ -636,3 +636,106 @@ footer {
 .complete-task {
     margin: 2rem 0;
 }
+
+// Forms - Django's as_div() rendering has no wrapper classes at all by
+// default: <div><label>...</label>[.helptext][.errorlist]<input/select/
+// textarea></div>, all as direct children of the field's div. Styled
+// structurally here so every form in the app (property/location/appliance/
+// maintenance-task/login/signup) looks consistent without editing each
+// one field-by-field.
+
+.form-card {
+    max-width: 60rem;
+    margin: 2rem auto;
+    padding: 2rem;
+    background-color: var(--color-white);
+    border: 1px solid var(--tetriary-color);
+    border-radius: 1rem;
+
+    form > div {
+        margin-bottom: 1.5rem;
+
+        &:last-of-type {
+            margin-bottom: 0;
+        }
+    }
+
+    label {
+        display: block;
+        margin-bottom: 0.4rem;
+        font-weight: 600;
+        color: var(--primary-color);
+    }
+
+    // Required-field marker, no server-side change needed.
+    div:has(> input:required) label::after,
+    div:has(> select:required) label::after,
+    div:has(> textarea:required) label::after {
+        content: " *";
+        color: var(--accent-color);
+    }
+
+    .helptext {
+        margin: 0.25rem 0 0.5rem;
+        font-size: 1.4rem;
+        color: var(--secondary-color);
+    }
+
+    .errorlist {
+        list-style: none;
+        margin: 0.25rem 0 0.5rem;
+        padding: 0;
+        color: var(--danger-color);
+        font-size: 1.4rem;
+        font-weight: 600;
+    }
+
+    div:has(> .errorlist) {
+        input,
+        select,
+        textarea {
+            border-color: var(--danger-color);
+        }
+    }
+
+    input[type="text"],
+    input[type="email"],
+    input[type="password"],
+    input[type="number"],
+    input[type="date"],
+    input[type="url"],
+    input[type="tel"],
+    select,
+    textarea {
+        width: 100%;
+        min-height: 44px;
+        padding: 0.6em 0.85em;
+        border: 1px solid var(--tetriary-color);
+        border-radius: 0.5em;
+        font: inherit;
+        font-size: 1.6rem;
+        background-color: var(--color-white);
+        color: var(--color-black);
+
+        &:focus-visible {
+            border-color: var(--accent-color);
+        }
+    }
+
+    textarea {
+        min-height: 8rem;
+        resize: vertical;
+    }
+
+    input[type="file"] {
+        width: 100%;
+        padding: 0.5em 0;
+    }
+
+    input[type="checkbox"] {
+        width: 1.6rem;
+        height: 1.6rem;
+        margin-right: 0.5em;
+        accent-color: var(--primary-color);
+    }
+}

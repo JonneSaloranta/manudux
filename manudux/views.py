@@ -13,6 +13,7 @@ from .forms import (
     LocationForm,
     MaintenanceCompletionForm,
     MaintenanceTaskForm,
+    PropertyDocumentForm,
     PropertyForm,
     RegisterForm,
 )
@@ -22,6 +23,7 @@ from .models import (
     Location,
     MaintenanceTask,
     Property,
+    PropertyDocument,
 )
 
 PAGE_SIZE = 20
@@ -128,9 +130,41 @@ def properties(request):
 def property_detail(request, pk):
     property = get_object_or_404(Property, pk=pk)
     locations = property.locations.all()  # Using related_name for efficient querying
+    documents = property.documents.all()
     return render(
-        request, "manudux/property.html", {"property": property, "locations": locations}
+        request,
+        "manudux/property.html",
+        {"property": property, "locations": locations, "documents": documents},
     )
+
+
+@login_required(login_url="/accounts/login/")
+def create_property_document(request, property_pk):
+    property_obj = get_object_or_404(Property, pk=property_pk)
+
+    if request.method == "POST":
+        form = PropertyDocumentForm(request.POST, request.FILES)
+        if form.is_valid():
+            document = form.save(commit=False)
+            document.property = property_obj
+            document.save()
+            return redirect("manudux:property", pk=property_obj.pk)
+    else:
+        form = PropertyDocumentForm()
+
+    context = {"form": form, "property": property_obj}
+    return render(request, "manudux/property-document-create.html", context)
+
+
+@login_required(login_url="/accounts/login/")
+def delete_property_document(request, pk):
+    document = get_object_or_404(PropertyDocument, pk=pk)
+    if request.method == "POST":
+        property_pk = document.property_id
+        document.delete()
+        return redirect("manudux:property", pk=property_pk)
+    context = {"document": document}
+    return render(request, "manudux/property-document-delete.html", context)
 
 
 @login_required(login_url="/accounts/login/")

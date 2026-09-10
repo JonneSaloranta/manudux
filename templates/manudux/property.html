@@ -96,6 +96,24 @@
             {% endfor %}
         </ul>
     </div>
+
+    <!-- Documents -->
+    <div class="documents">
+        <h2>{% trans "Documents" %}:</h2>
+        <a href="{% url 'manudux:create-property-document' property_pk=property.id %}">{% trans "Upload a document" %}</a>
+
+        <ul class="document-list">
+            {% for document in documents %}
+            <li>
+                <a href="{{ document.file.url }}" target="_blank">{{ document.name }}</a>
+                <span class="document-category">{{ document.get_category_display }}</span>
+                <a href="{% url 'manudux:delete-property-document' document.id %}" class="document-delete-link">{% trans "Delete" %}</a>
+            </li>
+            {% empty %}
+            <li>{% trans "No documents uploaded yet." %}</li>
+            {% endfor %}
+        </ul>
+    </div>
 </div>
 
 {% endblock %}

@@ -28,11 +28,13 @@
     {% if not task.is_done %}
     <section class="complete-task">
         <h2>{% trans "Mark complete" %}</h2>
-        <form action="{% url 'manudux:maintenance-task' pk=task.id %}" method="post">
-            {% csrf_token %}
-            {{ completion_form.as_div }}
-            <button class="btn btn-primary btn-large">{% trans "Mark complete" %}</button>
-        </form>
+        <div class="form-card">
+            <form action="{% url 'manudux:maintenance-task' pk=task.id %}" method="post">
+                {% csrf_token %}
+                {{ completion_form.as_div }}
+                <button class="btn btn-primary btn-large">{% trans "Mark complete" %}</button>
+            </form>
+        </div>
     </section>
     {% endif %}
 
