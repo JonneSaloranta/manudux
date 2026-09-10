@@ -22,7 +22,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = config("SECRET_KEY", default="django-insecure-fallback-key-here")
+# No insecure fallback on purpose - the app must refuse to start rather than
+# silently run with a known, public key when SECRET_KEY isn't configured.
+SECRET_KEY = config("SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = config("DEBUG", default=False, cast=bool)
@@ -38,6 +40,20 @@ INTERNAL_IPS = config(
 SITE_URL = config("SITE_URL", cast=str)
 
 ALLOW_REGISTRATION = config("ALLOW_REGISTRATION", default=False, cast=bool)
+
+# Off by default so a plain self-hosted instance without TLS in front keeps
+# working out of the box. Set to True once the deployment is served over
+# HTTPS (e.g. the hosted offering, or a self-hosted instance behind a
+# TLS-terminating reverse proxy).
+SECURE_SSL_REDIRECT = config("SECURE_SSL_REDIRECT", default=False, cast=bool)
+SESSION_COOKIE_SECURE = config("SESSION_COOKIE_SECURE", default=False, cast=bool)
+CSRF_COOKIE_SECURE = config("CSRF_COOKIE_SECURE", default=False, cast=bool)
+SECURE_HSTS_SECONDS = config("SECURE_HSTS_SECONDS", default=0, cast=int)
+CSRF_TRUSTED_ORIGINS = config(
+    "CSRF_TRUSTED_ORIGINS",
+    default="",
+    cast=lambda v: [s.strip() for s in v.split(",") if s.strip()],
+)
 
 
 # Application definition
