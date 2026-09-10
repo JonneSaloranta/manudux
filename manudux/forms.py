@@ -1,3 +1,4 @@
+from django.core.exceptions import ValidationError
 from django.forms import ModelForm, EmailField, CharField
 from .models import Property, Location
 from django.utils.translation import gettext_lazy as _
@@ -51,6 +52,17 @@ class PropertyForm(ModelForm):
             "property_type": _("Select the type of property."),
             "activated": _("Check to activate the property."),
         }
+
+    def clean_zip_code(self):
+        zip_code = self.cleaned_data.get("zip_code")
+        if zip_code:
+            try:
+                is_negative = int(zip_code) < 0
+            except ValueError:
+                is_negative = False  # non-numeric postal codes are allowed
+            if is_negative:
+                raise ValidationError(_("Zipcode should be a positive integer"))
+        return zip_code
 
 
 class LocationForm(ModelForm):

@@ -168,24 +168,6 @@ class PropertyTestCase(TestCase):
         )
 
     @tag("models", "property")
-    def test_if_property_zipcode_is_negative(self):
-        """Test if negative property zipcode raises an valueerror"""
-        pt = Property.objects.create(
-            name="Property",
-            description="testdescription",
-            address="456 Test St",
-            city="Test City2",
-            state="Test State3",
-            zip_code=-900,
-            activated=True,
-        )
-        pt.save()
-        self.assertRaises(
-            ValueError,
-            msg=f"The negative property zipcode should raise a ValueError, but did not",
-        )
-
-    @tag("models", "property")
     def test_if_get_map_function_works_correctly(self):
         """Test if property get_map function works"""
         pt = Property.objects.get(name="Test Property")

@@ -74,15 +74,6 @@ class Property(models.Model):
 
         return f"https://www.google.com/maps/search/?{params}"
 
-    def zipcode_is_negative(self):
-        if self.zip_code is None or "":
-            return False
-        else:
-            if int(self.zip_code) < 0:
-                raise ValueError(f"Zipcode cannot be negative {int(self.zip_code)}")
-            else:
-                return False
-
     class Meta:
         verbose_name = _("Property")
         verbose_name_plural = _("Properties")

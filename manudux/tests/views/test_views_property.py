@@ -133,7 +133,6 @@ class PropertyTestCase(TestCase):
         property_data = {
             "name": "Test Property1111",
             "description": "Description",
-            "address": "12345",
             "address": "Test Address",
             "city": "Test City",
             "state": "Test State",
@@ -161,40 +160,36 @@ class PropertyTestCase(TestCase):
         # check if the response url contains the property detail url
         self.assertTrue("property-detail", response.url)
 
-        @tag("views", "slow", "auth", "property")
-        def test_property_user_create_propery_object(self):
-            self.client.login(username="testuser", password="testpassword")
+    @tag("views", "slow", "auth", "property")
+    def test_property_create_rejects_negative_zip_code(self):
+        """Test that a negative zip code is rejected with a form error, not saved"""
+        self.client.login(username="testuser", password="testpassword")
 
-            # delete all properties
-            Property.objects.all().delete()
+        property_data = {
+            "name": "Negative Zip Property",
+            "description": "Description",
+            "address": "Test Address",
+            "city": "Test City",
+            "state": "Test State",
+            "zip_code": -12345,
+        }
 
-            property_data = {
-                "name": "",
-                "description": "Description",
-                "address": "12345",
-                "address": "Test Address",
-                "city": "Test City",
-                "state": "Test State",
-                "zip_code": -12345,
-            }
+        response = self.client.post(
+            reverse("manudux:create-property"), data=property_data
+        )
 
-            response = self.client.post(
-                reverse("manudux:create-property"), data=property_data
-            )
+        self.assertEqual(
+            response.status_code,
+            200,
+            msg="User should have stayed on page for invalid data entry",
+        )
+        self.assertTrue(
+            "form" in response.context, msg="No form context variable found"
+        )
 
-            self.assertEqual(
-                response.status_code,
-                200,
-                msg="User should have stayed on page for invalid data entry",
-            )
-            self.assertTrue(
-                "form" in response.context, msg="No form context variable found"
-            )
+        form = response.context["form"]
+        self.assertFormError(form, "zip_code", "Zipcode should be a positive integer")
 
-            form = response.context["form"]
-            self.assertFormError(form, "name", "This field is required")
-            self.assertFormError(
-                form, "zip_code", "Zipcode should be a positive integer"
-            )
-
-            self.assertFalse(Property.objects.exists())
+        self.assertFalse(
+            Property.objects.filter(name="Negative Zip Property").exists()
+        )
