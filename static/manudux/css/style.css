@@ -309,7 +309,9 @@ footer .row a:hover {
 .card {
   display: flex;
   flex-flow: column;
-  width: 30rem;
+  width: 100%;
+  max-width: 30rem;
+  margin: 0 auto;
   color: var(--color-white);
 }
 .card .card-content {
