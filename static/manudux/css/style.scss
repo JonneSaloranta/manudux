@@ -1,11 +1,19 @@
+// Brand palette: a deep pine green (a home/property, growth, permanence
+// association fitting a property-maintenance tool) paired with one warm
+// brass/amber accent (hardware, tools, upkeep) rather than a generic
+// SaaS blue. The accent is used deliberately as a border/underline/focus
+// colour, never as body text on the dark green - #c97a2e only clears
+// WCAG AA contrast (3:1) as a UI element, not as 4.5:1 text.
 :root {
     --color-white: #ffffff;
-    --color-black: #000000;
-    --color-background: #efefef;
-    --primary-color: #2f4b26;
-    --secondary-color: #3e885b;
-    --tetriary-color: #85bda6;
-    --accent-color: #bedcfe;
+    --color-black: #1b1b17;
+    --color-background: #f2f0ea;
+    --primary-color: #1f3a2c;
+    --secondary-color: #3c7a5a;
+    --tetriary-color: #8fb8a0;
+    --accent-color: #c97a2e;
+    --danger-color: #b23a2e;
+    --danger-color-hover: #8a2c22;
 }
 
 @font-face {
@@ -19,6 +27,11 @@
     box-sizing: border-box;
     margin: 0;
     padding: 0;
+}
+
+:focus-visible {
+    outline: 3px solid var(--accent-color);
+    outline-offset: 2px;
 }
 
 html {
@@ -68,11 +81,8 @@ main {
         & li {
             &.active {
                 & a {
-                    color: var(--accent-color);
-
-                    & svg {
-                        fill: var(--accent-color);
-                    }
+                    border-left: 3px solid var(--accent-color);
+                    background-color: rgba(201, 122, 30, 0.16);
                 }
             }
         }
@@ -509,10 +519,10 @@ footer {
 }
 
 .btn-danger {
-    background-color: #b3261e;
+    background-color: var(--danger-color);
 
     &:hover {
-        background-color: #7f1b16;
+        background-color: var(--danger-color-hover);
     }
 }
 
@@ -565,10 +575,10 @@ footer {
 }
 
 .entity-list-item-overdue {
-    border-color: #b3261e;
+    border-color: var(--danger-color);
 
     .entity-list-meta {
-        color: #b3261e;
+        color: var(--danger-color);
     }
 }
 
@@ -579,7 +589,7 @@ footer {
 }
 
 .overdue {
-    color: #b3261e;
+    color: var(--danger-color);
     font-weight: 600;
 }
 

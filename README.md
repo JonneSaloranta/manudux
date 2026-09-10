@@ -110,3 +110,11 @@ MAINTENANCE_REMINDER_LOOKAHEAD_DAYS=7 # how many days ahead counts as "coming up
 ```
 
 Use `--dry-run` to preview the digest without sending anything.
+
+### Releasing
+
+Bump the version in `VERSION` and push to `master` - CI builds and pushes `ghcr.io/jonnesaloranta/manudux:v<version>` and `:latest` once tests/lint/accessibility all pass. A push to `master` that doesn't touch `VERSION` does not publish an image.
+
+```
+docker pull ghcr.io/jonnesaloranta/manudux:latest
+```

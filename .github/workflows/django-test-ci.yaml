@@ -56,7 +56,168 @@ jobs:
                   source venv/bin/activate
                   python manage.py collectstatic --noinput
 
+            # --parallel dropped: Django's parallel test runner has a known
+            # class of "cannot pickle 'traceback' object" failures when a
+            # test's exception can't cross the multiprocessing boundary, and
+            # it surfaced intermittently on the GitHub-hosted runner without
+            # ever reproducing locally. The suite is fast enough serial.
             - name: Run tests
               run: |
                   source venv/bin/activate
-                  python manage.py test --parallel --noinput
+                  python manage.py test --noinput
+
+    lint:
+        runs-on: ubuntu-latest
+
+        steps:
+            - name: Checkout code
+              uses: actions/checkout@v4
+
+            - name: Set up Python
+              uses: actions/setup-python@v4
+              with:
+                  python-version: "3.12"
+
+            - name: Install dependencies
+              run: |
+                  python -m venv venv
+                  source venv/bin/activate
+                  pip install -r requirements.txt
+
+            - name: Check formatting (black)
+              run: |
+                  source venv/bin/activate
+                  black --check .
+
+            - name: Lint (ruff)
+              run: |
+                  source venv/bin/activate
+                  ruff check .
+
+    accessibility:
+        runs-on: ubuntu-latest
+        environment: master_secrets
+        env:
+            SECRET_KEY: ${{ secrets.SECRET_KEY }}
+            DEBUG: "False"
+            ALLOWED_HOSTS: 127.0.0.1,localhost
+            INTERNAL_IPS: 127.0.0.1
+            TIME_ZONE: ${{ vars.TIME_ZONE }}
+            SITE_URL: http://127.0.0.1:8877
+            ALLOW_REGISTRATION: ${{ vars.ALLOW_REGISTRATION }}
+
+        steps:
+            - name: Checkout code
+              uses: actions/checkout@v4
+
+            - name: Set up Python
+              uses: actions/setup-python@v4
+              with:
+                  python-version: "3.12"
+
+            - name: Set up Node
+              uses: actions/setup-node@v4
+              with:
+                  node-version: "22"
+
+            - name: Install dependencies
+              run: |
+                  python -m venv venv
+                  source venv/bin/activate
+                  pip install -r requirements.txt
+
+            - name: Ensure data directory exists
+              run: mkdir -p ./data
+
+            - name: Run migrations
+              run: |
+                  source venv/bin/activate
+                  python manage.py migrate --noinput
+
+            - name: Collect static files
+              run: |
+                  source venv/bin/activate
+                  python manage.py collectstatic --noinput
+
+            - name: Create a throwaway user for scanning authenticated pages
+              run: |
+                  source venv/bin/activate
+                  A11Y_PASSWORD="$(python -c 'import secrets; print(secrets.token_urlsafe(16))')"
+                  echo "::add-mask::$A11Y_PASSWORD"
+                  echo "A11Y_PASSWORD=$A11Y_PASSWORD" >> "$GITHUB_ENV"
+                  python manage.py shell -c "
+                  from django.contrib.auth.models import User
+                  User.objects.filter(username='a11y').delete()
+                  User.objects.create_user(username='a11y', password='$A11Y_PASSWORD')
+                  "
+
+            - name: Start the app
+              run: |
+                  source venv/bin/activate
+                  gunicorn core.wsgi:application --bind 127.0.0.1:8877 --daemon --pid /tmp/gunicorn.pid
+                  sleep 3
+
+            - name: Run accessibility checks (pa11y-ci)
+              run: |
+                  sed "s/__A11Y_TEST_PASSWORD__/$A11Y_PASSWORD/" .pa11yci.json > /tmp/pa11yci.json
+                  npx --yes pa11y-ci --config /tmp/pa11yci.json
+
+    docker-publish:
+        needs: [test, lint, accessibility]
+        if: github.ref == 'refs/heads/master' && github.event_name == 'push'
+        runs-on: ubuntu-latest
+        permissions:
+            contents: read
+            packages: write
+
+        steps:
+            - name: Checkout code
+              uses: actions/checkout@v4
+              with:
+                  fetch-depth: 0
+
+            - name: Check whether VERSION changed in this push
+              id: version_check
+              run: |
+                  if git diff --name-only "${{ github.event.before }}" "${{ github.event.after }}" | grep -qx "VERSION"; then
+                      echo "changed=true" >> "$GITHUB_OUTPUT"
+                  else
+                      echo "changed=false" >> "$GITHUB_OUTPUT"
+                  fi
+
+            - name: Read version
+              if: steps.version_check.outputs.changed == 'true'
+              id: version
+              run: echo "value=$(tr -d '[:space:]' < VERSION)" >> "$GITHUB_OUTPUT"
+
+            - name: Compute image name
+              if: steps.version_check.outputs.changed == 'true'
+              id: image
+              run: echo "name=ghcr.io/$(echo '${{ github.repository }}' | tr '[:upper:]' '[:lower:]')" >> "$GITHUB_OUTPUT"
+
+            - name: Set up Docker Buildx
+              if: steps.version_check.outputs.changed == 'true'
+              uses: docker/setup-buildx-action@v3
+
+            - name: Log in to GHCR
+              if: steps.version_check.outputs.changed == 'true'
+              uses: docker/login-action@v3
+              with:
+                  registry: ghcr.io
+                  username: ${{ github.actor }}
+                  password: ${{ secrets.GITHUB_TOKEN }}
+
+            - name: Build and push image
+              if: steps.version_check.outputs.changed == 'true'
+              uses: docker/build-push-action@v6
+              with:
+                  context: .
+                  file: ./dockerfile
+                  push: true
+                  tags: |
+                      ${{ steps.image.outputs.name }}:v${{ steps.version.outputs.value }}
+                      ${{ steps.image.outputs.name }}:latest
+
+            - name: No version bump
+              if: steps.version_check.outputs.changed == 'false'
+              run: echo "VERSION did not change in this push - nothing to publish."

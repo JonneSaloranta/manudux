@@ -1,8 +1,8 @@
-from django.test import TestCase, tag, Client
-from manudux.models import Property, Location
-from django.urls import reverse
 from django.contrib.auth.models import User
-from django.contrib.auth.views import LoginView, LogoutView
+from django.test import Client, TestCase, tag
+from django.urls import reverse
+
+from manudux.models import Property
 
 
 class PropertyTestCase(TestCase):
@@ -192,9 +192,7 @@ class PropertyTestCase(TestCase):
         form = response.context["form"]
         self.assertFormError(form, "zip_code", "Zipcode should be a positive integer")
 
-        self.assertFalse(
-            Property.objects.filter(name="Negative Zip Property").exists()
-        )
+        self.assertFalse(Property.objects.filter(name="Negative Zip Property").exists())
 
     @tag("views", "slow", "auth", "property")
     def test_properties_view_is_paginated(self):

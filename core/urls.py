@@ -1,11 +1,11 @@
 import re
 
-from django.contrib import admin
-from django.urls import path, re_path, include
+from debug_toolbar.toolbar import debug_toolbar_urls
 from django.conf import settings
+from django.contrib import admin
+from django.urls import include, path, re_path
 from django.views.static import serve
 from schema_graph.views import Schema
-from debug_toolbar.toolbar import debug_toolbar_urls
 
 from .views import healthz
 
@@ -24,7 +24,10 @@ media_urlpatterns = [
 
 urlpatterns = [
     path("admin/", admin.site.urls),
-    path("accounts/", include(("django.contrib.auth.urls", "accounts"), namespace="accounts")),
+    path(
+        "accounts/",
+        include(("django.contrib.auth.urls", "accounts"), namespace="accounts"),
+    ),
     path("healthz/", healthz, name="healthz"),
     path("", include(("manudux.urls", "manudux"), namespace="manudux")),
 ] + media_urlpatterns

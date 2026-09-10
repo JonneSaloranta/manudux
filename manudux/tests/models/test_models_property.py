@@ -1,8 +1,7 @@
-from django.test import TestCase, tag, Client
-from manudux.models.property_model import Property
-from django.urls import reverse
 from django.contrib.auth.models import User
-from django.contrib.auth.views import LoginView, LogoutView
+from django.test import Client, TestCase, tag
+
+from manudux.models.property_model import Property
 
 
 class PropertyTestCase(TestCase):
@@ -79,7 +78,7 @@ class PropertyTestCase(TestCase):
         self.assertEqual(
             str(test_property),
             "Test Property",
-            msg=f"The property name should be 'Test Property', but got {str(test_property)}",
+            msg=f"The property name should be 'Test Property', but got {test_property!s}",
         )
 
     @tag("models", "property")
@@ -206,7 +205,7 @@ class PropertyTestCase(TestCase):
         self.assertIsNone(
             pt.state, msg=f"The state should be None, returned {pt.state}"
         )
-        self.assertIsNone(pt.get_map(), msg=f"The get_map function should return None")
+        self.assertIsNone(pt.get_map(), msg="The get_map function should return None")
 
         pt.state = "Test State5"
         pt.zip_code = None
@@ -214,4 +213,4 @@ class PropertyTestCase(TestCase):
         self.assertIsNone(
             pt.zip_code, msg=f"The zipcode should be None, returned {pt.zip_code}"
         )
-        self.assertIsNone(pt.get_map(), msg=f"The get_map function should return None")
+        self.assertIsNone(pt.get_map(), msg="The get_map function should return None")

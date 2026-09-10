@@ -1,8 +1,7 @@
-from django.test import TestCase, tag, Client
-from manudux.models import GuideStep, Guide
-from django.urls import reverse
 from django.contrib.auth.models import User
-from django.contrib.auth.views import LoginView, LogoutView
+from django.test import Client, TestCase, tag
+
+from manudux.models import Guide, GuideStep
 
 
 class GuideStepTestCase(TestCase):
@@ -22,7 +21,7 @@ class GuideStepTestCase(TestCase):
             description="This is a test guide.",
         )
 
-        guidestep = GuideStep.objects.create(
+        GuideStep.objects.create(
             guide=guide,
             title="Test Guide Step",
             step_number=1,
@@ -54,7 +53,7 @@ class GuideStepTestCase(TestCase):
         """Test if the guide creationg time works correctly."""
         test_guidestep = GuideStep.objects.get(title="Test Guide Step")
         self.assertIsNotNone(
-            test_guidestep.created_at, msg=f"created_at should not be None."
+            test_guidestep.created_at, msg="created_at should not be None."
         )
 
     @tag("models", "guidestep")
@@ -62,7 +61,7 @@ class GuideStepTestCase(TestCase):
         """Test if the guide updated time works correctly."""
         test_guidestep = GuideStep.objects.get(title="Test Guide Step")
         self.assertIsNotNone(
-            test_guidestep.updated_at, msg=f"updated_at should not be None."
+            test_guidestep.updated_at, msg="updated_at should not be None."
         )
 
     @tag("models", "guidestep")
@@ -74,7 +73,7 @@ class GuideStepTestCase(TestCase):
         self.assertEqual(
             str(test_guide),
             "Step 1 for Test Guide Name",
-            msg=f"The string representation should be 'Step 1 for Test Guide Name', but got '{str(test_guide)}'",
+            msg=f"The string representation should be 'Step 1 for Test Guide Name', but got '{test_guide!s}'",
         )
 
     @tag("models", "guidestep")

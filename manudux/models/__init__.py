@@ -7,3 +7,15 @@ from .guidestep_model import GuideStep
 from .appliance_model import Appliance
 from .maintenancetask_model import MaintenanceTask
 from .maintenancelog_model import MaintenanceLog
+
+__all__ = [
+    "PropertyType",
+    "Guide",
+    "GuideFile",
+    "Property",
+    "Location",
+    "GuideStep",
+    "Appliance",
+    "MaintenanceTask",
+    "MaintenanceLog",
+]

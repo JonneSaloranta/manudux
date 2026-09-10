@@ -2,7 +2,6 @@ import shutil
 import tempfile
 from pathlib import Path
 
-from django.conf import settings
 from django.core.management import call_command
 from django.test import TransactionTestCase, override_settings, tag
 

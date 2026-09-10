@@ -1,8 +1,7 @@
-from django.test import TestCase, tag, Client
-from manudux.models import Property, Location, PropertyType
-from django.urls import reverse
 from django.contrib.auth.models import User
-from django.contrib.auth.views import LoginView, LogoutView
+from django.test import Client, TestCase, tag
+
+from manudux.models import PropertyType
 
 
 class PropertyTypeModelTest(TestCase):
@@ -42,14 +41,14 @@ class PropertyTypeModelTest(TestCase):
         self.assertEqual(
             str(pt),
             "Residential",
-            msg=f"Property Type name should contain '{str(pt)}', but got: {str(pt)}",
+            msg=f"Property Type name should contain '{pt!s}', but got: {pt!s}",
         )
         self.assertEqual(
             pt.__str__(),
             "Residential",
-            msg=f"Property Type names should be the same as str",
+            msg="Property Type names should be the same as str",
         )
-        self.assertEqual(1, pt.id, msg=f"The property type should have an id of 1")
+        self.assertEqual(1, pt.id, msg="The property type should have an id of 1")
 
         pt = PropertyType.objects.get(id=1)
         self.assertEqual(
@@ -102,13 +101,13 @@ class PropertyTypeModelTest(TestCase):
         self.assertEqual(
             pt.description,
             "A place where you can live.",
-            msg=f"property description is wrong.",
+            msg="property description is wrong.",
         )
 
         pt.name = "test-edit"
         pt.save()
         self.assertEqual(
-            pt.name, "test-edit", msg=f"Property type names should be the same as str"
+            pt.name, "test-edit", msg="Property type names should be the same as str"
         )
 
     @tag("models", "PropertyType")

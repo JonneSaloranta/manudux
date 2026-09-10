@@ -1,7 +1,8 @@
-from django.test import TestCase, tag, Client
-from django.urls import reverse
 from django.contrib.auth.models import User
-from manudux.models import Property, Location, Appliance
+from django.test import Client, TestCase, tag
+from django.urls import reverse
+
+from manudux.models import Appliance, Location, Property
 
 
 class ApplianceViewsTest(TestCase):

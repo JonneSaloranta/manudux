@@ -1,13 +1,14 @@
-from django.db import models
-from django.utils.translation import gettext_lazy as _
-import qrcode
-from io import BytesIO
-from django.core.files.base import ContentFile
-from PIL import Image, ImageDraw, ImageFont
-from django.urls import reverse
-from django.conf import settings
-import textwrap
 import os
+import textwrap
+from io import BytesIO
+
+import qrcode
+from django.conf import settings
+from django.core.files.base import ContentFile
+from django.db import models
+from django.urls import reverse
+from django.utils.translation import gettext_lazy as _
+from PIL import Image, ImageDraw, ImageFont
 
 
 class Guide(models.Model):
@@ -57,7 +58,7 @@ class Guide(models.Model):
         try:
             text_font = ImageFont.truetype(font_path, 16)  # Title/Description
             url_font = ImageFont.truetype(font_path, 16)  # URL
-        except IOError as e:
+        except OSError as e:
             text_font = ImageFont.load_default()
             url_font = ImageFont.load_default()
             print(e)

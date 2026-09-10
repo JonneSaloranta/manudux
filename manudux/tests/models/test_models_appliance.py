@@ -1,5 +1,6 @@
 from django.test import TestCase, tag
-from manudux.models import Property, Location, Appliance
+
+from manudux.models import Appliance, Location, Property
 
 
 class ApplianceTestCase(TestCase):

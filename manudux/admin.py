@@ -1,19 +1,20 @@
+import os
+
+from django.conf import settings
 from django.contrib import admin
 from django.core.files.storage import default_storage
-import os
+from django.shortcuts import redirect
+from django.urls import path, reverse
+
+from manudux.models.appliance_model import Appliance
 from manudux.models.guide_model import Guide
-from manudux.models.property_model import Property
 from manudux.models.guidefile_model import GuideFile
 from manudux.models.guidestep_model import GuideStep
 from manudux.models.location_model import Location
-from manudux.models.property_type_model import PropertyType
-from manudux.models.appliance_model import Appliance
-from manudux.models.maintenancetask_model import MaintenanceTask
 from manudux.models.maintenancelog_model import MaintenanceLog
-from django.conf import settings
-from django import forms
-from django.urls import path, reverse
-from django.shortcuts import redirect
+from manudux.models.maintenancetask_model import MaintenanceTask
+from manudux.models.property_model import Property
+from manudux.models.property_type_model import PropertyType
 
 
 class LocationInline(admin.TabularInline):
