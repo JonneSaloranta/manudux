@@ -14,6 +14,9 @@ def index(request):
     return render(request, "manudux/index.html", context)
 
 def sign_up(request):
+    if not settings.ALLOW_REGISTRATION:
+        raise PermissionDenied()
+
     if request.method == "POST":
         form = RegisterForm(request.POST)
         if form.is_valid():
