@@ -2,46 +2,77 @@
 {% load static %}
 
 <div class="property-details">
-    {% if property.address %}
-    <p class="">{% trans "Address" %}: {{ property.address }}</p>
-    {% else %}
-    <p class="">{% trans "Address" %}: -</p>
+    <div class="detail-grid">
+        {% if property.address %}
+        <p>{% trans "Address" %}: {{ property.address }}</p>
+        {% else %}
+        <p>{% trans "Address" %}: -</p>
+        {% endif %}
+
+        {% if property.city %}
+        <p>{% trans "City" %}: {{ property.city }}</p>
+        {% else %}
+        <p>{% trans "City" %}: -</p>
+        {% endif %}
+
+        {% if property.state %}
+        <p>{% trans "State" %}: {{ property.state }}</p>
+        {% else %}
+        <p>{% trans "State" %}: -</p>
+        {% endif %}
+
+        {% if property.zip_code %}
+        <p>{% trans "Zipcode" %}: {{ property.zip_code }}</p>
+        {% else %}
+        <p>{% trans "Zipcode" %}: -</p>
+        {% endif %}
+
+        {% if property.property_type %}
+        <p>{% trans "Property type" %}: {{ property.property_type }}</p>
+        {% else %}
+        <p>{% trans "Property type" %}: -</p>
+        {% endif %}
+    </div>
+
+    {% if property.parcel_number or property.year_built or property.size_sqm or property.lot_size_sqm %}
+    <h3>{% trans "Identification" %}</h3>
+    <div class="detail-grid">
+        {% if property.parcel_number %}<p>{% trans "Parcel Number" %}: {{ property.parcel_number }}</p>{% endif %}
+        {% if property.year_built %}<p>{% trans "Year Built" %}: {{ property.year_built }}</p>{% endif %}
+        {% if property.size_sqm %}<p>{% trans "Living Area" %}: {{ property.size_sqm }} m²</p>{% endif %}
+        {% if property.lot_size_sqm %}<p>{% trans "Lot Size" %}: {{ property.lot_size_sqm }} m²</p>{% endif %}
+    </div>
     {% endif %}
 
-    {% if property.city %}
-    <p class="">{% trans "City" %}: {{ property.city }}</p>
-    {% else %}
-    <p class="">{% trans "City" %}: -</p>
+    {% if property.purchase_date or property.purchase_price or property.estimated_value %}
+    <h3>{% trans "Financial" %}</h3>
+    <div class="detail-grid">
+        {% if property.purchase_date %}<p>{% trans "Purchase Date" %}: {{ property.purchase_date|date:"d.m.Y" }}</p>{% endif %}
+        {% if property.purchase_price %}<p>{% trans "Purchase Price" %}: {{ property.purchase_price }}</p>{% endif %}
+        {% if property.estimated_value %}<p>{% trans "Estimated Value" %}: {{ property.estimated_value }}</p>{% endif %}
+    </div>
     {% endif %}
 
-    {% if property.state %}
-    <p class="">{% trans "State" %}: {{ property.state }}</p>
-    {% else %}
-    <p class="">{% trans "State" %}: -</p>
+    {% if property.insurance_company or property.insurance_policy_number or property.insurance_expires %}
+    <h3>{% trans "Insurance" %}</h3>
+    <div class="detail-grid">
+        {% if property.insurance_company %}<p>{% trans "Insurance Company" %}: {{ property.insurance_company }}</p>{% endif %}
+        {% if property.insurance_policy_number %}<p>{% trans "Policy Number" %}: {{ property.insurance_policy_number }}</p>{% endif %}
+        {% if property.insurance_expires %}<p>{% trans "Insurance Expires" %}: {{ property.insurance_expires|date:"d.m.Y" }}</p>{% endif %}
+    </div>
     {% endif %}
 
-    {% if property.zip_code %}
-    <p class="">{% trans "Zipcode" %}: {{ property.zip_code }}</p>
-    {% else %}
-    <p class="">{% trans "Zipcode" %}: -</p>
-    {% endif %}
-
-    {% if property.property_type %}
-    <p class="">{% trans "Property type" %}: {{ property.property_type }}</p>
-    {% else %}
-    <p class="">{% trans "Property type" %}: -</p>
-    {% endif %}
     <div class="timestamps">
         {% if property.created_at %}
-        <p class="">{% trans "Created" %}: {{ property.created_at|date:"d.m.Y H:i" }}</p>
+        <p>{% trans "Created" %}: {{ property.created_at|date:"d.m.Y H:i" }}</p>
         {% else %}
-        <p class="">{% trans "Created" %}: -</p>
+        <p>{% trans "Created" %}: -</p>
         {% endif %}
 
         {% if property.updated_at %}
-        <p class="">{% trans "Updated" %}: {{ property.updated_at|date:"d.m.Y H:i" }}</p>
+        <p>{% trans "Updated" %}: {{ property.updated_at|date:"d.m.Y H:i" }}</p>
         {% else %}
-        <p class="">{% trans "Updated" %}: -</p>
+        <p>{% trans "Updated" %}: -</p>
         {% endif %}
     </div>
 </div>

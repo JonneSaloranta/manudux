@@ -10,6 +10,16 @@ urlpatterns = [
     path("properties/create-property/", views.create_property, name="create-property"),
     path("property/<int:pk>/edit/", views.edit_property, name="edit-property"),
     path("property/<int:pk>/delete/", views.delete_property, name="delete-property"),
+    path(
+        "property/<int:property_pk>/documents/create/",
+        views.create_property_document,
+        name="create-property-document",
+    ),
+    path(
+        "property-document/<int:pk>/delete/",
+        views.delete_property_document,
+        name="delete-property-document",
+    ),
     path("property/<int:pk>/", views.property_detail, name="property"),
     path("locations/create-location/", views.create_location, name="create-location"),
     path("location/<int:pk>/edit/", views.edit_location, name="edit-location"),

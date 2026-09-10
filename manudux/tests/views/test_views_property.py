@@ -211,3 +211,35 @@ class PropertyTestCase(TestCase):
         second_page = self.client.get(reverse("manudux:properties"), {"page": 2})
         self.assertEqual(second_page.status_code, 200)
         self.assertEqual(len(second_page.context["page_obj"]), 9)
+
+    @tag("views", "slow", "auth", "property")
+    def test_property_card_link_has_an_accessible_name(self):
+        """The whole-card overlay link on the properties list must not be an
+        empty <a> with no accessible name (WCAG 2.4.4/4.1.2)."""
+        self.client.login(username="testuser", password="testpassword")
+        response = self.client.get(reverse("manudux:properties"))
+        self.assertContains(response, 'aria-label="View Test Property"')
+
+    @tag("views", "slow", "auth", "property")
+    def test_edit_property_saves_extended_fields(self):
+        """Test that the registry/financial/insurance fields save via the edit form"""
+        self.client.login(username="testuser", password="testpassword")
+        property_obj = Property.objects.get(name="Test Property")
+
+        response = self.client.post(
+            reverse("manudux:edit-property", kwargs={"pk": property_obj.pk}),
+            data={
+                "name": "Test Property",
+                "parcel_number": "123-456-789",
+                "year_built": "1998",
+                "size_sqm": "120.5",
+                "purchase_price": "250000",
+                "insurance_company": "Acme Insurance",
+            },
+        )
+
+        self.assertEqual(response.status_code, 302)
+        property_obj.refresh_from_db()
+        self.assertEqual(property_obj.parcel_number, "123-456-789")
+        self.assertEqual(property_obj.year_built, 1998)
+        self.assertEqual(property_obj.insurance_company, "Acme Insurance")

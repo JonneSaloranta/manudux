@@ -7,6 +7,7 @@ from .guidestep_model import GuideStep
 from .appliance_model import Appliance
 from .maintenancetask_model import MaintenanceTask
 from .maintenancelog_model import MaintenanceLog
+from .propertydocument_model import PropertyDocument
 
 __all__ = [
     "PropertyType",
@@ -18,4 +19,5 @@ __all__ = [
     "Appliance",
     "MaintenanceTask",
     "MaintenanceLog",
+    "PropertyDocument",
 ]

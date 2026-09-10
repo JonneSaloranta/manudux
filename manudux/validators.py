@@ -50,3 +50,10 @@ validate_guide_file = FileExtensionAndSizeValidator(
     ],
     max_size_mb=25,
 )
+
+# Deeds, insurance certificates, inspection reports, floor plans - scans and
+# office documents, not the broader media types guides accept.
+validate_property_document = FileExtensionAndSizeValidator(
+    allowed_extensions=["pdf", "doc", "docx", "xlsx", "jpg", "jpeg", "png"],
+    max_size_mb=25,
+)

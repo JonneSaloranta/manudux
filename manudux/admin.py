@@ -15,11 +15,18 @@ from manudux.models.maintenancelog_model import MaintenanceLog
 from manudux.models.maintenancetask_model import MaintenanceTask
 from manudux.models.property_model import Property
 from manudux.models.property_type_model import PropertyType
+from manudux.models.propertydocument_model import PropertyDocument
 
 
 class LocationInline(admin.TabularInline):
     model = Location
     extra = 1
+
+
+class PropertyDocumentInline(admin.TabularInline):
+    model = PropertyDocument
+    extra = 0
+    fields = ("name", "category", "file", "notes")
 
 
 @admin.register(Property)
@@ -35,11 +42,11 @@ class PropertyAdmin(admin.ModelAdmin):
         "activated",
     )
     list_filter = ("created_at", "updated_at", "activated")
-    search_fields = ("name", "address", "city", "state", "zip_code")
+    search_fields = ("name", "address", "city", "state", "zip_code", "parcel_number")
     ordering = ("name", "created_at", "updated_at")
     date_hierarchy = "created_at"
     readonly_fields = ("created_at", "updated_at")
-    inlines = [LocationInline]
+    inlines = [LocationInline, PropertyDocumentInline]
 
     change_list_template = "admin/property_changelist.html"  # Custom admin template
 
@@ -180,3 +187,10 @@ class MaintenanceLogAdmin(admin.ModelAdmin):
     list_display = ("task_title", "property", "completed_at", "completed_by", "cost")
     list_filter = ("completed_at",)
     search_fields = ("task_title", "property__name", "notes")
+
+
+@admin.register(PropertyDocument)
+class PropertyDocumentAdmin(admin.ModelAdmin):
+    list_display = ("name", "property", "category", "uploaded_at")
+    list_filter = ("category", "uploaded_at")
+    search_fields = ("name", "property__name", "notes")
