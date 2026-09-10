@@ -27,5 +27,7 @@ RUN chown -R myuser:myuser /var/manudux/
 # Switch to non-root user
 USER myuser
 
+EXPOSE 8866
+
 # Entrypoint for the container
 ENTRYPOINT ["/bin/sh", "/var/manudux/runserver.sh"]

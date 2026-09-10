@@ -70,8 +70,8 @@ GUNICORN_WORKERS=3
 2. cd into the repo's root directory and create a virtual environment
 3. run `pip install -r requirements.txt`
 4. Run django's migrations `./manage.py migrate` (you may need to first do `sudo ./manage.py collectstatic`)
-5. Start the development server with `./manage.py runserver`
-6. Open your browser and go to `http://localhost:8000/`
+5. Start the development server with `./manage.py runserver 8866`
+6. Open your browser and go to `http://localhost:8866/`
 
 #### Venv superuser
 
@@ -82,7 +82,7 @@ GUNICORN_WORKERS=3
 1. clone the repo
 2. cd into the repo's root directory and run `cp .env.example .env`, then edit `.env`
 3. run `docker compose up --build -d`
-4. Open your browser and go to `http://localhost:8000/`
+4. Open your browser and go to `http://localhost:8866/`
 
 #### Docker superuser
 
