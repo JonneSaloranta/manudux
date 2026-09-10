@@ -76,3 +76,22 @@ class GuideStepTestCase(TestCase):
             "Step 1 for Test Guide Name",
             msg=f"The string representation should be 'Step 1 for Test Guide Name', but got '{str(test_guide)}'",
         )
+
+    @tag("models", "guidestep")
+    def test_guidesteps_are_ordered_by_step_number(self):
+        """Steps should come back ordered by step_number regardless of creation order"""
+        guide = Guide.objects.get(name="Test Guide Name")
+
+        GuideStep.objects.create(
+            guide=guide, title="Third", step_number=3, description="c"
+        )
+        GuideStep.objects.create(
+            guide=guide, title="Second", step_number=2, description="b"
+        )
+
+        step_numbers = list(guide.steps.values_list("step_number", flat=True))
+        self.assertEqual(
+            step_numbers,
+            [1, 2, 3],
+            msg=f"Steps should be ordered by step_number, got {step_numbers}",
+        )

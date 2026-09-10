@@ -30,7 +30,7 @@ jobs:
             - name: Set up Python
               uses: actions/setup-python@v4
               with:
-                  python-version: "3.11"
+                  python-version: "3.12"
 
             - name: Install dependencies
               run: |
@@ -41,11 +41,20 @@ jobs:
             - name: Ensure data directory exists
               run: mkdir -p ./data
 
+            - name: Check for missing migrations
+              run: |
+                  source venv/bin/activate
+                  python manage.py makemigrations --check --dry-run
+
             - name: Run migrations
               run: |
                   source venv/bin/activate
-                  python manage.py makemigrations --noinput
                   python manage.py migrate --noinput
+
+            - name: Collect static files
+              run: |
+                  source venv/bin/activate
+                  python manage.py collectstatic --noinput
 
             - name: Run tests
               run: |

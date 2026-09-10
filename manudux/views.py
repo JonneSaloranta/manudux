@@ -1,4 +1,5 @@
 from django.shortcuts import render, get_object_or_404
+from django.core.paginator import Paginator
 from .models import Property, Location, Guide, GuideFile, GuideStep
 from django.contrib.auth.decorators import login_required, permission_required
 from .forms import PropertyForm, LocationForm
@@ -8,12 +9,17 @@ from .forms import RegisterForm
 from django.core.exceptions import PermissionDenied
 from django.contrib.auth import login, logout, authenticate
 
+PAGE_SIZE = 20
+
 
 def index(request):
     context = {}
     return render(request, "manudux/index.html", context)
 
 def sign_up(request):
+    if not settings.ALLOW_REGISTRATION:
+        raise PermissionDenied()
+
     if request.method == "POST":
         form = RegisterForm(request.POST)
         if form.is_valid():
@@ -76,9 +82,10 @@ def delete_property(request, pk):
 
 @login_required(login_url="/accounts/login/")
 def properties(request):
-    properties = Property.objects.all()
+    queryset = Property.objects.filter(activated=True).order_by("name")
+    page_obj = Paginator(queryset, PAGE_SIZE).get_page(request.GET.get("page"))
 
-    context = {"properties": properties}
+    context = {"properties": page_obj, "page_obj": page_obj}
 
     return render(request, "manudux/properties.html", context=context)
 
@@ -125,6 +132,20 @@ def create_location(request):
 
 
 @login_required(login_url="/accounts/login/")
+def edit_location(request, pk):
+    location = get_object_or_404(Location, pk=pk)
+    if request.method == "POST":
+        form = LocationForm(request.POST, request.FILES, instance=location)
+        if form.is_valid():
+            form.save()
+            return redirect("manudux:location", pk=pk)
+    else:
+        form = LocationForm(instance=location)
+    context = {"form": form, "location": location}
+    return render(request, "manudux/location-edit.html", context)
+
+
+@login_required(login_url="/accounts/login/")
 def delete_location(request, pk):
     return delete_obj(
         request,
@@ -138,42 +159,17 @@ def delete_location(request, pk):
 
 @login_required(login_url="/accounts/login/")
 def locations(request):
-    locations = Location.objects.all()
-    return render(request, "manudux/locations.html", {"locations": locations})
+    queryset = Location.objects.order_by("name")
+    page_obj = Paginator(queryset, PAGE_SIZE).get_page(request.GET.get("page"))
+    return render(
+        request, "manudux/locations.html", {"locations": page_obj, "page_obj": page_obj}
+    )
 
 
 @login_required(login_url="/accounts/login/")
 def location_detail(request, pk):
     location = get_object_or_404(Location, pk=pk)
-    appliances = location.appliances.all()  # Using related_name to fetch appliances
-    return render(
-        request,
-        "manudux/location.html",
-        {"location": location, "appliances": appliances},
-    )
-
-
-def parts(request):
-    parts = Part.objects.all()
-    return render(request, "manudux/parts.html", {"parts": parts})
-
-
-def part_detail(request, pk):
-    part = get_object_or_404(Part, pk=pk)
-    return render(request, "manudux/part.html", {"part": part})
-
-
-def appliances(request):
-    appliances = Appliance.objects.all()
-    return render(request, "manudux/appliances.html", {"appliances": appliances})
-
-
-def appliance_detail(request, pk):
-    appliance = get_object_or_404(Appliance, pk=pk)
-    parts = appliance.parts.all()  # Get all parts related to the appliance
-    return render(
-        request, "manudux/appliance.html", {"appliance": appliance, "parts": parts}
-    )
+    return render(request, "manudux/location.html", {"location": location})
 
 
 def delete_obj(request, pk, model, redirect_url, template, context_name):
@@ -186,8 +182,9 @@ def delete_obj(request, pk, model, redirect_url, template, context_name):
 
 
 def guide_list(request):
-    guides = Guide.objects.all()  # Retrieve all Guide objects
-    context = {"guides": guides}
+    queryset = Guide.objects.order_by("name")
+    page_obj = Paginator(queryset, PAGE_SIZE).get_page(request.GET.get("page"))
+    context = {"guides": page_obj, "page_obj": page_obj}
     return render(request, "manudux/guide-list.html", context=context)
 
 

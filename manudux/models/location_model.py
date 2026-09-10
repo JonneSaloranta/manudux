@@ -1,17 +1,6 @@
-from django.db import models
-from django.contrib.auth.models import User
+from django.db import models, transaction
 from django.utils.translation import gettext_lazy as _
 from django.utils.timezone import now
-import qrcode
-from io import BytesIO
-from django.core.files.base import ContentFile
-from PIL import Image, ImageDraw, ImageFont
-from django.urls import reverse
-from django.conf import settings
-from urllib.parse import urlencode
-import textwrap
-from django.conf import settings
-import os
 from . import Property, Guide
 
 
@@ -37,20 +26,21 @@ class Location(models.Model):
 
     def save(self, *args, **kwargs):
         """Update the property's updated_at field when a location is created or updated."""
-        if self.pk:  # If location already exists (update)
-            old_instance = Location.objects.get(pk=self.pk)
-            if (
-                old_instance.name != self.name
-                or old_instance.description != self.description
-                or old_instance.activated != self.activated
-            ):
+        with transaction.atomic():
+            if self.pk:  # If location already exists (update)
+                old_instance = Location.objects.get(pk=self.pk)
+                if (
+                    old_instance.name != self.name
+                    or old_instance.description != self.description
+                    or old_instance.activated != self.activated
+                ):
+                    self.property.updated_at = now()
+                    self.property.save(update_fields=["updated_at"])
+            else:  # If creating a new location
                 self.property.updated_at = now()
-                self.property.save()
-        else:  # If creating a new location
-            self.property.updated_at = now()
-            self.property.save()
+                self.property.save(update_fields=["updated_at"])
 
-        super().save(*args, **kwargs)  # Call the original save method
+            super().save(*args, **kwargs)  # Call the original save method
 
     class Meta:
         verbose_name = _("Location")

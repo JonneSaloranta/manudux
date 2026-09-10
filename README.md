@@ -26,7 +26,6 @@ Manudux aims to be an easy-to-use tool for managing documentation and maintenanc
 
     **Future versions**
     - Import/Export
-    - Backups
     - Automated QR-Code generation for placing easier access to guides.
     - Other auth methods e.g LDAP, OAUTH, SSO
 
@@ -50,13 +49,19 @@ Manudux aims to be an easy-to-use tool for managing documentation and maintenanc
 ### Environment variables
 
 ```yaml
-SECRET_KEY=your_django_secret_key_for_manudux # or generate one
+SECRET_KEY=your_django_secret_key_for_manudux # required, no default - generate your own
 DEBUG=True # or False, defaults to False if not set
 ALLOWED_HOSTS=localhost,192.162.2.10 # or your host
 INTERNAL_IPS=*,127.0.0.1,localhost # used in development and testing
 TIME_ZONE=UTC # or your timezone. Optional, defaults to UTC if not set
 SITE_URL='http://manuxu.example.com' # This is used for links
-ALLOW_REGISTRATION=True # Not implemented yet
+ALLOW_REGISTRATION=True # allow visitors to sign up
+SECURE_SSL_REDIRECT=False # set to True once served over HTTPS
+SESSION_COOKIE_SECURE=False # set to True once served over HTTPS
+CSRF_COOKIE_SECURE=False # set to True once served over HTTPS
+SECURE_HSTS_SECONDS=0 # set once served over HTTPS
+CSRF_TRUSTED_ORIGINS= # comma separated, needed behind a reverse proxy
+GUNICORN_WORKERS=3
 ```
 
 ### Venv steps for Deployment
@@ -65,8 +70,8 @@ ALLOW_REGISTRATION=True # Not implemented yet
 2. cd into the repo's root directory and create a virtual environment
 3. run `pip install -r requirements.txt`
 4. Run django's migrations `./manage.py migrate` (you may need to first do `sudo ./manage.py collectstatic`)
-5. Start the development server with `./manage.py runserver`
-6. Open your browser and go to `http://localhost:8000/`
+5. Start the development server with `./manage.py runserver 8866`
+6. Open your browser and go to `http://localhost:8866/`
 
 #### Venv superuser
 
@@ -75,10 +80,16 @@ ALLOW_REGISTRATION=True # Not implemented yet
 ### Deployment using Docker
 
 1. clone the repo
-2. cd into the repo's root directory and run `docker compose up --build -d`
-3. Open your browser and go to `http://localhost:8000/`
+2. cd into the repo's root directory and run `cp .env.example .env`, then edit `.env`
+3. run `docker compose up --build -d`
+4. Open your browser and go to `http://localhost:8866/`
 
 #### Docker superuser
 
 1. run `docker compose exec -it web /bin/bash`
 2. run `python manage.py createsuperuser`
+
+### Backups
+
+1. `python manage.py backup` (writes to `backups/`, or pass `--output-dir`)
+2. `python manage.py restore backups/manudux-backup-<timestamp>.tar.gz`

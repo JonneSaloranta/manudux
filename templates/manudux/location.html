@@ -37,6 +37,7 @@
         <input type="submit" value="{% trans 'Delete' %}" class="btn btn-danger" style="background-color: red; cursor: pointer;">
     </form>
 
+    <a href="{% url 'manudux:edit-location' pk=location.id %}" class="btn btn-primary" style="background-color: aqua;">{% trans "Edit" %}</a>
 
     <p>{% trans "View property" %}: <a href="{% url 'manudux:property' location.property.id %}">{{ location.property }}</a></p>
 
