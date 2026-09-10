@@ -5,12 +5,14 @@
 {% block content %}
 <div class="container">
     <section>
-        <form action="{% url 'manudux:edit-maintenance-task' pk=task.id %}" method="post">
-            {% csrf_token %}
+        <div class="form-card">
+            <form action="{% url 'manudux:edit-maintenance-task' pk=task.id %}" method="post">
+                {% csrf_token %}
 
-            {{ form.as_div }}
-            <button>{% trans "Save" %}</button>
-        </form>
+                {{ form.as_div }}
+                <button class="btn btn-primary">{% trans "Save" %}</button>
+            </form>
+        </div>
     </section>
 </div>
 {% endblock %}

@@ -5,12 +5,14 @@
 {% block content %}
 <div class="container">
     <section>
-        <form action="{% url 'manudux:create-location' %}" method="post" enctype="multipart/form-data">
-            {% csrf_token %}
+        <div class="form-card">
+            <form action="{% url 'manudux:create-location' %}" method="post" enctype="multipart/form-data">
+                {% csrf_token %}
 
-            {{ form.as_div }}
-            <button>{% trans "Create" %}</button>
-        </form>
+                {{ form.as_div }}
+                <button class="btn btn-primary">{% trans "Create" %}</button>
+            </form>
+        </div>
         {% if success %}
         <p style="color: green; font-weight: bold;">{% trans "Location created successfully" %}</p>
         {% endif %}

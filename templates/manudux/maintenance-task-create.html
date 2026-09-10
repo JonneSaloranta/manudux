@@ -5,12 +5,14 @@
 {% block content %}
 <div class="container">
     <section>
-        <form action="{{ request.get_full_path }}" method="post">
-            {% csrf_token %}
+        <div class="form-card">
+            <form action="{{ request.get_full_path }}" method="post">
+                {% csrf_token %}
 
-            {{ form.as_div }}
-            <button>{% trans "Create" %}</button>
-        </form>
+                {{ form.as_div }}
+                <button class="btn btn-primary">{% trans "Create" %}</button>
+            </form>
+        </div>
     </section>
 </div>
 {% endblock %}

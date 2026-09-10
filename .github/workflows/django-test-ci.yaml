@@ -139,7 +139,7 @@ jobs:
                   source venv/bin/activate
                   python manage.py collectstatic --noinput
 
-            - name: Create a throwaway user for scanning authenticated pages
+            - name: Seed a throwaway user and sample data for scanning authenticated pages
               run: |
                   source venv/bin/activate
                   A11Y_PASSWORD="$(python -c 'import secrets; print(secrets.token_urlsafe(16))')"
@@ -147,8 +147,17 @@ jobs:
                   echo "A11Y_PASSWORD=$A11Y_PASSWORD" >> "$GITHUB_ENV"
                   python manage.py shell -c "
                   from django.contrib.auth.models import User
+                  from manudux.models import Property, Location, Appliance, MaintenanceTask
                   User.objects.filter(username='a11y').delete()
                   User.objects.create_user(username='a11y', password='$A11Y_PASSWORD')
+                  # Seed one of everything so list/card views render their real
+                  # markup during the scan, not just their empty states.
+                  p = Property.objects.create(name='A11y Test Property')
+                  l = Location.objects.create(name='A11y Test Location', property=p)
+                  Appliance.objects.create(name='A11y Test Appliance', location=l)
+                  MaintenanceTask.objects.create(
+                      title='A11y Test Task', property=p, due_date='2030-01-01'
+                  )
                   "
 
             - name: Start the app

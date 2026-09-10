@@ -23,6 +23,6 @@
         <div class="card-body">{% trans "No description available" %}</div>
         {% endif %}
 
-        <a href="{% url 'manudux:property' pk=property.id %}" class="card-link"></a>
+        <a href="{% url 'manudux:property' pk=property.id %}" class="card-link" aria-label="{% blocktrans with name=property.name %}View {{ name }}{% endblocktrans %}"></a>
     </div>
 </div>

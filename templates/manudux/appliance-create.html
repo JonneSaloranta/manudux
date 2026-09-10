@@ -5,12 +5,14 @@
 {% block content %}
 <div class="container">
     <section>
-        <form action="{% url 'manudux:create-appliance' %}{% if location %}?location_id={{ location.id }}{% endif %}" method="post" enctype="multipart/form-data">
-            {% csrf_token %}
+        <div class="form-card">
+            <form action="{% url 'manudux:create-appliance' %}{% if location %}?location_id={{ location.id }}{% endif %}" method="post" enctype="multipart/form-data">
+                {% csrf_token %}
 
-            {{ form.as_div }}
-            <button>{% trans "Create" %}</button>
-        </form>
+                {{ form.as_div }}
+                <button class="btn btn-primary">{% trans "Create" %}</button>
+            </form>
+        </div>
     </section>
 </div>
 {% endblock %}
