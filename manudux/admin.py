@@ -18,11 +18,6 @@ class LocationInline(admin.TabularInline):
     extra = 1
 
 
-class PropertyInline(admin.TabularInline):
-    model = Property
-    extra = 1
-
-
 @admin.register(Property)
 class PropertyAdmin(admin.ModelAdmin):
     list_display = (
@@ -98,52 +93,6 @@ class LocationAdmin(admin.ModelAdmin):
     readonly_fields = ("created_at", "updated_at")
 
 
-# @admin.register(Appliance)
-# class ApplianceAdmin(admin.ModelAdmin):
-#     list_display = ('name', 'location', 'created_at', 'updated_at', 'activated')
-#     list_filter = ('created_at', 'updated_at', 'activated')
-#     search_fields = ('name', 'location')
-#     ordering = ('name', 'created_at', 'updated_at')
-#     date_hierarchy = 'created_at'
-#     readonly_fields = ('created_at', 'updated_at')
-
-# @admin.register(Part)
-# class PartAdmin(admin.ModelAdmin):
-#     list_display = ('name', 'appliance', 'created_at', 'updated_at', 'activated')
-#     list_filter = ('created_at', 'updated_at', 'activated')
-#     search_fields = ('name', 'appliance')
-#     ordering = ('name', 'created_at', 'updated_at')
-#     date_hierarchy = 'created_at'
-#     readonly_fields = ('created_at', 'updated_at')
-
-# @admin.register(Generator)
-# class GeneratorAdmin(admin.ModelAdmin):
-#     list_display = ('name', 'generator', 'created_at', 'updated_at', 'activated')
-#     list_filter = ('created_at', 'updated_at', 'activated')
-#     search_fields = ('name', 'generator')
-#     ordering = ('name', 'created_at', 'updated_at')
-#     date_hierarchy = 'created_at'
-#     readonly_fields = ('created_at', 'updated_at')
-
-# @admin.register(Stock)
-# class StockAdmin(admin.ModelAdmin):
-#     list_display = ('name', 'location', 'created_at', 'updated_at', 'activated')
-#     list_filter = ('created_at', 'updated_at', 'activated')
-#     search_fields = ('name', 'location')
-#     ordering = ('name', 'created_at', 'updated_at')
-#     date_hierarchy = 'created_at'
-#     readonly_fields = ('created_at', 'updated_at')
-
-# @admin.register(StockItem)
-# class StockItemAdmin(admin.ModelAdmin):
-#     list_display = ('stock', 'part', 'quantity', 'condition', 'created_at', 'updated_at')
-#     list_filter = ('created_at', 'updated_at')
-#     search_fields = ('stock', 'part', 'quantity', 'condition')
-#     ordering = ('stock', 'part', 'created_at', 'updated_at')
-#     date_hierarchy = 'created_at'
-#     readonly_fields = ('created_at', 'updated_at')
-
-
 @admin.register(PropertyType)
 class PropertyTypeAdmin(admin.ModelAdmin):
     list_display = ("name", "description")
@@ -151,7 +100,7 @@ class PropertyTypeAdmin(admin.ModelAdmin):
     ordering = ("name",)
 
 
-class GuideFileAdmin(admin.StackedInline):
+class GuideFileInline(admin.StackedInline):
     model = GuideFile
     extra = 1
 
@@ -173,7 +122,7 @@ class GuideStepInline(admin.TabularInline):
 class GuideAdmin(admin.ModelAdmin):
     list_display = ("name", "description", "qr_code", "created_at", "updated_at")
     search_fields = ("name", "created_at", "updated_at")
-    inlines = [GuideStepInline, GuideFileAdmin]  # PropertyInline, LocationInline
+    inlines = [GuideStepInline, GuideFileInline]
 
 
 @admin.register(GuideFile)

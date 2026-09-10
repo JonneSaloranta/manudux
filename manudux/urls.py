@@ -15,10 +15,6 @@ urlpatterns = [
     path("location/<int:pk>/delete/", views.delete_location, name="delete-location"),
     path("locations/", views.locations, name="locations"),
     path("location/<int:pk>/", views.location_detail, name="location"),
-    # path("parts/", views.parts, name="parts"),
-    # path("part/<int:pk>/", views.part_detail, name="part"),
-    # path("appliances/", views.appliances, name="appliances"),
-    # path("appliance/<int:pk>/", views.appliance_detail, name="appliance"),
     path("guides/", views.guide_list, name="guides"),
     path("guide/<int:pk>/", views.guide_detail, name="guide"),
 ]

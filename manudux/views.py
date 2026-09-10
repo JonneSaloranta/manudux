@@ -148,35 +148,7 @@ def locations(request):
 @login_required(login_url="/accounts/login/")
 def location_detail(request, pk):
     location = get_object_or_404(Location, pk=pk)
-    appliances = location.appliances.all()  # Using related_name to fetch appliances
-    return render(
-        request,
-        "manudux/location.html",
-        {"location": location, "appliances": appliances},
-    )
-
-
-def parts(request):
-    parts = Part.objects.all()
-    return render(request, "manudux/parts.html", {"parts": parts})
-
-
-def part_detail(request, pk):
-    part = get_object_or_404(Part, pk=pk)
-    return render(request, "manudux/part.html", {"part": part})
-
-
-def appliances(request):
-    appliances = Appliance.objects.all()
-    return render(request, "manudux/appliances.html", {"appliances": appliances})
-
-
-def appliance_detail(request, pk):
-    appliance = get_object_or_404(Appliance, pk=pk)
-    parts = appliance.parts.all()  # Get all parts related to the appliance
-    return render(
-        request, "manudux/appliance.html", {"appliance": appliance, "parts": parts}
-    )
+    return render(request, "manudux/location.html", {"location": location})
 
 
 def delete_obj(request, pk, model, redirect_url, template, context_name):
