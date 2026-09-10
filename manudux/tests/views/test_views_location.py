@@ -83,3 +83,30 @@ class LocationViewsTest(TestCase):
 
         self.assertEqual(response.status_code, 302, msg="User was not redirected")
         self.assertTrue(Location.objects.filter(name="New Location").exists())
+
+    @tag("views", "auth", "location")
+    def test_edit_location_view_public(self):
+        """Test if logged out users are redirected to login page when trying to edit a location"""
+        response = self.client.get(
+            reverse("manudux:edit-location", kwargs={"pk": self.location.pk})
+        )
+        self.assertEqual(response.status_code, 302)
+        self.assertTrue("accounts/login" in response.url)
+
+    @tag("views", "auth", "location")
+    def test_edit_location_view_private(self):
+        """Test if logged in users can update a location"""
+        self.client.login(username="testuser", password="testpassword")
+
+        response = self.client.post(
+            reverse("manudux:edit-location", kwargs={"pk": self.location.pk}),
+            data={
+                "name": "Updated Location",
+                "description": "Updated Description",
+                "property": self.property.pk,
+            },
+        )
+
+        self.assertEqual(response.status_code, 302, msg="User was not redirected")
+        self.location.refresh_from_db()
+        self.assertEqual(self.location.name, "Updated Location")

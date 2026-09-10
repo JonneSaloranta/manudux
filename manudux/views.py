@@ -128,6 +128,20 @@ def create_location(request):
 
 
 @login_required(login_url="/accounts/login/")
+def edit_location(request, pk):
+    location = get_object_or_404(Location, pk=pk)
+    if request.method == "POST":
+        form = LocationForm(request.POST, request.FILES, instance=location)
+        if form.is_valid():
+            form.save()
+            return redirect("manudux:location", pk=pk)
+    else:
+        form = LocationForm(instance=location)
+    context = {"form": form, "location": location}
+    return render(request, "manudux/location-edit.html", context)
+
+
+@login_required(login_url="/accounts/login/")
 def delete_location(request, pk):
     return delete_obj(
         request,
