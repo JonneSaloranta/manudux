@@ -116,6 +116,12 @@ DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.sqlite3",
         "NAME": BASE_DIR / "data/db.sqlite3",
+        # File-backed rather than in-memory so the backup/restore management
+        # commands, which read the file path off the live connection, can be
+        # exercised against a real database file in tests too.
+        "TEST": {
+            "NAME": BASE_DIR / "data/test_db.sqlite3",
+        },
     }
 }
 

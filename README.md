@@ -26,7 +26,6 @@ Manudux aims to be an easy-to-use tool for managing documentation and maintenanc
 
     **Future versions**
     - Import/Export
-    - Backups
     - Automated QR-Code generation for placing easier access to guides.
     - Other auth methods e.g LDAP, OAUTH, SSO
 
@@ -89,3 +88,8 @@ GUNICORN_WORKERS=3
 
 1. run `docker compose exec -it web /bin/bash`
 2. run `python manage.py createsuperuser`
+
+### Backups
+
+1. `python manage.py backup` (writes to `backups/`, or pass `--output-dir`)
+2. `python manage.py restore backups/manudux-backup-<timestamp>.tar.gz`
