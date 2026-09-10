@@ -1,129 +1,44 @@
 {% extends "manudux/base.html" %}
+{% load i18n %}
 {% load static %}
 
 {% block content %}
 <div class="container">
     <h1 class="title">Manudux</h1>
 
+    {% if user.is_authenticated %}
+    <section class="dashboard-section">
+        <h2>{% trans "Overdue maintenance" %}</h2>
+        <div class="entity-list">
+            {% for task in overdue_tasks %}
+            <a class="entity-list-item entity-list-item-overdue" href="{% url 'manudux:maintenance-task' pk=task.id %}">
+                <span class="entity-list-title">{{ task.title }}</span>
+                <span class="entity-list-meta">{{ task.property.name }} - {% trans "Due" %} {{ task.due_date|date:"d.m.Y" }}</span>
+            </a>
+            {% empty %}
+            <p>{% trans "Nothing overdue." %}</p>
+            {% endfor %}
+        </div>
+
+        <h2>{% trans "Coming up" %}</h2>
+        <div class="entity-list">
+            {% for task in upcoming_tasks %}
+            <a class="entity-list-item" href="{% url 'manudux:maintenance-task' pk=task.id %}">
+                <span class="entity-list-title">{{ task.title }}</span>
+                <span class="entity-list-meta">{{ task.property.name }} - {% trans "Due" %} {{ task.due_date|date:"d.m.Y" }}</span>
+            </a>
+            {% empty %}
+            <p>{% trans "Nothing coming up." %}</p>
+            {% endfor %}
+        </div>
+
+        <a href="{% url 'manudux:maintenance-tasks' %}" class="btn btn-primary">{% trans "View all maintenance tasks" %}</a>
+    </section>
+    {% else %}
     <div class="page-hero bg-dark-green text-color-white">
-        <h2>What have we been working on?</h2>
-        <p>Lorem ipsum dolor sit amet consectetur, adipisicing elit. Nobis dolorem magnam hic, ex atque necessitatibus accusamus voluptate error, cum, perspiciatis sunt omnis harum ducimus et ut. Eos odit vero
-            voluptatum.</p>
+        <h2>{% trans "Manudux" %}</h2>
+        <p>{% trans "Manudux is a self-hostable tool for managing documentation and maintenance of your properties." %}</p>
     </div>
+    {% endif %}
 </div>
-
-<div class="container">
-    <div class="list-group">
-        <div class="group-title">
-            <h2>Features</h2>
-        </div>
-        <div class="feature-list">
-            <p class="title">Security</p>
-            <ul>
-                <li><input type="checkbox" checked disabled>Authentication</li>
-            </ul>
-        </div>
-
-        <div class="feature-list">
-            <p class="title">UI/UX</p>
-            <ul>
-                <li><input type="checkbox" checked disabled>Navbar for Desktop/Mobile</li>
-            </ul>
-        </div>
-
-        <div class="feature-list">
-            <p class="title">UI/UX</p>
-            <ul>
-                <li><input type="checkbox" checked disabled>Navbar for Desktop/Mobile</li>
-            </ul>
-        </div>
-        <div class="feature-list">
-            <p class="title">UI/UX</p>
-            <ul>
-                <li><input type="checkbox" checked disabled>Navbar for Desktop/Mobile</li>
-            </ul>
-        </div>
-        <div class="feature-list">
-            <p class="title">UI/UX</p>
-            <ul>
-                <li><input type="checkbox" checked disabled>Navbar for Desktop/Mobile</li>
-            </ul>
-        </div>
-
-        <div class="feature-list">
-            <p class="title">Models</p>
-            <ul>
-                <li><input type="checkbox" checked disabled>Guides</li>
-                <li><input type="checkbox" checked disabled>Properties</li>
-                <li><input type="checkbox" checked disabled>Locations</li>
-            </ul>
-        </div>
-    </div>
-
-    <div class="list-group">
-        <div class="group-title">
-            <h2>Work In Progress</h2>
-        </div>
-        <div class="feature-list">
-            <p class="title">Plans</p>
-            <ul>
-                <li><input type="checkbox" disabled>OAuth/LDAP/SSO</li>
-            </ul>
-        </div>
-
-        <div class="feature-list">
-            <p class="title">Work In Progress</p>
-            <ul>
-                <li><input type="checkbox" checked disabled> Fast performance</li>
-                <li><input type="checkbox" checked disabled> Secure by default</li>
-                <li><input type="checkbox" disabled> Dark mode</li>
-                <li><input type="checkbox" checked disabled> Easy to use</li>
-            </ul>
-        </div>
-
-        <div class="feature-list">
-            <p class="title">Features</p>
-            <ul>
-                <li><input type="checkbox" checked disabled> Fast performance</li>
-                <li><input type="checkbox" checked disabled> Secure by default</li>
-                <li><input type="checkbox" disabled> Dark mode</li>
-                <li><input type="checkbox" checked disabled> Easy to use</li>
-            </ul>
-        </div>
-    </div>
-
-    <div class="list-group">
-        <div class="group-title">
-            <h2>Future plans</h2>
-        </div>
-        <div class="feature-list">
-            <p class="title">Plans</p>
-            <ul>
-                <li><input type="checkbox" disabled>OAuth/LDAP/SSO</li>
-            </ul>
-        </div>
-
-        <div class="feature-list">
-            <p class="title">Work In Progress</p>
-            <ul>
-                <li><input type="checkbox" checked disabled> Fast performance</li>
-                <li><input type="checkbox" checked disabled> Secure by default</li>
-                <li><input type="checkbox" disabled> Dark mode</li>
-                <li><input type="checkbox" checked disabled> Easy to use</li>
-            </ul>
-        </div>
-
-        <div class="feature-list">
-            <p class="title">Features</p>
-            <ul>
-                <li><input type="checkbox" checked disabled> Fast performance</li>
-                <li><input type="checkbox" checked disabled> Secure by default</li>
-                <li><input type="checkbox" disabled> Dark mode</li>
-                <li><input type="checkbox" checked disabled> Easy to use</li>
-            </ul>
-        </div>
-    </div>
-
-</div>
-
 {% endblock %}

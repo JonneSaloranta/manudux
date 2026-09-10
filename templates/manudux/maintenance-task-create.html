@@ -1,0 +1,16 @@
+{% extends "manudux/base.html" %}
+{% load i18n %}
+{% load static %}
+
+{% block content %}
+<div class="container">
+    <section>
+        <form action="{{ request.get_full_path }}" method="post">
+            {% csrf_token %}
+
+            {{ form.as_div }}
+            <button>{% trans "Create" %}</button>
+        </form>
+    </section>
+</div>
+{% endblock %}

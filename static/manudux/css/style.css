@@ -280,9 +280,7 @@ footer .row a:hover {
 }
 @supports not (accent-color: green) {
   .feature-list input[type=checkbox] {
-    -webkit-appearance: none;
-       -moz-appearance: none;
-            appearance: none;
+    appearance: none;
     width: 1em;
     height: 1em;
     border: 2px solid green;
@@ -321,8 +319,7 @@ footer .row a:hover {
   inline-size: 100%;
   aspect-ratio: 1;
   display: block;
-  -o-object-fit: cover;
-     object-fit: cover;
+  object-fit: cover;
   border-radius: 1rem;
 }
 .card .card-title h2 {
@@ -421,4 +418,139 @@ footer .row a:hover {
   #sidebar .dropdown-btn svg:last-child {
     display: none;
   }
-}/*# sourceMappingURL=style.css.map */
+}
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-height: 44px;
+  margin: 0.5rem 0;
+  padding: 0.75em 1.5em;
+  border: none;
+  border-radius: 0.5em;
+  font: inherit;
+  font-weight: 600;
+  text-align: center;
+  text-decoration: none;
+  cursor: pointer;
+  color: var(--color-white);
+  background-color: var(--secondary-color);
+}
+.btn:hover {
+  background-color: var(--primary-color);
+}
+
+.btn-primary {
+  background-color: var(--primary-color);
+}
+.btn-primary:hover {
+  background-color: var(--secondary-color);
+}
+
+.btn-danger {
+  background-color: #b3261e;
+}
+.btn-danger:hover {
+  background-color: #7f1b16;
+}
+
+.btn-large {
+  min-height: 52px;
+  font-size: 1.8rem;
+}
+
+@media (min-width: 700px) {
+  .btn {
+    width: auto;
+  }
+}
+.entity-list {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1rem;
+  margin: 1rem 0;
+}
+
+.entity-list-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  padding: 1.25rem;
+  min-height: 44px;
+  border: 1px solid var(--tetriary-color);
+  border-radius: 1rem;
+  text-decoration: none;
+  color: var(--color-black);
+  background-color: var(--color-white);
+}
+.entity-list-item:hover {
+  border-color: var(--secondary-color);
+}
+.entity-list-item .entity-list-title {
+  font-weight: 600;
+  font-size: 1.8rem;
+}
+.entity-list-item .entity-list-meta {
+  color: var(--primary-color);
+}
+
+.entity-list-item-overdue {
+  border-color: #b3261e;
+}
+.entity-list-item-overdue .entity-list-meta {
+  color: #b3261e;
+}
+
+@media (min-width: 700px) {
+  .entity-list {
+    grid-template-columns: repeat(auto-fill, minmax(28rem, 1fr));
+  }
+}
+.overdue {
+  color: #b3261e;
+  font-weight: 600;
+}
+
+.filter-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin: 1rem 0;
+}
+.filter-tabs a {
+  padding: 0.75em 1.25em;
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  border-radius: 0.5em;
+  text-decoration: none;
+  color: var(--primary-color);
+  background-color: var(--color-white);
+  border: 1px solid var(--tetriary-color);
+}
+.filter-tabs a.active {
+  color: var(--color-white);
+  background-color: var(--primary-color);
+}
+
+.detail-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.5rem;
+  margin: 1rem 0;
+}
+
+@media (min-width: 700px) {
+  .detail-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+.dashboard-section,
+.maintenance-section,
+.maintenance-history,
+.complete-task {
+  margin: 2rem 0;
+}
+
+/*# sourceMappingURL=style.css.map */

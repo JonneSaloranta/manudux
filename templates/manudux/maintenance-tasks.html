@@ -1,0 +1,32 @@
+{% extends "manudux/base.html" %}
+{% load i18n %}
+{% load static %}
+
+{% block title %}{% trans "Maintenance" %}{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1 class="title">{% trans "Maintenance" %}</h1>
+
+    <a href="{% url 'manudux:create-maintenance-task' %}" class="btn btn-primary">{% trans "Add a task" %}</a>
+
+    <nav class="filter-tabs">
+        <a href="?filter=active" class="{% if status == 'active' %}active{% endif %}">{% trans "Active" %}</a>
+        <a href="?filter=overdue" class="{% if status == 'overdue' %}active{% endif %}">{% trans "Overdue" %}</a>
+        <a href="?filter=done" class="{% if status == 'done' %}active{% endif %}">{% trans "Done" %}</a>
+    </nav>
+
+    <div class="entity-list">
+        {% for task in maintenance_tasks %}
+        <a class="entity-list-item{% if not task.is_done and task.due_date < today %} entity-list-item-overdue{% endif %}" href="{% url 'manudux:maintenance-task' pk=task.id %}">
+            <span class="entity-list-title">{{ task.title }}</span>
+            <span class="entity-list-meta">{{ task.property.name }} - {% trans "Due" %} {{ task.due_date|date:"d.m.Y" }}</span>
+        </a>
+        {% empty %}
+        <p>{% trans "No maintenance tasks here." %}</p>
+        {% endfor %}
+    </div>
+
+    {% include "manudux/_pagination.html" %}
+</div>
+{% endblock %}

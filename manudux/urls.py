@@ -17,4 +17,32 @@ urlpatterns = [
     path("location/<int:pk>/", views.location_detail, name="location"),
     path("guides/", views.guide_list, name="guides"),
     path("guide/<int:pk>/", views.guide_detail, name="guide"),
+    path("appliances/", views.appliances, name="appliances"),
+    path(
+        "appliances/create-appliance/", views.create_appliance, name="create-appliance"
+    ),
+    path("appliance/<int:pk>/edit/", views.edit_appliance, name="edit-appliance"),
+    path("appliance/<int:pk>/delete/", views.delete_appliance, name="delete-appliance"),
+    path("appliance/<int:pk>/", views.appliance_detail, name="appliance"),
+    path("maintenance/", views.maintenance_tasks, name="maintenance-tasks"),
+    path(
+        "maintenance/create-task/",
+        views.create_maintenance_task,
+        name="create-maintenance-task",
+    ),
+    path(
+        "maintenance/<int:pk>/edit/",
+        views.edit_maintenance_task,
+        name="edit-maintenance-task",
+    ),
+    path(
+        "maintenance/<int:pk>/delete/",
+        views.delete_maintenance_task,
+        name="delete-maintenance-task",
+    ),
+    path(
+        "maintenance/<int:pk>/",
+        views.maintenance_task_detail,
+        name="maintenance-task",
+    ),
 ]

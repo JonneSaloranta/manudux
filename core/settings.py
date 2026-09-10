@@ -33,9 +33,7 @@ ALLOWED_HOSTS = config(
     "ALLOWED_HOSTS", cast=lambda v: [s.strip() for s in v.split(",")]
 )
 
-INTERNAL_IPS = config(
-    "INTERNAL_IPS", cast=lambda v: [s.strip() for s in v.split(",")]
-)
+INTERNAL_IPS = config("INTERNAL_IPS", cast=lambda v: [s.strip() for s in v.split(",")])
 
 SITE_URL = config("SITE_URL", cast=str)
 
@@ -53,6 +51,29 @@ CSRF_TRUSTED_ORIGINS = config(
     "CSRF_TRUSTED_ORIGINS",
     default="",
     cast=lambda v: [s.strip() for s in v.split(",") if s.strip()],
+)
+
+# Email - used for the maintenance reminder digest (see
+# manudux/management/commands/send_maintenance_reminders.py). Defaults to
+# printing to the console when DEBUG so self-hosted instances work without
+# any SMTP setup until an operator configures one.
+EMAIL_BACKEND = config(
+    "EMAIL_BACKEND",
+    default=(
+        "django.core.mail.backends.console.EmailBackend"
+        if DEBUG
+        else "django.core.mail.backends.smtp.EmailBackend"
+    ),
+)
+EMAIL_HOST = config("EMAIL_HOST", default="localhost")
+EMAIL_PORT = config("EMAIL_PORT", default=587, cast=int)
+EMAIL_HOST_USER = config("EMAIL_HOST_USER", default="")
+EMAIL_HOST_PASSWORD = config("EMAIL_HOST_PASSWORD", default="")
+EMAIL_USE_TLS = config("EMAIL_USE_TLS", default=True, cast=bool)
+DEFAULT_FROM_EMAIL = config("DEFAULT_FROM_EMAIL", default="manudux@localhost")
+
+MAINTENANCE_REMINDER_LOOKAHEAD_DAYS = config(
+    "MAINTENANCE_REMINDER_LOOKAHEAD_DAYS", default=7, cast=int
 )
 
 
@@ -80,7 +101,7 @@ MIDDLEWARE = [
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.locale.LocaleMiddleware",
     "django.middleware.common.CommonMiddleware",
-    'debug_toolbar.middleware.DebugToolbarMiddleware',
+    "debug_toolbar.middleware.DebugToolbarMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",

@@ -1,0 +1,56 @@
+{% extends "manudux/base.html" %}
+{% load i18n %}
+{% load static %}
+
+{% block title %}{% trans "Appliance" %} - {{ appliance.name }}{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1>{% trans "Appliance" %}</h1>
+
+    {% if not appliance.image %}
+    <img src="{% static 'manudux/img/placeholder300x200.png'%}" alt="placeholder image">
+    {% else %}
+    <img src="{{ appliance.image.url }}" alt="{{ appliance.name }}" height="200">
+    {% endif %}
+    <h2>{{ appliance.name }}</h2>
+
+    <div class="detail-grid">
+        {% if appliance.brand %}<p>{% trans "Brand" %}: {{ appliance.brand }}</p>{% endif %}
+        {% if appliance.model_number %}<p>{% trans "Model Number" %}: {{ appliance.model_number }}</p>{% endif %}
+        {% if appliance.serial_number %}<p>{% trans "Serial Number" %}: {{ appliance.serial_number }}</p>{% endif %}
+        {% if appliance.purchase_date %}<p>{% trans "Purchased" %}: {{ appliance.purchase_date|date:"d.m.Y" }}</p>{% endif %}
+        {% if appliance.warranty_expires %}<p>{% trans "Warranty expires" %}: {{ appliance.warranty_expires|date:"d.m.Y" }}</p>{% endif %}
+    </div>
+
+    {% if appliance.notes %}
+    <p>{{ appliance.notes }}</p>
+    {% endif %}
+
+    {% if appliance.guide %}
+    <p>{% trans "Manual" %}: <a href="{% url 'manudux:guide' pk=appliance.guide.pk %}">{{ appliance.guide }}</a></p>
+    {% endif %}
+
+    <form action="{% url 'manudux:delete-appliance' appliance.id %}" method="post">
+        {% csrf_token %}
+        <input type="submit" value="{% trans 'Delete' %}" class="btn btn-danger">
+    </form>
+
+    <a href="{% url 'manudux:edit-appliance' pk=appliance.id %}" class="btn btn-primary">{% trans "Edit" %}</a>
+
+    <p>{% trans "Location" %}: <a href="{% url 'manudux:location' appliance.location.id %}">{{ appliance.location }}</a></p>
+
+    <div class="maintenance-section">
+        <h2>{% trans "Maintenance tasks" %}:</h2>
+        <a href="{% url 'manudux:create-maintenance-task' %}?appliance_id={{ appliance.id }}">{% trans "Add a maintenance task" %}</a>
+
+        <ul>
+            {% for task in maintenance_tasks %}
+            <li><a href="{% url 'manudux:maintenance-task' pk=task.id %}">{{ task.title }}</a> - {{ task.due_date|date:"d.m.Y" }}</li>
+            {% empty %}
+            <li>{% trans "No maintenance tasks for this appliance yet." %}</li>
+            {% endfor %}
+        </ul>
+    </div>
+</div>
+{% endblock %}

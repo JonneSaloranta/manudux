@@ -1,0 +1,20 @@
+{% extends "manudux/base.html" %}
+{% load i18n %}
+{% load static %}
+
+{% block title %}{% trans "Delete" %} - {{ task.title }}{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1>{% trans "Delete Maintenance Task" %}</h1>
+
+    <p>{% blocktrans %}Are you sure you want to delete "{{ task }}"? This cannot be undone.{% endblocktrans %}</p>
+
+    <form action="{% url 'manudux:delete-maintenance-task' task.id %}" method="post">
+        {% csrf_token %}
+        <input type="submit" value="{% trans 'Delete' %}" class="btn btn-danger">
+    </form>
+
+    <a href="{% url 'manudux:maintenance-task' pk=task.id %}" class="btn">{% trans "Cancel" %}</a>
+</div>
+{% endblock %}

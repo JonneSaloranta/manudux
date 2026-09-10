@@ -1,8 +1,25 @@
+from datetime import timedelta
+
 from django.shortcuts import render, get_object_or_404
 from django.core.paginator import Paginator
-from .models import Property, Location, Guide, GuideFile, GuideStep
+from django.utils import timezone
+from .models import (
+    Property,
+    Location,
+    Guide,
+    GuideFile,
+    GuideStep,
+    Appliance,
+    MaintenanceTask,
+)
 from django.contrib.auth.decorators import login_required, permission_required
-from .forms import PropertyForm, LocationForm
+from .forms import (
+    PropertyForm,
+    LocationForm,
+    ApplianceForm,
+    MaintenanceTaskForm,
+    MaintenanceCompletionForm,
+)
 from django.shortcuts import redirect
 from django.conf import settings
 from .forms import RegisterForm
@@ -10,11 +27,27 @@ from django.core.exceptions import PermissionDenied
 from django.contrib.auth import login, logout, authenticate
 
 PAGE_SIZE = 20
+DASHBOARD_TASK_LIMIT = 10
 
 
 def index(request):
     context = {}
+
+    if request.user.is_authenticated:
+        today = timezone.localdate()
+        lookahead = today + timedelta(days=settings.MAINTENANCE_REMINDER_LOOKAHEAD_DAYS)
+        active_tasks = MaintenanceTask.objects.filter(is_done=False).select_related(
+            "property"
+        )
+        context["overdue_tasks"] = active_tasks.filter(due_date__lt=today)[
+            :DASHBOARD_TASK_LIMIT
+        ]
+        context["upcoming_tasks"] = active_tasks.filter(
+            due_date__gte=today, due_date__lte=lookahead
+        )[:DASHBOARD_TASK_LIMIT]
+
     return render(request, "manudux/index.html", context)
+
 
 def sign_up(request):
     if not settings.ALLOW_REGISTRATION:
@@ -30,9 +63,10 @@ def sign_up(request):
         form = RegisterForm()
 
     context = {
-        'form': form,
+        "form": form,
     }
     return render(request, "registration/signup.html", context=context)
+
 
 @login_required
 def site_settings(request):
@@ -40,6 +74,7 @@ def site_settings(request):
         return render(request, "manudux/site-settings.html")
     else:
         raise PermissionDenied()
+
 
 @login_required(login_url=settings.LOGIN_URL)
 def create_property(request):
@@ -169,7 +204,12 @@ def locations(request):
 @login_required(login_url="/accounts/login/")
 def location_detail(request, pk):
     location = get_object_or_404(Location, pk=pk)
-    return render(request, "manudux/location.html", {"location": location})
+    appliances = location.appliances.filter(activated=True)
+    return render(
+        request,
+        "manudux/location.html",
+        {"location": location, "appliances": appliances},
+    )
 
 
 def delete_obj(request, pk, model, redirect_url, template, context_name):
@@ -179,6 +219,189 @@ def delete_obj(request, pk, model, redirect_url, template, context_name):
         return redirect(redirect_url)
     context = {context_name: obj}
     return render(request, template, context)
+
+
+@login_required(login_url="/accounts/login/")
+def appliances(request):
+    queryset = Appliance.objects.filter(activated=True).order_by("name")
+    page_obj = Paginator(queryset, PAGE_SIZE).get_page(request.GET.get("page"))
+    return render(
+        request,
+        "manudux/appliances.html",
+        {"appliances": page_obj, "page_obj": page_obj},
+    )
+
+
+@login_required(login_url="/accounts/login/")
+def create_appliance(request):
+    location_obj = None
+    location_id = request.GET.get("location_id")
+
+    if location_id:
+        location_obj = get_object_or_404(Location, id=location_id)
+
+    if request.method == "POST":
+        form = ApplianceForm(request.POST, request.FILES)
+        if form.is_valid():
+            appliance = form.save(commit=False)
+            if location_obj:
+                appliance.location = location_obj
+            appliance.save()
+            return redirect("manudux:appliance", pk=appliance.pk)
+    else:
+        form = ApplianceForm(initial={"location": location_obj})
+
+    context = {"form": form, "location": location_obj}
+    return render(request, "manudux/appliance-create.html", context)
+
+
+@login_required(login_url="/accounts/login/")
+def appliance_detail(request, pk):
+    appliance = get_object_or_404(Appliance, pk=pk)
+    tasks = appliance.maintenance_tasks.all()
+    return render(
+        request,
+        "manudux/appliance.html",
+        {"appliance": appliance, "maintenance_tasks": tasks},
+    )
+
+
+@login_required(login_url="/accounts/login/")
+def edit_appliance(request, pk):
+    appliance = get_object_or_404(Appliance, pk=pk)
+    if request.method == "POST":
+        form = ApplianceForm(request.POST, request.FILES, instance=appliance)
+        if form.is_valid():
+            form.save()
+            return redirect("manudux:appliance", pk=pk)
+    else:
+        form = ApplianceForm(instance=appliance)
+    context = {"form": form, "appliance": appliance}
+    return render(request, "manudux/appliance-edit.html", context)
+
+
+@login_required(login_url="/accounts/login/")
+def delete_appliance(request, pk):
+    return delete_obj(
+        request,
+        pk,
+        Appliance,
+        "manudux:appliances",
+        "manudux/appliance-delete.html",
+        "appliance",
+    )
+
+
+@login_required(login_url="/accounts/login/")
+def maintenance_tasks(request):
+    status = request.GET.get("filter", "active")
+    queryset = MaintenanceTask.objects.select_related(
+        "property", "location", "appliance"
+    )
+
+    if status == "done":
+        queryset = queryset.filter(is_done=True)
+    elif status == "overdue":
+        queryset = queryset.filter(is_done=False, due_date__lt=timezone.localdate())
+    else:
+        status = "active"
+        queryset = queryset.filter(is_done=False)
+
+    page_obj = Paginator(queryset, PAGE_SIZE).get_page(request.GET.get("page"))
+    context = {
+        "maintenance_tasks": page_obj,
+        "page_obj": page_obj,
+        "status": status,
+        "today": timezone.localdate(),
+    }
+    return render(request, "manudux/maintenance-tasks.html", context)
+
+
+@login_required(login_url="/accounts/login/")
+def create_maintenance_task(request):
+    initial = {}
+    property_obj = None
+
+    property_id = request.GET.get("property_id")
+    location_id = request.GET.get("location_id")
+    appliance_id = request.GET.get("appliance_id")
+
+    if appliance_id:
+        appliance_obj = get_object_or_404(Appliance, id=appliance_id)
+        initial["appliance"] = appliance_obj
+        initial["location"] = appliance_obj.location
+        property_obj = appliance_obj.location.property
+    elif location_id:
+        location_obj = get_object_or_404(Location, id=location_id)
+        initial["location"] = location_obj
+        property_obj = location_obj.property
+    elif property_id:
+        property_obj = get_object_or_404(Property, id=property_id)
+
+    if property_obj:
+        initial["property"] = property_obj
+
+    if request.method == "POST":
+        form = MaintenanceTaskForm(request.POST)
+        if form.is_valid():
+            task = form.save()
+            return redirect("manudux:maintenance-task", pk=task.pk)
+    else:
+        form = MaintenanceTaskForm(initial=initial)
+
+    context = {"form": form, "property": property_obj}
+    return render(request, "manudux/maintenance-task-create.html", context)
+
+
+@login_required(login_url="/accounts/login/")
+def maintenance_task_detail(request, pk):
+    task = get_object_or_404(MaintenanceTask, pk=pk)
+
+    if request.method == "POST":
+        completion_form = MaintenanceCompletionForm(request.POST)
+        if completion_form.is_valid():
+            task.mark_complete(
+                request.user,
+                notes=completion_form.cleaned_data["notes"],
+                cost=completion_form.cleaned_data["cost"],
+            )
+            return redirect("manudux:maintenance-task", pk=pk)
+    else:
+        completion_form = MaintenanceCompletionForm()
+
+    context = {
+        "task": task,
+        "logs": task.logs.all(),
+        "completion_form": completion_form,
+        "today": timezone.localdate(),
+    }
+    return render(request, "manudux/maintenance-task.html", context)
+
+
+@login_required(login_url="/accounts/login/")
+def edit_maintenance_task(request, pk):
+    task = get_object_or_404(MaintenanceTask, pk=pk)
+    if request.method == "POST":
+        form = MaintenanceTaskForm(request.POST, instance=task)
+        if form.is_valid():
+            form.save()
+            return redirect("manudux:maintenance-task", pk=pk)
+    else:
+        form = MaintenanceTaskForm(instance=task)
+    context = {"form": form, "task": task}
+    return render(request, "manudux/maintenance-task-edit.html", context)
+
+
+@login_required(login_url="/accounts/login/")
+def delete_maintenance_task(request, pk):
+    return delete_obj(
+        request,
+        pk,
+        MaintenanceTask,
+        "manudux:maintenance-tasks",
+        "manudux/maintenance-task-delete.html",
+        "task",
+    )
 
 
 def guide_list(request):

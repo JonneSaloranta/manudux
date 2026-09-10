@@ -7,6 +7,9 @@ from manudux.models.guidefile_model import GuideFile
 from manudux.models.guidestep_model import GuideStep
 from manudux.models.location_model import Location
 from manudux.models.property_type_model import PropertyType
+from manudux.models.appliance_model import Appliance
+from manudux.models.maintenancetask_model import MaintenanceTask
+from manudux.models.maintenancelog_model import MaintenanceLog
 from django.conf import settings
 from django import forms
 from django.urls import path, reverse
@@ -139,3 +142,40 @@ class GuideStepAdmin(admin.ModelAdmin):
         "title",
         "description",
     )  # Allows searching by guide name, title, and description
+
+
+@admin.register(Appliance)
+class ApplianceAdmin(admin.ModelAdmin):
+    list_display = ("name", "location", "brand", "warranty_expires", "activated")
+    list_filter = ("activated", "brand")
+    search_fields = ("name", "brand", "model_number", "serial_number", "location__name")
+    ordering = ("name",)
+    readonly_fields = ("created_at", "updated_at")
+
+
+class MaintenanceLogInline(admin.TabularInline):
+    model = MaintenanceLog
+    extra = 0
+    fields = ("completed_at", "completed_by", "notes", "cost")
+    readonly_fields = ("completed_at", "completed_by", "notes", "cost")
+    can_delete = False
+
+    def has_add_permission(self, request, obj=None):
+        return False
+
+
+@admin.register(MaintenanceTask)
+class MaintenanceTaskAdmin(admin.ModelAdmin):
+    list_display = ("title", "property", "due_date", "priority", "is_done")
+    list_filter = ("priority", "is_done", "due_date")
+    search_fields = ("title", "property__name", "location__name", "appliance__name")
+    ordering = ("due_date",)
+    readonly_fields = ("last_completed_at", "created_at", "updated_at")
+    inlines = [MaintenanceLogInline]
+
+
+@admin.register(MaintenanceLog)
+class MaintenanceLogAdmin(admin.ModelAdmin):
+    list_display = ("task_title", "property", "completed_at", "completed_by", "cost")
+    list_filter = ("completed_at",)
+    search_fields = ("task_title", "property__name", "notes")

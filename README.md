@@ -62,6 +62,13 @@ CSRF_COOKIE_SECURE=False # set to True once served over HTTPS
 SECURE_HSTS_SECONDS=0 # set once served over HTTPS
 CSRF_TRUSTED_ORIGINS= # comma separated, needed behind a reverse proxy
 GUNICORN_WORKERS=3
+EMAIL_HOST=localhost # used by the maintenance reminder digest
+EMAIL_PORT=587
+EMAIL_HOST_USER=
+EMAIL_HOST_PASSWORD=
+EMAIL_USE_TLS=True
+DEFAULT_FROM_EMAIL=manudux@localhost
+MAINTENANCE_REMINDER_LOOKAHEAD_DAYS=7 # how many days ahead counts as "coming up"
 ```
 
 ### Venv steps for Deployment
@@ -93,3 +100,13 @@ GUNICORN_WORKERS=3
 
 1. `python manage.py backup` (writes to `backups/`, or pass `--output-dir`)
 2. `python manage.py restore backups/manudux-backup-<timestamp>.tar.gz`
+
+### Maintenance reminders
+
+`python manage.py send_maintenance_reminders` emails a digest of overdue/upcoming maintenance tasks to every active user with an email address. Configure `EMAIL_*` above, then run it daily via cron/systemd timer, e.g.:
+
+```
+0 7 * * * docker compose exec -T web python manage.py send_maintenance_reminders
+```
+
+Use `--dry-run` to preview the digest without sending anything.
