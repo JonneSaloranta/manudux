@@ -4,3 +4,6 @@ from .guidefile_model import GuideFile
 from .property_model import Property
 from .location_model import Location
 from .guidestep_model import GuideStep
+from .appliance_model import Appliance
+from .maintenancetask_model import MaintenanceTask
+from .maintenancelog_model import MaintenanceLog
