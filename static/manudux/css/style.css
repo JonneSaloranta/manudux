@@ -1,11 +1,13 @@
 :root {
   --color-white: #ffffff;
-  --color-black: #000000;
-  --color-background: #efefef;
-  --primary-color: #2f4b26;
-  --secondary-color: #3e885b;
-  --tetriary-color: #85bda6;
-  --accent-color: #bedcfe;
+  --color-black: #1b1b17;
+  --color-background: #f2f0ea;
+  --primary-color: #1f3a2c;
+  --secondary-color: #3c7a5a;
+  --tetriary-color: #8fb8a0;
+  --accent-color: #c97a2e;
+  --danger-color: #b23a2e;
+  --danger-color-hover: #8a2c22;
 }
 
 @font-face {
@@ -18,6 +20,11 @@
   box-sizing: border-box;
   margin: 0;
   padding: 0;
+}
+
+:focus-visible {
+  outline: 3px solid var(--accent-color);
+  outline-offset: 2px;
 }
 
 html {
@@ -64,10 +71,8 @@ main {
   list-style: none;
 }
 #sidebar ul li.active a {
-  color: var(--accent-color);
-}
-#sidebar ul li.active a svg {
-  fill: var(--accent-color);
+  border-left: 3px solid var(--accent-color);
+  background-color: rgba(201, 122, 30, 0.16);
 }
 #sidebar > ul > li:first-child {
   display: flex;
@@ -449,10 +454,10 @@ footer .row a:hover {
 }
 
 .btn-danger {
-  background-color: #b3261e;
+  background-color: var(--danger-color);
 }
 .btn-danger:hover {
-  background-color: #7f1b16;
+  background-color: var(--danger-color-hover);
 }
 
 .btn-large {
@@ -496,10 +501,10 @@ footer .row a:hover {
 }
 
 .entity-list-item-overdue {
-  border-color: #b3261e;
+  border-color: var(--danger-color);
 }
 .entity-list-item-overdue .entity-list-meta {
-  color: #b3261e;
+  color: var(--danger-color);
 }
 
 @media (min-width: 700px) {
@@ -508,7 +513,7 @@ footer .row a:hover {
   }
 }
 .overdue {
-  color: #b3261e;
+  color: var(--danger-color);
   font-weight: 600;
 }
 
