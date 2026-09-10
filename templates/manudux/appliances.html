@@ -1,0 +1,26 @@
+{% extends "manudux/base.html" %}
+{% load i18n %}
+{% load static %}
+
+{% block title %}{% trans "Appliances" %}{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1 class="title">{% trans "Appliances" %}</h1>
+
+    <a href="{% url 'manudux:create-appliance' %}" class="btn btn-primary">{% trans "Add an appliance" %}</a>
+
+    <div class="entity-list">
+        {% for appliance in appliances %}
+        <a class="entity-list-item" href="{% url 'manudux:appliance' pk=appliance.id %}">
+            <span class="entity-list-title">{{ appliance.name }}</span>
+            <span class="entity-list-meta">{{ appliance.location.name }}</span>
+        </a>
+        {% empty %}
+        <p>{% trans "No appliances available." %}</p>
+        {% endfor %}
+    </div>
+
+    {% include "manudux/_pagination.html" %}
+</div>
+{% endblock %}

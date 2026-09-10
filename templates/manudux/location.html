@@ -34,12 +34,25 @@
 
     <form action="{% url 'manudux:delete-location' pk=location.id %}" method="post">
         {% csrf_token %}
-        <input type="submit" value="{% trans 'Delete' %}" class="btn btn-danger" style="background-color: red; cursor: pointer;">
+        <input type="submit" value="{% trans 'Delete' %}" class="btn btn-danger">
     </form>
 
-    <a href="{% url 'manudux:edit-location' pk=location.id %}" class="btn btn-primary" style="background-color: aqua;">{% trans "Edit" %}</a>
+    <a href="{% url 'manudux:edit-location' pk=location.id %}" class="btn btn-primary">{% trans "Edit" %}</a>
 
     <p>{% trans "View property" %}: <a href="{% url 'manudux:property' location.property.id %}">{{ location.property }}</a></p>
+
+    <div class="appliances">
+        <h2>{% trans "Appliances" %}:</h2>
+        <a href="{% url 'manudux:create-appliance' %}?location_id={{ location.id }}">{% trans "Add an appliance" %}</a>
+
+        <ul>
+            {% for appliance in appliances %}
+            <li><a href="{% url 'manudux:appliance' pk=appliance.id %}">{{ appliance.name }}</a></li>
+            {% empty %}
+            <li>{% trans "No appliances at this location yet." %}</li>
+            {% endfor %}
+        </ul>
+    </div>
 
 </div>
 

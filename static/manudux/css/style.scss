@@ -472,3 +472,157 @@ footer {
         }
     }
 }
+
+// Buttons - shared by every create/edit/delete form. Mobile-first: full
+// width and a comfortable tap target by default, sized down on wider
+// screens.
+
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    min-height: 44px;
+    margin: 0.5rem 0;
+    padding: 0.75em 1.5em;
+    border: none;
+    border-radius: 0.5em;
+    font: inherit;
+    font-weight: 600;
+    text-align: center;
+    text-decoration: none;
+    cursor: pointer;
+    color: var(--color-white);
+    background-color: var(--secondary-color);
+
+    &:hover {
+        background-color: var(--primary-color);
+    }
+}
+
+.btn-primary {
+    background-color: var(--primary-color);
+
+    &:hover {
+        background-color: var(--secondary-color);
+    }
+}
+
+.btn-danger {
+    background-color: #b3261e;
+
+    &:hover {
+        background-color: #7f1b16;
+    }
+}
+
+.btn-large {
+    min-height: 52px;
+    font-size: 1.8rem;
+}
+
+@media (min-width: 700px) {
+    .btn {
+        width: auto;
+    }
+}
+
+// Entity lists (appliances, maintenance tasks, dashboard) - mobile-first
+// stacked cards with large tap targets, widening into a grid on larger
+// screens.
+
+.entity-list {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1rem;
+    margin: 1rem 0;
+}
+
+.entity-list-item {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    padding: 1.25rem;
+    min-height: 44px;
+    border: 1px solid var(--tetriary-color);
+    border-radius: 1rem;
+    text-decoration: none;
+    color: var(--color-black);
+    background-color: var(--color-white);
+
+    &:hover {
+        border-color: var(--secondary-color);
+    }
+
+    .entity-list-title {
+        font-weight: 600;
+        font-size: 1.8rem;
+    }
+
+    .entity-list-meta {
+        color: var(--primary-color);
+    }
+}
+
+.entity-list-item-overdue {
+    border-color: #b3261e;
+
+    .entity-list-meta {
+        color: #b3261e;
+    }
+}
+
+@media (min-width: 700px) {
+    .entity-list {
+        grid-template-columns: repeat(auto-fill, minmax(28rem, 1fr));
+    }
+}
+
+.overdue {
+    color: #b3261e;
+    font-weight: 600;
+}
+
+.filter-tabs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin: 1rem 0;
+
+    a {
+        padding: 0.75em 1.25em;
+        min-height: 44px;
+        display: flex;
+        align-items: center;
+        border-radius: 0.5em;
+        text-decoration: none;
+        color: var(--primary-color);
+        background-color: var(--color-white);
+        border: 1px solid var(--tetriary-color);
+
+        &.active {
+            color: var(--color-white);
+            background-color: var(--primary-color);
+        }
+    }
+}
+
+.detail-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 0.5rem;
+    margin: 1rem 0;
+}
+
+@media (min-width: 700px) {
+    .detail-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+.dashboard-section,
+.maintenance-section,
+.maintenance-history,
+.complete-task {
+    margin: 2rem 0;
+}
