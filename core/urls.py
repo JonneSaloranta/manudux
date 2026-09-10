@@ -7,6 +7,8 @@ from django.views.static import serve
 from schema_graph.views import Schema
 from debug_toolbar.toolbar import debug_toolbar_urls
 
+from .views import healthz
+
 # Media (user-uploaded) files have no dedicated web server or CDN in front of
 # this project, so they are served by Django itself in every environment.
 # django.conf.urls.static.static() only wires this up when DEBUG=True, which
@@ -23,6 +25,7 @@ media_urlpatterns = [
 urlpatterns = [
     path("admin/", admin.site.urls),
     path("accounts/", include(("django.contrib.auth.urls", "accounts"), namespace="accounts")),
+    path("healthz/", healthz, name="healthz"),
     path("", include(("manudux.urls", "manudux"), namespace="manudux")),
 ] + media_urlpatterns
 
