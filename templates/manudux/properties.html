@@ -13,10 +13,10 @@
 
 <div class="container-grid">
     {% for property in properties %}
-    {% if property.activated %}
     {% include "manudux/property-card.html" %}
-    {% endif %}
     {% endfor %}
 </div>
+
+{% include "manudux/_pagination.html" %}
 
 {% endblock %}

@@ -1,4 +1,5 @@
 from django.shortcuts import render, get_object_or_404
+from django.core.paginator import Paginator
 from .models import Property, Location, Guide, GuideFile, GuideStep
 from django.contrib.auth.decorators import login_required, permission_required
 from .forms import PropertyForm, LocationForm
@@ -7,6 +8,8 @@ from django.conf import settings
 from .forms import RegisterForm
 from django.core.exceptions import PermissionDenied
 from django.contrib.auth import login, logout, authenticate
+
+PAGE_SIZE = 20
 
 
 def index(request):
@@ -79,9 +82,10 @@ def delete_property(request, pk):
 
 @login_required(login_url="/accounts/login/")
 def properties(request):
-    properties = Property.objects.all()
+    queryset = Property.objects.filter(activated=True).order_by("name")
+    page_obj = Paginator(queryset, PAGE_SIZE).get_page(request.GET.get("page"))
 
-    context = {"properties": properties}
+    context = {"properties": page_obj, "page_obj": page_obj}
 
     return render(request, "manudux/properties.html", context=context)
 
@@ -155,8 +159,11 @@ def delete_location(request, pk):
 
 @login_required(login_url="/accounts/login/")
 def locations(request):
-    locations = Location.objects.all()
-    return render(request, "manudux/locations.html", {"locations": locations})
+    queryset = Location.objects.order_by("name")
+    page_obj = Paginator(queryset, PAGE_SIZE).get_page(request.GET.get("page"))
+    return render(
+        request, "manudux/locations.html", {"locations": page_obj, "page_obj": page_obj}
+    )
 
 
 @login_required(login_url="/accounts/login/")
@@ -175,8 +182,9 @@ def delete_obj(request, pk, model, redirect_url, template, context_name):
 
 
 def guide_list(request):
-    guides = Guide.objects.all()  # Retrieve all Guide objects
-    context = {"guides": guides}
+    queryset = Guide.objects.order_by("name")
+    page_obj = Paginator(queryset, PAGE_SIZE).get_page(request.GET.get("page"))
+    context = {"guides": page_obj, "page_obj": page_obj}
     return render(request, "manudux/guide-list.html", context=context)
 
 

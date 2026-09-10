@@ -74,14 +74,16 @@ class PropertyTestCase(TestCase):
 
     @tag("views", "slow", "auth", "property")
     def test_property_view_is_private(self):
-        """Test if logged in users can see properties"""
+        """Test if logged in users can see activated properties"""
         self.client.login(username="testuser", password="testpassword")
         response = self.client.get(reverse("manudux:properties"))
         self.assertEqual(response.status_code, 200)
         self.assertIn("properties", response.context)
 
         properties = response.context["properties"]
-        self.assertEqual(len(properties), 5)
+        self.assertEqual(
+            len(properties), 4, msg="Only activated properties should be listed"
+        )
 
     @tag("views", "slow", "auth", "property")
     def test_property_detail_view_public(self):
@@ -193,3 +195,21 @@ class PropertyTestCase(TestCase):
         self.assertFalse(
             Property.objects.filter(name="Negative Zip Property").exists()
         )
+
+    @tag("views", "slow", "auth", "property")
+    def test_properties_view_is_paginated(self):
+        """Test that the properties list is paginated once there are enough of them"""
+        for i in range(25):
+            Property.objects.create(name=f"Bulk Property {i}", activated=True)
+
+        self.client.login(username="testuser", password="testpassword")
+        response = self.client.get(reverse("manudux:properties"))
+        self.assertEqual(response.status_code, 200)
+
+        page_obj = response.context["page_obj"]
+        self.assertTrue(page_obj.has_next())
+        self.assertEqual(len(page_obj), 20)
+
+        second_page = self.client.get(reverse("manudux:properties"), {"page": 2})
+        self.assertEqual(second_page.status_code, 200)
+        self.assertEqual(len(second_page.context["page_obj"]), 9)
