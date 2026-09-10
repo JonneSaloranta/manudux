@@ -1,7 +1,8 @@
-from django.test import TestCase, tag, Client
-from manudux.models import Property, Location
-from django.urls import reverse
 from django.contrib.auth.models import User
+from django.test import Client, TestCase, tag
+from django.urls import reverse
+
+from manudux.models import Location, Property
 
 
 class LocationViewsTest(TestCase):

@@ -1,0 +1,12 @@
+[tool.ruff]
+line-length = 88
+
+[tool.ruff.lint]
+# Ruff's own documented default set (pyflakes + a handful of pycodestyle
+# error classes). Pinned explicitly rather than left to ruff's ambient
+# default so a future ruff upgrade can't silently change what CI enforces.
+# Deliberately excludes rule families like RUF012 (mutable class-attribute
+# defaults) and DTZ011 (date.today() calls) that fire pervasively on
+# completely idiomatic Django code (choices/fields as class-level lists,
+# tests using date.today()) rather than catching real bugs.
+select = ["E4", "E7", "E9", "F"]

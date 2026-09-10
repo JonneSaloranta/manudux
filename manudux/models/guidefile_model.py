@@ -1,7 +1,8 @@
 from django.db import models
 from django.utils.translation import gettext_lazy as _
-from . import Guide
+
 from ..validators import validate_guide_file
+from . import Guide
 
 
 class GuideFile(models.Model):

@@ -1,7 +1,8 @@
 from django.db import models
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
-from . import Property, MaintenanceTask
+
+from . import MaintenanceTask, Property
 
 
 class MaintenanceLog(models.Model):

@@ -29,7 +29,9 @@ class GuideFileTestCase(TestCase):
         guide_file = GuideFile(
             name="Script",
             guide=self.guide,
-            file=SimpleUploadedFile("payload.exe", b"content", "application/x-msdownload"),
+            file=SimpleUploadedFile(
+                "payload.exe", b"content", "application/x-msdownload"
+            ),
         )
         with self.assertRaises(ValidationError):
             guide_file.full_clean()

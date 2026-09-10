@@ -1,9 +1,10 @@
 from datetime import date, timedelta
 
-from django.test import TestCase, tag, Client
-from django.urls import reverse
 from django.contrib.auth.models import User
-from manudux.models import Property, MaintenanceTask
+from django.test import Client, TestCase, tag
+from django.urls import reverse
+
+from manudux.models import MaintenanceTask, Property
 
 
 class MaintenanceTaskViewsTest(TestCase):

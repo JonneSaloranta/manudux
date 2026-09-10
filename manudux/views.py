@@ -1,30 +1,28 @@
 from datetime import timedelta
 
-from django.shortcuts import render, get_object_or_404
-from django.core.paginator import Paginator
-from django.utils import timezone
-from .models import (
-    Property,
-    Location,
-    Guide,
-    GuideFile,
-    GuideStep,
-    Appliance,
-    MaintenanceTask,
-)
-from django.contrib.auth.decorators import login_required, permission_required
-from .forms import (
-    PropertyForm,
-    LocationForm,
-    ApplianceForm,
-    MaintenanceTaskForm,
-    MaintenanceCompletionForm,
-)
-from django.shortcuts import redirect
 from django.conf import settings
-from .forms import RegisterForm
+from django.contrib.auth import login
+from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
-from django.contrib.auth import login, logout, authenticate
+from django.core.paginator import Paginator
+from django.shortcuts import get_object_or_404, redirect, render
+from django.utils import timezone
+
+from .forms import (
+    ApplianceForm,
+    LocationForm,
+    MaintenanceCompletionForm,
+    MaintenanceTaskForm,
+    PropertyForm,
+    RegisterForm,
+)
+from .models import (
+    Appliance,
+    Guide,
+    Location,
+    MaintenanceTask,
+    Property,
+)
 
 PAGE_SIZE = 20
 DASHBOARD_TASK_LIMIT = 10

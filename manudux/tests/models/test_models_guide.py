@@ -1,8 +1,7 @@
-from django.test import TestCase, tag, Client
-from manudux.models.guide_model import Guide
-from django.urls import reverse
 from django.contrib.auth.models import User
-from django.contrib.auth.views import LoginView, LogoutView
+from django.test import Client, TestCase, tag
+
+from manudux.models.guide_model import Guide
 
 
 class GuideTestCase(TestCase):
@@ -17,7 +16,7 @@ class GuideTestCase(TestCase):
             email="test@example.com",
         )
 
-        guide = Guide.objects.create(
+        Guide.objects.create(
             name="Test Guide Name",
             description="This is a test guide.",
         )
@@ -37,7 +36,7 @@ class GuideTestCase(TestCase):
         """Test if the created_at works properly"""
         test_guide = Guide.objects.get(name="Test Guide Name")
         self.assertIsNotNone(
-            test_guide.created_at, msg=f"The guide's created_at field is null"
+            test_guide.created_at, msg="The guide's created_at field is null"
         )
 
     @tag("models", "guide")
@@ -45,7 +44,7 @@ class GuideTestCase(TestCase):
         """Test if the updated_at works properly"""
         test_guide = Guide.objects.get(name="Test Guide Name")
         self.assertIsNotNone(
-            test_guide.updated_at, msg=f"The guide's updated_at field is null"
+            test_guide.updated_at, msg="The guide's updated_at field is null"
         )
 
     @tag("models", "guide")

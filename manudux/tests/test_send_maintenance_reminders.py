@@ -1,12 +1,12 @@
 from datetime import date, timedelta
 from io import StringIO
 
+from django.contrib.auth.models import User
 from django.core import mail
 from django.core.management import call_command
 from django.test import TestCase, override_settings, tag
-from django.contrib.auth.models import User
 
-from manudux.models import Property, MaintenanceTask
+from manudux.models import MaintenanceTask, Property
 
 
 @override_settings(EMAIL_BACKEND="django.core.mail.backends.locmem.EmailBackend")

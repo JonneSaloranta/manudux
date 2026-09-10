@@ -1,14 +1,15 @@
 from datetime import date, timedelta
 
+from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 from django.test import TestCase, tag
-from django.contrib.auth.models import User
+
 from manudux.models import (
-    Property,
-    Location,
     Appliance,
-    MaintenanceTask,
+    Location,
     MaintenanceLog,
+    MaintenanceTask,
+    Property,
 )
 
 

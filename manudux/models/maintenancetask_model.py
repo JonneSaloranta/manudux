@@ -4,7 +4,8 @@ from django.core.exceptions import ValidationError
 from django.db import models, transaction
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
-from . import Property, Location, Appliance
+
+from . import Appliance, Location, Property
 
 
 class MaintenanceTask(models.Model):

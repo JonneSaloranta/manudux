@@ -1,7 +1,9 @@
+from urllib.parse import urlencode
+
 from django.db import models
 from django.utils.translation import gettext_lazy as _
-from urllib.parse import urlencode
-from . import PropertyType, Guide
+
+from . import Guide, PropertyType
 
 
 class Property(models.Model):

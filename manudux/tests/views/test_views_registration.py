@@ -1,6 +1,6 @@
-from django.test import TestCase, tag, Client, override_settings
-from django.urls import reverse
 from django.contrib.auth.models import User
+from django.test import Client, TestCase, override_settings, tag
+from django.urls import reverse
 
 
 class RegistrationViewTest(TestCase):

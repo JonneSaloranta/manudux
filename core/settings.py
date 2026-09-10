@@ -11,11 +11,17 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 """
 
 from pathlib import Path
+
 from decouple import config
 from django.utils.translation import gettext_lazy as _
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+
+# Single source of truth for the running version, also read by CI
+# (.github/workflows/django-test-ci.yaml) to decide whether to publish a
+# new ghcr.io image. Bump this file by hand to cut a release.
+APP_VERSION = (BASE_DIR / "VERSION").read_text().strip()
 
 
 # Quick-start development settings - unsuitable for production

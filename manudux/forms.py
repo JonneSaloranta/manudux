@@ -1,10 +1,11 @@
 from django import forms
-from django.core.exceptions import ValidationError
-from django.forms import ModelForm, EmailField, CharField
-from .models import Property, Location, Appliance, MaintenanceTask
-from django.utils.translation import gettext_lazy as _
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
+from django.core.exceptions import ValidationError
+from django.forms import CharField, EmailField, ModelForm
+from django.utils.translation import gettext_lazy as _
+
+from .models import Appliance, Location, MaintenanceTask, Property
 
 
 class RegisterForm(UserCreationForm):
