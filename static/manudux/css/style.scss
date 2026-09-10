@@ -146,6 +146,20 @@ main {
     }
 }
 
+// The mobile bottom bar + "Menu" drawer are a separate nav from #sidebar
+// (shown instead of it below 800px, see the media query) rather than a
+// responsive transform of it, since a fixed 5-item bar and a dropdown
+// sidebar need fundamentally different markup/interaction.
+#mobile-nav,
+#mobile-menu-overlay,
+#mobile-menu-drawer {
+    display: none;
+}
+
+body.mobile-menu-open {
+    overflow: hidden;
+}
+
 .dropdown-btn {
     width: 100%;
     text-align: left;
@@ -410,78 +424,149 @@ footer {
 
     main {
         padding: 0;
+        padding-bottom: 60px; // clear the fixed bottom bar
     }
 
     .container {
         border: none;
         padding: 0;
     }
-    #sidebar {
-        height: 60px;
-        width: 100%;
-        border-right: none;
-        border-top: 1px solid var(--secondary-color);
-        padding: 0;
-        position: fixed;
-        top: unset;
-        bottom: 0;
 
-        > ul {
-            padding: 0;
-            display: grid;
-            grid-auto-flow: column;
-            // grid-auto-columns: 60px;
-            align-items: center;
-            overflow-x: scroll;
-            overflow-y: hidden;
-            height: 100%;
+    #sidebar {
+        display: none;
+    }
+
+    #mobile-nav {
+        display: grid;
+        grid-template-columns: repeat(5, 1fr);
+        position: fixed;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        z-index: 40;
+        height: 60px;
+        background-color: var(--primary-color);
+        border-top: 1px solid var(--secondary-color);
+    }
+
+    .mobile-nav-item {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 0.2em;
+        height: 100%;
+        border: none;
+        background: none;
+        color: var(--color-white);
+        text-decoration: none;
+        font: inherit;
+        font-size: 1.05rem;
+        cursor: pointer;
+
+        svg {
+            fill: var(--color-white);
         }
 
-        ul li {
-            height: 100%;
+        &:hover,
+        &:focus-visible {
+            background-color: var(--secondary-color);
+        }
 
-            .sub-menu.show {
-                position: fixed;
-                bottom: 60px;
-                left: 0;
-                box-sizing: border-box;
-                height: 60px;
-                width: 100%;
+        &[aria-expanded="true"] {
+            background-color: var(--secondary-color);
+        }
+    }
+
+    #mobile-menu-overlay:not([hidden]) {
+        display: block;
+        position: fixed;
+        inset: 0;
+        z-index: 45;
+        background-color: rgba(27, 27, 23, 0.5);
+    }
+
+    #mobile-menu-drawer:not([hidden]) {
+        display: flex;
+        flex-direction: column;
+        position: fixed;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        z-index: 50;
+        max-height: 70vh;
+        background-color: var(--primary-color);
+        color: var(--color-white);
+        border-top: 1px solid var(--secondary-color);
+        border-radius: 1em 1em 0 0;
+        padding-bottom: 1em;
+        overflow-y: auto;
+    }
+
+    .mobile-menu-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 1em 1.5em;
+        border-bottom: 1px solid var(--secondary-color);
+        position: sticky;
+        top: 0;
+        background-color: var(--primary-color);
+
+        h2 {
+            font-size: 1.8rem;
+        }
+    }
+
+    #mobile-menu-close {
+        border: none;
+        background: none;
+        padding: 0.5em;
+        border-radius: 0.5em;
+        cursor: pointer;
+
+        svg {
+            fill: var(--color-white);
+        }
+
+        &:hover {
+            background-color: var(--secondary-color);
+        }
+    }
+
+    .mobile-menu-list {
+        list-style: none;
+
+        li {
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        a,
+        button {
+            display: flex;
+            align-items: center;
+            width: 100%;
+            min-height: 48px;
+            padding: 0.85em 1.5em;
+            color: var(--color-white);
+            text-decoration: none;
+            background: none;
+            border: none;
+            font: inherit;
+            text-align: left;
+            cursor: pointer;
+
+            &:hover,
+            &:focus-visible {
                 background-color: var(--secondary-color);
-                border-top: 1px solid var(--primary-color);
-                display: flex;
-                justify-content: center;
-
-                > div {
-                    overflow-x: auto;
-                }
-                li {
-                    display: inline-flex;
-                }
-                a {
-                    box-sizing: border-box;
-                    padding: 1em;
-                    width: auto;
-                    justify-content: center;
-                }
             }
         }
+    }
 
-        ul a,
-        ul .dropdown-btn,
-        ul .account-items {
-            width: 60px;
-            height: 60px;
-            padding: 0;
-            border-radius: 0;
-            justify-content: center;
-        }
-
-        ul li span,
-        ul li:first-child,
-        .dropdown-btn svg:last-child {
-            display: none;
-        }
+    .mobile-menu-account {
+        padding: 0.85em 1.5em;
+        color: var(--tetriary-color);
+        font-weight: 600;
     }
 }
 
