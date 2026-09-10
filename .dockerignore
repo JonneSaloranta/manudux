@@ -4,7 +4,6 @@ staticfiles
 .github
 .venv
 __pycache__
-migrations/
 tests/
 .dockerignore
 dockerfile

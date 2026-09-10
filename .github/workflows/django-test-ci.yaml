@@ -41,10 +41,14 @@ jobs:
             - name: Ensure data directory exists
               run: mkdir -p ./data
 
+            - name: Check for missing migrations
+              run: |
+                  source venv/bin/activate
+                  python manage.py makemigrations --check --dry-run
+
             - name: Run migrations
               run: |
                   source venv/bin/activate
-                  python manage.py makemigrations --noinput
                   python manage.py migrate --noinput
 
             - name: Run tests
