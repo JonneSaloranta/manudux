@@ -160,11 +160,11 @@ USE_TZ = True
 
 LOCALE_PATHS = [BASE_DIR / "locale"]
 
+# Only languages with an actual translation catalog under locale/ - add
+# sv/ru back here once locale/sv and locale/ru exist.
 LANGUAGES = [
     ("en", _("English")),
     ("fi", _("Finnish")),
-    ("sv", _("Swedish")),
-    ("ru", _("Russian")),
 ]
 
 # Static files (CSS, JavaScript, Images)

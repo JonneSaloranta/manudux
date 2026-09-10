@@ -41,7 +41,11 @@ class Property(models.Model):
         return self.name
 
     def get_map(self):
-        """Returns an embeddable Google Maps iframe for the property."""
+        """Returns an embeddable Google Maps iframe src URL for the property.
+
+        Building this as a URL rather than a chunk of HTML lets the template
+        render the iframe itself, so it never needs the |safe filter.
+        """
         if not self.address or not self.city or not self.state or not self.zip_code:
             return None
 
@@ -51,15 +55,7 @@ class Property(models.Model):
         # URL encode the address for Google Maps
         params = urlencode({"q": full_address})
 
-        # Generate the iframe with the dynamic address
-        return (
-            f'<div style="width: 100%;">'
-            f'<iframe width="100%" height="400" frameborder="0" scrolling="no" '
-            f'marginheight="0" marginwidth="0" '
-            f'src="https://maps.google.com/maps?{params}&amp;t=&amp;z=14&amp;ie=UTF8&amp;iwloc=B&amp;output=embed">'
-            f"</iframe>"
-            f"</div>"
-        )
+        return f"https://maps.google.com/maps?{params}&t=&z=14&ie=UTF8&iwloc=B&output=embed"
 
     def google_maps_link(self):
         """Generates a Google Maps link for the property's address."""
