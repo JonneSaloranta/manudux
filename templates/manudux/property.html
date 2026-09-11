@@ -6,114 +6,100 @@
 
 {% block content %}
 <div class="container">
-    <h1>{% trans "Property" %}</h1>
+    <div class="detail-card">
+        <div class="detail-card-header">
+            <div class="img-skeleton">
+                {% if not property.image %}
+                <img src="{% static 'manudux/img/placeholder300x200.png'%}" alt="{% trans 'Placeholder image' %}">
+                {% else %}
+                <img src="{{ property.image.url }}" alt="{% blocktrans with name=property.name %}{{ name }}{% endblocktrans %}">
+                {% endif %}
+            </div>
 
-    <div class="">
-
-
-        <div class="img-skeleton">
-            {% if not property.image %}
-            <img src="{% static 'manudux/img/placeholder300x200.png'%}" alt="{% trans 'Placeholder image' %}">
-            {% else %}
-            <img src="{{ property.image.url }}" alt="{% blocktrans with name=property.name %}{{ name }}{% endblocktrans %}">
-            {% endif %}
+            <div>
+                <h1>{{ property.name }}</h1>
+                {% if property.property_type %}
+                <p class="detail-card-subtitle">{{ property.property_type }}</p>
+                {% endif %}
+            </div>
         </div>
 
-        <div class="">
-            <h2>{{ property.name }}</h2>
+        <div class="card-actions">
+            <a href="{% url 'manudux:edit-property' pk=property.id %}" class="btn btn-primary">{% trans "Edit" %}</a>
+            <a href="{% url 'manudux:delete-property' pk=property.id %}" class="btn btn-danger">{% trans "Delete" %}</a>
         </div>
 
         {% include "manudux/property-details-card.html" %}
 
-        <hr />
-
-
         {% if property.description %}
-        <div class="">{{ property.description|escape|truncatewords_html:5 }}</div>
+        <div class="detail-card-description">{{ property.description|linebreaksbr }}</div>
         {% else %}
-        <div class="">{% trans "No description available." %}</div>
+        <p>{% trans "No description available." %}</p>
         {% endif %}
     </div>
 
-    <form action="{% url 'manudux:delete-property' property.id %}" method="post">
-        {% csrf_token %}
-        <input type="submit" value='{% trans "Delete" %}' class="btn btn-danger">
-    </form>
-
-    <a href="{% url 'manudux:edit-property' pk=property.id %}" class="btn btn-primary">{% trans "Edit" %}</a>
-
-    <hr />
-
     {% if property.get_map %}
-    <div style="width: 100%;">
-        <iframe width="100%" height="400" frameborder="0" scrolling="no" marginheight="0" marginwidth="0" src="{{ property.get_map }}"></iframe>
-    </div>
+    <section class="page-section">
+        <h2>{% trans "Map" %}</h2>
+        <div class="map-embed">
+            <iframe width="100%" height="400" frameborder="0" scrolling="no" marginheight="0" marginwidth="0" title="{% blocktrans with name=property.name %}Map of {{ name }}{% endblocktrans %}" src="{{ property.get_map }}"></iframe>
+        </div>
+        <a href="{{ property.google_maps_link }}" target="_blank" rel="noopener" class="btn">{% trans "Open in Google Maps" %}</a>
+    </section>
     {% endif %}
 
-
-    <!--
-    {% if property.google_maps_link %}
-    <a href="{{ property.google_maps_link }}" target="_blank">{% trans "View on Google Maps" %}</a>
-    {% endif %}
-    -->
-
-
-    <!-- Property Guide -->
-    <div class="locations">
-        <h2>{% trans "Guides" %}:</h2>
+    <section class="page-section">
+        <h2>{% trans "Guides" %}</h2>
         {% if property.guide %}
-        <ul>
-            <li>
-                <p><a href="{% url 'manudux:guide' pk=property.guide.pk %}">{{ property.guide }}</a></p>
-            </li>
-        </ul>
+        <div class="entity-list">
+            <a class="entity-list-item" href="{% url 'manudux:guide' pk=property.guide.pk %}">
+                <span class="entity-list-title">{{ property.guide }}</span>
+            </a>
+        </div>
         {% else %}
         <p>{% trans "There are no guides at the moment." %}</p>
         {% endif %}
-    </div>
+    </section>
 
+    <section class="page-section">
+        <h2>{% trans "Locations" %}</h2>
+        <a href="{% url 'manudux:create-location' %}?property_id={{ property.id }}" class="btn btn-primary">{% trans "Create location" %}</a>
 
-
-    <!-- Location Guides -->
-    <div class="locations">
-        <h2>{% trans "Locations" %}:</h2>
-        <a href="{% url 'manudux:create-location' %}?property_id={{ property.id }}">{% trans "Create a location!" %}</a>
-
-        <ul>
+        <div class="entity-list">
             {% for location in property.locations.all %}
-            <li>
-                <p><a href="{% url 'manudux:location' location.id %}">{{ location.name }}</a></p>
-                <!-- Display guide for each location -->
+            <a class="entity-list-item" href="{% url 'manudux:location' location.id %}">
+                <span class="entity-list-title">{{ location.name }}</span>
                 {% if location.guide %}
-                <p><a href="{% url 'manudux:guide' pk=location.guide.pk %}">- {{ location.guide }}</a></p>
+                <span class="entity-list-meta">{% trans "Guide" %}: {{ location.guide }}</span>
                 {% else %}
-                <p>{% trans "No guide available for this location." %}</p>
+                <span class="entity-list-meta">{% trans "No guide available for this location." %}</span>
                 {% endif %}
-            </li>
-            <hr>
+            </a>
             {% empty %}
-            <li>{% trans "No locations available." %}</li>
+            <p>{% trans "No locations available." %}</p>
             {% endfor %}
-        </ul>
-    </div>
+        </div>
+    </section>
 
-    <!-- Documents -->
-    <div class="documents">
-        <h2>{% trans "Documents" %}:</h2>
-        <a href="{% url 'manudux:create-property-document' property_pk=property.id %}">{% trans "Upload a document" %}</a>
+    <section class="page-section">
+        <h2>{% trans "Documents" %}</h2>
+        <a href="{% url 'manudux:create-property-document' property_pk=property.id %}" class="btn btn-primary">{% trans "Upload a document" %}</a>
 
-        <ul class="document-list">
+        <div class="entity-list">
             {% for document in documents %}
-            <li>
-                <a href="{{ document.file.url }}" target="_blank">{{ document.name }}</a>
-                <span class="document-category">{{ document.get_category_display }}</span>
-                <a href="{% url 'manudux:delete-property-document' document.id %}" class="document-delete-link">{% trans "Delete" %}</a>
-            </li>
+            <div class="entity-list-item">
+                <span class="entity-list-title">{{ document.name }}</span>
+                <span class="entity-list-meta">{{ document.get_category_display }}</span>
+                <div class="card-actions">
+                    <a href="{{ document.file.url }}" target="_blank" class="btn">{% trans "View" %}</a>
+                    <a href="{% url 'manudux:delete-property-document' document.id %}" class="btn btn-danger">{% trans "Delete" %}</a>
+                </div>
+            </div>
             {% empty %}
-            <li>{% trans "No documents uploaded yet." %}</li>
+            <p>{% trans "No documents uploaded yet." %}</p>
             {% endfor %}
-        </ul>
-    </div>
+        </div>
+    </section>
 </div>
 
 {% endblock %}

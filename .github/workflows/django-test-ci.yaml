@@ -151,8 +151,16 @@ jobs:
                   User.objects.filter(username='a11y').delete()
                   User.objects.create_user(username='a11y', password='$A11Y_PASSWORD')
                   # Seed one of everything so list/card views render their real
-                  # markup during the scan, not just their empty states.
-                  p = Property.objects.create(name='A11y Test Property')
+                  # markup during the scan, not just their empty states. The
+                  # property gets an address so its detail page's embedded
+                  # map also renders during the scan (see .pa11yci.json).
+                  p = Property.objects.create(
+                      name='A11y Test Property',
+                      address='Testikatu 1',
+                      city='Helsinki',
+                      state='Uusimaa',
+                      zip_code='00100',
+                  )
                   l = Location.objects.create(name='A11y Test Location', property=p)
                   Appliance.objects.create(name='A11y Test Appliance', location=l)
                   MaintenanceTask.objects.create(
