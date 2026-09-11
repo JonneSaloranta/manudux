@@ -149,14 +149,16 @@ jobs:
                   from django.contrib.auth.models import User
                   from manudux.models import (
                       Property, PropertyType, Location, LocationType, Appliance,
-                      MaintenanceTask,
+                      MaintenanceTask, Guide, GuideStep,
                   )
                   User.objects.filter(username='a11y').delete()
                   User.objects.create_user(username='a11y', password='$A11Y_PASSWORD')
                   # Seed one of everything so list/card views render their real
                   # markup during the scan, not just their empty states. The
                   # property gets an address so its detail page's embedded
-                  # map also renders during the scan (see .pa11yci.json).
+                  # map also renders during the scan (see .pa11yci.json). The
+                  # guide gets a step so the drag/Move up/down reorder controls
+                  # render too.
                   property_type = PropertyType.objects.create(name='A11y Test Property Type')
                   location_type = LocationType.objects.create(name='A11y Test Location Type')
                   p = Property.objects.create(
@@ -173,6 +175,11 @@ jobs:
                   Appliance.objects.create(name='A11y Test Appliance', location=l)
                   MaintenanceTask.objects.create(
                       title='A11y Test Task', property=p, due_date='2030-01-01'
+                  )
+                  guide = Guide.objects.create(name='A11y Test Guide')
+                  GuideStep.objects.create(
+                      guide=guide, step_number=1, title='A11y Test Step',
+                      description='Step description.',
                   )
                   "
 

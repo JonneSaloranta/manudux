@@ -87,6 +87,9 @@
                     <li>
                         <a href="{% url 'manudux:guides' %}">{% trans "Guides" %}</a>
                     </li>
+                    <li>
+                        <a href="{% url 'manudux:create-guide' %}">{% trans "Create a new guide" %}</a>
+                    </li>
                 </div>
             </ul>
         </li>
@@ -253,6 +256,7 @@
         <li><a href="{% url 'manudux:create-location' %}">{% trans "Create location" %}</a></li>
         <li><a href="{% url 'manudux:location-types' %}">{% trans "Manage location types" %}</a></li>
         <li><a href="{% url 'manudux:guides' %}">{% trans "Guides" %}</a></li>
+        <li><a href="{% url 'manudux:create-guide' %}">{% trans "Create a new guide" %}</a></li>
         <li><a href="{% url 'manudux:create-maintenance-task' %}">{% trans "Add a task" %}</a></li>
         <li><a href="{% url 'manudux:appliances' %}">{% trans "Appliances" %}</a></li>
         <li><a href="{% url 'manudux:create-appliance' %}">{% trans "Add an appliance" %}</a></li>

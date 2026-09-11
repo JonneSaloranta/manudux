@@ -39,7 +39,8 @@ class Guide(models.Model):
         is_new = self.pk is None
 
         if is_new:
-            # Save initially to get a primary key
+            # Save initially to get a primary key, needed to build the QR
+            # code's target URL and filename below.
             super().save(*args, **kwargs)
 
         # Generate QR Code
@@ -98,9 +99,14 @@ class Guide(models.Model):
         )
         canvas.close()
 
-        # Save updated model (only if not already saved with pk and we need to write qr_code)
-        if not is_new:
-            super().save(update_fields=["qr_code"])
+        # Persist the guide - the regenerated qr_code plus any other field
+        # changes made before calling save() (e.g. editing name/
+        # description). Previously this write only happened for existing
+        # guides and was restricted to update_fields=["qr_code"], silently
+        # discarding any other pending changes; brand-new guides never got
+        # a second save at all, so qr_code stayed empty in the database
+        # despite the file having been written to storage.
+        super().save()
 
     class Meta:
         verbose_name = _("Guide")

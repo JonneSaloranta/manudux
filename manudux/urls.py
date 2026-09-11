@@ -59,6 +59,40 @@ urlpatterns = [
     ),
     path("location/<int:pk>/", views.location_detail, name="location"),
     path("guides/", views.guide_list, name="guides"),
+    path("guides/create-guide/", views.create_guide, name="create-guide"),
+    path("guide/<int:pk>/edit/", views.edit_guide, name="edit-guide"),
+    path("guide/<int:pk>/delete/", views.delete_guide, name="delete-guide"),
+    path(
+        "guide/<int:guide_pk>/steps/create/",
+        views.create_guide_step,
+        name="create-guide-step",
+    ),
+    path("guide-step/<int:pk>/edit/", views.edit_guide_step, name="edit-guide-step"),
+    path(
+        "guide-step/<int:pk>/delete/",
+        views.delete_guide_step,
+        name="delete-guide-step",
+    ),
+    path(
+        "guide-step/<int:pk>/move/<str:direction>/",
+        views.move_guide_step,
+        name="move-guide-step",
+    ),
+    path(
+        "guide/<int:guide_pk>/steps/reorder/",
+        views.reorder_guide_steps,
+        name="reorder-guide-steps",
+    ),
+    path(
+        "guide/<int:guide_pk>/files/create/",
+        views.create_guide_file,
+        name="create-guide-file",
+    ),
+    path(
+        "guide-file/<int:pk>/delete/",
+        views.delete_guide_file,
+        name="delete-guide-file",
+    ),
     path("guide/<int:pk>/", views.guide_detail, name="guide"),
     path("appliances/", views.appliances, name="appliances"),
     path(

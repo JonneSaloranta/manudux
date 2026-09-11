@@ -1035,3 +1035,69 @@ footer {
         display: block;
     }
 }
+
+.page-section-hint {
+    margin-bottom: 1rem;
+    // --secondary-color only clears ~4.47:1 against --color-background,
+    // just under the 4.5:1 AA text threshold - primary-color has plenty
+    // of margin here.
+    color: var(--primary-color);
+    font-size: 1.4rem;
+}
+
+// Guide step reordering. The drag handle is pointer/touch-only and
+// aria-hidden (see scripts.js - it uses Pointer Events rather than native
+// HTML5 drag-and-drop, which doesn't work on touch); .step-reorder-controls
+// holds the Move up/down buttons, which are the keyboard/screen-reader-
+// accessible way to do the same thing and always render regardless of JS.
+.step-item {
+    position: relative;
+    padding-left: 3.5rem;
+
+    &.dragging {
+        opacity: 0.5;
+    }
+}
+
+.step-item-drag-handle {
+    position: absolute;
+    top: 1.25rem;
+    left: 1rem;
+    padding: 0.5rem;
+    border: none;
+    background: none;
+    color: var(--tetriary-color);
+    cursor: grab;
+    touch-action: none;
+    user-select: none;
+
+    &:active {
+        cursor: grabbing;
+    }
+}
+
+.step-reorder-controls {
+    display: flex;
+    gap: 0.5rem;
+    margin-top: 1rem;
+
+    button {
+        width: 44px;
+        height: 44px;
+        padding: 0;
+        border: 1px solid var(--tetriary-color);
+        border-radius: 0.5em;
+        background-color: var(--color-white);
+        color: var(--primary-color);
+        font: inherit;
+        font-size: 1.8rem;
+        cursor: pointer;
+
+        &:hover,
+        &:focus-visible {
+            background-color: var(--secondary-color);
+            border-color: var(--secondary-color);
+            color: var(--color-white);
+        }
+    }
+}
