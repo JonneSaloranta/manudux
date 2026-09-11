@@ -6,6 +6,8 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.core.exceptions import PermissionDenied
 from django.core.paginator import Paginator
+from django.db.models import Prefetch
+from django.http import Http404
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.utils import timezone
@@ -15,6 +17,9 @@ from .forms import (
     ApplianceForm,
     ApplianceTypeForm,
     CreateUserForm,
+    GuestCodeForm,
+    GuestCodeLoginForm,
+    GuideAttachForm,
     GuideFileForm,
     GuideForm,
     GuideStepForm,
@@ -33,6 +38,7 @@ from .models import (
     Appliance,
     ApplianceDocument,
     ApplianceType,
+    GuestCode,
     Guide,
     GuideFile,
     GuideStep,
@@ -43,6 +49,7 @@ from .models import (
     PropertyDocument,
     PropertyType,
 )
+from .models.guestcode_model import GUEST_SESSION_KEY
 
 PAGE_SIZE = 20
 DASHBOARD_TASK_LIMIT = 10
@@ -211,7 +218,12 @@ def property_detail(request, pk):
     return render(
         request,
         "manudux/property.html",
-        {"property": property, "locations": locations, "documents": documents},
+        {
+            "property": property,
+            "locations": locations,
+            "documents": documents,
+            "guest_codes": property.guest_codes.all(),
+        },
     )
 
 
@@ -693,13 +705,10 @@ def guide_list(request):
     return render(request, "manudux/guide-list.html", context=context)
 
 
-@login_required(login_url="/accounts/login/")
-def guide_detail(request, pk):
-    guide = get_object_or_404(Guide, pk=pk)
-
-    # What this guide is actually linked from - Property/Location/Appliance
-    # each have an optional FK to Guide (not the other way around), so this
-    # is built from their reverse managers rather than a field on Guide.
+def _guide_used_by(guide):
+    """What this guide is actually linked from - Property/Location/Appliance
+    each have an optional FK to Guide (not the other way around), so this
+    is built from their reverse managers rather than a field on Guide."""
     used_by = []
     for prop in guide.property_set.all():
         used_by.append(
@@ -722,9 +731,43 @@ def guide_detail(request, pk):
                 "url": reverse("manudux:appliance", kwargs={"pk": appliance.pk}),
             }
         )
+    return used_by
 
-    context = {"guide": guide, "used_by": used_by}
 
+@login_required(login_url="/accounts/login/")
+def guide_detail(request, pk):
+    guide = get_object_or_404(Guide, pk=pk)
+    context = {
+        "guide": guide,
+        "used_by": _guide_used_by(guide),
+        "attach_form": GuideAttachForm(),
+    }
+    return render(request, "manudux/guide-details.html", context=context)
+
+
+@login_required(login_url="/accounts/login/")
+def attach_guide(request, pk):
+    """Links this guide to a property/location/appliance by setting that
+    target's guide FK - the reverse of picking a guide from the "Manual"
+    field on PropertyForm/LocationForm/ApplianceForm."""
+    guide = get_object_or_404(Guide, pk=pk)
+
+    if request.method == "POST":
+        form = GuideAttachForm(request.POST)
+        if form.is_valid():
+            for target in (
+                form.cleaned_data.get("property"),
+                form.cleaned_data.get("location"),
+                form.cleaned_data.get("appliance"),
+            ):
+                if target is not None:
+                    target.guide = guide
+                    target.save(update_fields=["guide"])
+            return redirect("manudux:guide", pk=guide.pk)
+    else:
+        form = GuideAttachForm()
+
+    context = {"guide": guide, "used_by": _guide_used_by(guide), "attach_form": form}
     return render(request, "manudux/guide-details.html", context=context)
 
 
@@ -878,3 +921,206 @@ def delete_guide_file(request, pk):
         return redirect("manudux:guide", pk=guide_pk)
     context = {"guide_file": guide_file}
     return render(request, "manudux/guide-file-delete.html", context)
+
+
+@login_required(login_url="/accounts/login/")
+def create_guest_code(request, property_pk):
+    property_obj = get_object_or_404(Property, pk=property_pk)
+
+    if request.method == "POST":
+        form = GuestCodeForm(request.POST)
+        if form.is_valid():
+            guest_code = form.save(commit=False)
+            guest_code.property = property_obj
+            guest_code.created_by = request.user
+            guest_code.save()
+            return redirect("manudux:property", pk=property_obj.pk)
+    else:
+        form = GuestCodeForm()
+
+    context = {"form": form, "property": property_obj}
+    return render(request, "manudux/guest-code-create.html", context)
+
+
+@login_required(login_url="/accounts/login/")
+def delete_guest_code(request, pk):
+    guest_code = get_object_or_404(GuestCode, pk=pk)
+    if request.method == "POST":
+        property_pk = guest_code.property_id
+        guest_code.delete()
+        return redirect("manudux:property", pk=property_pk)
+    context = {"guest_code": guest_code}
+    return render(request, "manudux/guest-code-delete.html", context)
+
+
+def guest_login(request):
+    """Public: exchanges a guest code for a browser-session-only guest
+    session. Deliberately never calls django.contrib.auth.login() - a guest
+    never becomes a real User, so request.user.is_authenticated stays False
+    and every existing @login_required view stays exactly as protected as
+    it already is."""
+    if request.method == "POST":
+        form = GuestCodeLoginForm(request.POST)
+        if form.is_valid():
+            guest_code = GuestCode.objects.get(code=form.cleaned_data["code"])
+            request.session[GUEST_SESSION_KEY] = guest_code.pk
+            request.session.set_expiry(0)  # ends when the browser closes
+            return redirect("manudux:guest-property")
+    else:
+        form = GuestCodeLoginForm()
+
+    return render(request, "manudux/guest-login.html", {"form": form})
+
+
+def guest_logout(request):
+    if request.method == "POST":
+        request.session.pop(GUEST_SESSION_KEY, None)
+    return redirect("manudux:guest-login")
+
+
+def _guide_is_guest_reachable(guide, property_obj):
+    """Whether a guest browsing this property is allowed to open this
+    guide's own page - the guide has to be guest-visible itself, and
+    actually be the manual for something guest-visible on this specific
+    property (the property itself, one of its guest-visible locations, or
+    one of its guest-visible appliances - an appliance's own location
+    doesn't have to be guest-visible too, since a guest-visible appliance
+    in an otherwise-hidden location is still shown on the property page)."""
+    if not guide.guest_visible:
+        return False
+    if property_obj.guide_id == guide.pk:
+        return True
+    if Location.objects.filter(
+        property=property_obj, guest_visible=True, activated=True, guide=guide
+    ).exists():
+        return True
+    if Appliance.objects.filter(
+        location__property=property_obj,
+        guest_visible=True,
+        activated=True,
+        guide=guide,
+    ).exists():
+        return True
+    return False
+
+
+def guest_property_view(request):
+    """Public: the read-only view a guest session lands on. Deleting the
+    GuestCode (revoking it) makes get_object_or_404 below 404 on the
+    guest's very next request, immediately cutting off their access."""
+    guest_code_id = request.session.get(GUEST_SESSION_KEY)
+    if not guest_code_id:
+        return redirect("manudux:guest-login")
+
+    guest_code = get_object_or_404(
+        GuestCode.objects.select_related("property__guide"), pk=guest_code_id
+    )
+    property_obj = guest_code.property
+
+    # The same guide can be attached to the property, one of its locations,
+    # and one of its appliances all at once (see attach_guide). Track which
+    # guides have already been placed on the page so each one gets exactly
+    # one link - claimed by the most specific thing it's linked from
+    # (appliance, then location, then property), so e.g. a guide shared by
+    # an appliance and its own parent location shows nested under the
+    # appliance rather than one level up.
+    seen_guide_ids = set()
+
+    def claim_guide(guide):
+        if not guide or not guide.guest_visible or guide.pk in seen_guide_ids:
+            return None
+        seen_guide_ids.add(guide.pk)
+        return guide
+
+    location_qs = (
+        property_obj.locations.filter(guest_visible=True, activated=True)
+        .select_related("location_type", "guide")
+        .prefetch_related(
+            Prefetch(
+                "appliances",
+                queryset=Appliance.objects.filter(
+                    guest_visible=True, activated=True
+                ).select_related("appliance_type", "guide"),
+            )
+        )
+    )
+
+    # An appliance can be marked guest-visible even though its own location
+    # isn't - e.g. a shared laundry appliance in an otherwise private
+    # basement. Those would otherwise never reach the guest at all, since
+    # they're excluded from `location_qs` above along with the rest of
+    # their (hidden) location. List them separately so nothing attached to
+    # the property gets silently dropped, without duplicating the ones
+    # already shown nested under a visible location.
+    orphan_appliance_qs = (
+        Appliance.objects.filter(
+            location__property=property_obj, guest_visible=True, activated=True
+        )
+        .exclude(location__guest_visible=True, location__activated=True)
+        .select_related("appliance_type", "guide", "location")
+    )
+
+    # Pass 1 - appliances claim their guide first, being the most specific
+    # thing on the page a guide can describe.
+    locations = [
+        {
+            "location": location,
+            "appliances": [
+                {
+                    "appliance": appliance,
+                    "guide": (
+                        claim_guide(appliance.guide) if appliance.guide_id else None
+                    ),
+                }
+                for appliance in location.appliances.all()
+            ],
+        }
+        for location in location_qs
+    ]
+    orphan_appliances = [
+        {
+            "appliance": appliance,
+            "guide": claim_guide(appliance.guide) if appliance.guide_id else None,
+        }
+        for appliance in orphan_appliance_qs
+    ]
+
+    # Pass 2 - locations only get a guide card of their own if none of
+    # their appliances already claimed that same guide above.
+    for item in locations:
+        location = item["location"]
+        item["guide"] = claim_guide(location.guide) if location.guide_id else None
+
+    # Pass 3 - the property itself, the least specific level of all.
+    property_guide = claim_guide(property_obj.guide) if property_obj.guide_id else None
+
+    context = {
+        "property": property_obj,
+        "property_guide": property_guide,
+        "locations": locations,
+        "orphan_appliances": orphan_appliances,
+        "has_shared_content": bool(property_guide or locations or orphan_appliances),
+        "guest_code": guest_code,
+    }
+    return render(request, "manudux/guest-property.html", context)
+
+
+def guest_guide_detail(request, pk):
+    """Public: the page a guide's link card on the guest property page
+    points to. Kept separate from the property page itself so a guide
+    linked from several places (property/location/appliance) only ever
+    needs to be shown once - see claim_guide() above."""
+    guest_code_id = request.session.get(GUEST_SESSION_KEY)
+    if not guest_code_id:
+        return redirect("manudux:guest-login")
+
+    guest_code = get_object_or_404(
+        GuestCode.objects.select_related("property"), pk=guest_code_id
+    )
+    guide = get_object_or_404(Guide, pk=pk)
+
+    if not _guide_is_guest_reachable(guide, guest_code.property):
+        raise Http404()
+
+    context = {"guide": guide, "guest_code": guest_code}
+    return render(request, "manudux/guest-guide-detail.html", context)

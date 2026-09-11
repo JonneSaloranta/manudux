@@ -1,0 +1,14 @@
+{% extends "manudux/base.html" %}
+{% load i18n %}
+
+{% block title %}{{ guide.name }}{% endblock %}
+
+{% block content %}
+<div class="container">
+    <p class="page-section-hint">
+        <a href="{% url 'manudux:guest-property' %}">&larr; {% trans "Back to the property" %}</a>
+    </p>
+
+    {% include "manudux/guest-guide-steps.html" %}
+</div>
+{% endblock %}

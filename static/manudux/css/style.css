@@ -448,7 +448,9 @@ footer {
   }
   main {
     padding: 0;
-    padding-bottom: 60px;
+    /* Must match #mobile-nav's own height below so the fixed bar never
+       covers the last bit of page content. */
+    padding-bottom: calc(68px + env(safe-area-inset-bottom, 0px));
   }
   .container {
     border: none;
@@ -459,27 +461,47 @@ footer {
   }
   #mobile-nav {
     display: grid;
-    grid-template-columns: repeat(5, 1fr);
+    /* auto-fit with a 0 minimum sizes tracks to however many items are
+       actually rendered - 5 for a signed-in user, 2 for a guest or a
+       logged-out visitor - rather than assuming a fixed count. */
+    grid-template-columns: repeat(auto-fit, minmax(0, 1fr));
     position: fixed;
     left: 0;
     right: 0;
     bottom: 0;
     z-index: 40;
-    height: 60px;
+    /* The base bar is taller than before for easier tapping, plus extra
+       room for the home-indicator/gesture-bar safe area on notched
+       phones (this is installable as a standalone app - see the
+       apple-mobile-web-app meta tags in base.html - so it can render
+       flush to the bottom edge instead of behind normal browser chrome).
+       env() resolves to 0 wherever there's no inset, so this is a no-op
+       on everything else. */
+    height: calc(68px + env(safe-area-inset-bottom, 0px));
+    padding-bottom: env(safe-area-inset-bottom, 0px);
     background-color: var(--primary-color);
     border-top: 1px solid var(--secondary-color);
+  }
+  .mobile-nav-item-form {
+    /* Lets the <button class="mobile-nav-item"> inside this form act as
+       the grid item directly, matching the <a class="mobile-nav-item">
+       items around it, instead of the form itself taking up the cell. */
+    display: contents;
   }
   .mobile-nav-item {
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 0.2em;
+    gap: 0.3em;
     height: 100%;
+    padding: 0.4em 0.5em;
     border: none;
     background: none;
     color: var(--color-white);
     text-decoration: none;
+    text-align: center;
+    line-height: 1.2;
     font: inherit;
     font-size: 1.05rem;
     cursor: pointer;
@@ -513,7 +535,7 @@ footer {
     color: var(--color-white);
     border-top: 1px solid var(--secondary-color);
     border-radius: 1em 1em 0 0;
-    padding-bottom: 1em;
+    padding-bottom: calc(1em + env(safe-area-inset-bottom, 0px));
     overflow-y: auto;
   }
   .mobile-menu-header {
@@ -667,6 +689,41 @@ footer {
 }
 .entity-list-item-overdue .entity-list-meta {
   color: var(--danger-color);
+}
+
+/* Collapsible tree nodes (guest property page: location -> appliances ->
+   guide links) built on native <details>/<summary> rather than sidebar-
+   style JS toggles, since these live in page content, not the nav - they
+   get keyboard/screen-reader support for free and need no script. */
+.tree-summary {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  cursor: pointer;
+  list-style: none;
+}
+.tree-summary::-webkit-details-marker {
+  display: none;
+}
+.tree-summary .entity-list-meta {
+  margin-right: auto;
+}
+.tree-chevron {
+  flex-shrink: 0;
+  margin-left: auto;
+  fill: currentColor;
+  transition: transform 0.15s ease;
+}
+details[open] > .tree-summary .tree-chevron {
+  transform: rotate(180deg);
+}
+.tree-node-body {
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--tetriary-color);
+}
+.tree-node-body > .entity-list {
+  margin: 0;
 }
 
 @media (min-width: 700px) {

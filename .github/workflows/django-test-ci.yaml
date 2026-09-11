@@ -145,11 +145,15 @@ jobs:
                   A11Y_PASSWORD="$(python -c 'import secrets; print(secrets.token_urlsafe(16))')"
                   echo "::add-mask::$A11Y_PASSWORD"
                   echo "A11Y_PASSWORD=$A11Y_PASSWORD" >> "$GITHUB_ENV"
+                  A11Y_GUEST_CODE="$(python -c 'import secrets, string; print("".join(secrets.choice(string.ascii_uppercase + string.digits) for _ in range(8)))')"
+                  echo "::add-mask::$A11Y_GUEST_CODE"
+                  echo "A11Y_GUEST_CODE=$A11Y_GUEST_CODE" >> "$GITHUB_ENV"
                   python manage.py shell -c "
                   from django.contrib.auth.models import User
                   from manudux.models import (
                       Property, PropertyType, Location, LocationType, Appliance,
                       ApplianceType, ApplianceDocument, MaintenanceTask, Guide, GuideStep,
+                      GuestCode,
                   )
                   from django.core.files.base import ContentFile
                   User.objects.filter(username='a11y').delete()
@@ -162,6 +166,9 @@ jobs:
                   # render too. The appliance gets a document so its Documents
                   # section renders too. Superuser so it can also reach the
                   # staff-only pages (site-settings, users) during the scan.
+                  # The location/appliance are marked guest-visible and the
+                  # guest code is pinned to a known value so the guest-login
+                  # and guest-property pages can be scanned too.
                   property_type = PropertyType.objects.create(name='A11y Test Property Type')
                   location_type = LocationType.objects.create(name='A11y Test Location Type')
                   appliance_type = ApplianceType.objects.create(name='A11y Test Appliance Type')
@@ -173,11 +180,18 @@ jobs:
                       zip_code='00100',
                       property_type=property_type,
                   )
+                  guide = Guide.objects.create(name='A11y Test Guide')
+                  GuideStep.objects.create(
+                      guide=guide, step_number=1, title='A11y Test Step',
+                      description='Step description.',
+                  )
                   l = Location.objects.create(
-                      name='A11y Test Location', property=p, location_type=location_type
+                      name='A11y Test Location', property=p, location_type=location_type,
+                      guide=guide, guest_visible=True,
                   )
                   a = Appliance.objects.create(
-                      name='A11y Test Appliance', location=l, appliance_type=appliance_type
+                      name='A11y Test Appliance', location=l, appliance_type=appliance_type,
+                      guest_visible=True,
                   )
                   ApplianceDocument.objects.create(
                       name='A11y Test Document',
@@ -187,11 +201,7 @@ jobs:
                   MaintenanceTask.objects.create(
                       title='A11y Test Task', property=p, due_date='2030-01-01'
                   )
-                  guide = Guide.objects.create(name='A11y Test Guide')
-                  GuideStep.objects.create(
-                      guide=guide, step_number=1, title='A11y Test Step',
-                      description='Step description.',
-                  )
+                  GuestCode.objects.create(name='A11y Test Guest', property=p, code='$A11Y_GUEST_CODE')
                   "
 
             - name: Start the app
@@ -202,7 +212,7 @@ jobs:
 
             - name: Run accessibility checks (pa11y-ci)
               run: |
-                  sed "s/__A11Y_TEST_PASSWORD__/$A11Y_PASSWORD/" .pa11yci.json > /tmp/pa11yci.json
+                  sed -e "s/__A11Y_TEST_PASSWORD__/$A11Y_PASSWORD/" -e "s/__A11Y_TEST_GUEST_CODE__/$A11Y_GUEST_CODE/" .pa11yci.json > /tmp/pa11yci.json
                   npx --yes pa11y-ci --config /tmp/pa11yci.json
 
     docker-publish:

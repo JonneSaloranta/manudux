@@ -29,6 +29,10 @@ class Appliance(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     activated = models.BooleanField(default=True)
+    guest_visible = models.BooleanField(
+        default=False,
+        help_text=_("Show this appliance to anyone browsing with a guest code."),
+    )
 
     def __str__(self):
         return f"{self.name} -> {self.location.name}"

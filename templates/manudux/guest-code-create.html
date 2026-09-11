@@ -1,0 +1,20 @@
+{% extends "manudux/base.html" %}
+{% load i18n %}
+{% load static %}
+
+{% block title %}{% trans "Create guest code" %}{% endblock %}
+
+{% block content %}
+<div class="container">
+    <section>
+        <div class="form-card">
+            <form action="{% url 'manudux:create-guest-code' property_pk=property.id %}" method="post">
+                {% csrf_token %}
+
+                {{ form.as_div }}
+                <button class="btn btn-primary">{% trans "Create" %}</button>
+            </form>
+        </div>
+    </section>
+</div>
+{% endblock %}

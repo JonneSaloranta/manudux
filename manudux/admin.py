@@ -9,6 +9,7 @@ from django.urls import path, reverse
 from manudux.models.appliance_model import Appliance
 from manudux.models.appliancedocument_model import ApplianceDocument
 from manudux.models.appliancetype_model import ApplianceType
+from manudux.models.guestcode_model import GuestCode
 from manudux.models.guide_model import Guide
 from manudux.models.guidefile_model import GuideFile
 from manudux.models.guidestep_model import GuideStep
@@ -246,3 +247,11 @@ class PropertyDocumentAdmin(admin.ModelAdmin):
     list_display = ("name", "property", "category", "uploaded_at")
     list_filter = ("category", "uploaded_at")
     search_fields = ("name", "property__name", "notes")
+
+
+@admin.register(GuestCode)
+class GuestCodeAdmin(admin.ModelAdmin):
+    list_display = ("name", "property", "code", "created_by", "created_at")
+    list_filter = ("created_at",)
+    search_fields = ("name", "property__name", "code")
+    readonly_fields = ("code", "created_at")

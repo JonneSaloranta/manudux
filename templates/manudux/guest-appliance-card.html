@@ -1,0 +1,41 @@
+{% load i18n %}
+{% comment %}
+Read-only appliance dropdown for the guest view. Used both nested under a
+guest-visible location and, for an appliance whose own location isn't
+guest-visible, in the property's standalone "Appliances" section - pass
+show_location=True in the latter case so it's still clear where it is.
+
+`guide` is passed in separately rather than read off appliance.guide -
+it's already been through claim_guide() in the view, so it's None both
+when the appliance has no guide and when its guide has already been
+claimed by something else on the page.
+{% endcomment %}
+<details class="detail-card">
+    <summary class="tree-summary">
+        <span class="entity-list-title">{{ appliance.name }}</span>
+        {% if appliance.appliance_type %}
+        <span class="entity-list-meta">{{ appliance.appliance_type }}</span>
+        {% endif %}
+        <svg class="tree-chevron" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px">
+            <path d="M480-344 240-584l56-56 184 184 184-184 56 56-240 240Z" />
+        </svg>
+    </summary>
+
+    <div class="tree-node-body">
+        <div class="detail-grid">
+            {% if show_location %}<p>{% trans "Location" %}: {{ appliance.location.name }}</p>{% endif %}
+            {% if appliance.brand %}<p>{% trans "Brand" %}: {{ appliance.brand }}</p>{% endif %}
+            {% if appliance.model_number %}<p>{% trans "Model Number" %}: {{ appliance.model_number }}</p>{% endif %}
+            {% if appliance.serial_number %}<p>{% trans "Serial Number" %}: {{ appliance.serial_number }}</p>{% endif %}
+            {% if appliance.purchase_date %}<p>{% trans "Purchased" %}: {{ appliance.purchase_date|date:"d.m.Y" }}</p>{% endif %}
+            {% if appliance.warranty_expires %}<p>{% trans "Warranty expires" %}: {{ appliance.warranty_expires|date:"d.m.Y" }}</p>{% endif %}
+        </div>
+        {% if appliance.notes %}
+        <div class="detail-card-description">{{ appliance.notes|linebreaksbr }}</div>
+        {% endif %}
+
+        {% if guide %}
+        {% include "manudux/guest-guide-link.html" %}
+        {% endif %}
+    </div>
+</details>

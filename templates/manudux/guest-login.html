@@ -1,0 +1,20 @@
+{% extends "manudux/base.html" %}
+{% load i18n %}
+{% load static %}
+
+{% block title %}{% trans "Guest login" %}{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h2>{% trans "Guest login" %}</h2>
+    <p>{% trans "Enter the guest code you were given to view a property's information." %}</p>
+    <div class="form-card">
+        <form method="post">
+            {% csrf_token %}
+            {{ form.as_div }}
+
+            <button type="submit" class="btn btn-primary">{% trans "View property" %}</button>
+        </form>
+    </div>
+</div>
+{% endblock %}

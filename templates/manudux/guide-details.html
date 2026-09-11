@@ -45,6 +45,18 @@
     {% endif %}
 
     <section class="page-section">
+        <h2>{% trans "Attach to" %}</h2>
+        <p class="page-section-hint">{% trans "Link this guide as the manual for a property, location, or appliance." %}</p>
+        <div class="form-card">
+            <form action="{% url 'manudux:attach-guide' pk=guide.id %}" method="post">
+                {% csrf_token %}
+                {{ attach_form.as_div }}
+                <button class="btn btn-primary">{% trans "Attach" %}</button>
+            </form>
+        </div>
+    </section>
+
+    <section class="page-section">
         <h2>{% trans "Steps" %}</h2>
         <a href="{% url 'manudux:create-guide-step' guide_pk=guide.id %}" class="btn btn-primary">{% trans "Add a step" %}</a>
 

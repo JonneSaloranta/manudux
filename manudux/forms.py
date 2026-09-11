@@ -9,6 +9,7 @@ from .models import (
     Appliance,
     ApplianceDocument,
     ApplianceType,
+    GuestCode,
     Guide,
     GuideFile,
     GuideStep,
@@ -189,6 +190,7 @@ class LocationForm(ModelForm):
             "property",
             "location_type",
             "guide",
+            "guest_visible",
         ]
         labels = {
             "name": _("Location Name"),
@@ -197,6 +199,7 @@ class LocationForm(ModelForm):
             "property": _("Property"),
             "location_type": _("Location Type"),
             "guide": _("Manual"),
+            "guest_visible": _("Visible to guests"),
         }
         help_texts = {
             "name": _("Enter the name of the location."),
@@ -207,6 +210,9 @@ class LocationForm(ModelForm):
                 "What kind of space this is, e.g. garage, boiler room, storage."
             ),
             "guide": _("Optionally link an existing guide as this location's manual."),
+            "guest_visible": _(
+                "Show this location to anyone browsing this property with a guest code."
+            ),
         }
 
 
@@ -241,15 +247,55 @@ class PropertyTypeForm(ModelForm):
 class GuideForm(ModelForm):
     class Meta:
         model = Guide
-        fields = ["name", "description"]
+        fields = ["name", "description", "guest_visible"]
         labels = {
             "name": _("Name"),
             "description": _("Description"),
+            "guest_visible": _("Visible to guests"),
         }
         help_texts = {
             "name": _("Enter a name for this guide."),
             "description": _("A short description of what this guide covers."),
+            "guest_visible": _(
+                "Show this guide's steps to anyone browsing with a guest code, "
+                "when it's linked from a guest-visible property, location, or "
+                "appliance."
+            ),
         }
+
+
+class GuideAttachForm(forms.Form):
+    """Lets a guide be linked to a property/location/appliance from the
+    guide's own page, the reverse direction of the "Manual" field already
+    on PropertyForm/LocationForm/ApplianceForm. Any combination of the three
+    can be picked at once; each selected target's guide FK is overwritten
+    with this guide."""
+
+    property = forms.ModelChoiceField(
+        label=_("Property"),
+        queryset=Property.objects.filter(activated=True).order_by("name"),
+        required=False,
+    )
+    location = forms.ModelChoiceField(
+        label=_("Location"),
+        queryset=Location.objects.filter(activated=True).order_by("name"),
+        required=False,
+    )
+    appliance = forms.ModelChoiceField(
+        label=_("Appliance"),
+        queryset=Appliance.objects.filter(activated=True).order_by("name"),
+        required=False,
+    )
+
+    def clean(self):
+        cleaned_data = super().clean()
+        if not any(
+            cleaned_data.get(field) for field in ("property", "location", "appliance")
+        ):
+            raise ValidationError(
+                _("Choose at least one property, location, or appliance to attach.")
+            )
+        return cleaned_data
 
 
 class GuideStepForm(ModelForm):
@@ -298,6 +344,7 @@ class ApplianceForm(ModelForm):
             "image",
             "guide",
             "activated",
+            "guest_visible",
         ]
         widgets = {
             "purchase_date": forms.DateInput(attrs={"type": "date"}),
@@ -316,6 +363,7 @@ class ApplianceForm(ModelForm):
             "image": _("Image"),
             "guide": _("Manual"),
             "activated": _("Activated"),
+            "guest_visible": _("Visible to guests"),
         }
         help_texts = {
             "name": _("Enter the name of the appliance."),
@@ -325,6 +373,10 @@ class ApplianceForm(ModelForm):
             ),
             "guide": _("Optionally link an existing guide as this appliance's manual."),
             "activated": _("Check to keep this appliance active."),
+            "guest_visible": _(
+                "Show this appliance to anyone browsing this property with a guest"
+                " code."
+            ),
         }
 
 
@@ -445,3 +497,25 @@ class PropertyDocumentForm(ModelForm):
             "name": _('E.g. "Deed of sale" or "Home insurance policy 2026".'),
             "file": _("PDF, Word, Excel, or an image scan (max 25MB)."),
         }
+
+
+class GuestCodeForm(ModelForm):
+    class Meta:
+        model = GuestCode
+        fields = ["name"]
+        labels = {
+            "name": _("Name"),
+        }
+        help_texts = {
+            "name": _('Who this code is for, e.g. "3rd floor tenant".'),
+        }
+
+
+class GuestCodeLoginForm(forms.Form):
+    code = forms.CharField(label=_("Guest code"))
+
+    def clean_code(self):
+        code = self.cleaned_data["code"].strip().upper()
+        if not GuestCode.objects.filter(code=code).exists():
+            raise ValidationError(_("That code isn't valid. Check it and try again."))
+        return code

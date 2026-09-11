@@ -1,0 +1,20 @@
+{% extends "manudux/base.html" %}
+{% load i18n %}
+{% load static %}
+
+{% block title %}{% trans "Revoke" %} - {{ guest_code.name }}{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1>{% trans "Revoke guest code" %}</h1>
+
+    <p>{% blocktrans with name=guest_code.name %}Are you sure you want to revoke the guest code for "{{ name }}"? Anyone currently viewing this property as that guest will immediately lose access. This cannot be undone.{% endblocktrans %}</p>
+
+    <form action="{% url 'manudux:delete-guest-code' guest_code.id %}" method="post">
+        {% csrf_token %}
+        <input type="submit" value="{% trans 'Revoke' %}" class="btn btn-danger">
+    </form>
+
+    <a href="{% url 'manudux:property' pk=guest_code.property.id %}" class="btn">{% trans "Cancel" %}</a>
+</div>
+{% endblock %}

@@ -1,0 +1,11 @@
+{% load i18n %}
+{% comment %}
+A compact card linking to a guide's own page (guest-guide-detail.html),
+used everywhere a guest-visible guide is referenced (property/location/
+appliance) instead of inlining its steps - see claim_guide() in
+guest_property_view, which makes sure each guide only gets one of these
+per page.
+{% endcomment %}
+<a class="entity-list-item" href="{% url 'manudux:guest-guide' pk=guide.pk %}">
+    <span class="entity-list-title">{% trans "Manual" %}: {{ guide.name }}</span>
+</a>

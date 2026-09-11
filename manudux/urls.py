@@ -25,6 +25,20 @@ urlpatterns = [
         name="delete-property-document",
     ),
     path("property/<int:pk>/", views.property_detail, name="property"),
+    path(
+        "property/<int:property_pk>/guest-codes/create/",
+        views.create_guest_code,
+        name="create-guest-code",
+    ),
+    path(
+        "guest-code/<int:pk>/delete/",
+        views.delete_guest_code,
+        name="delete-guest-code",
+    ),
+    path("guest-login/", views.guest_login, name="guest-login"),
+    path("guest-logout/", views.guest_logout, name="guest-logout"),
+    path("guest/property/", views.guest_property_view, name="guest-property"),
+    path("guest/guide/<int:pk>/", views.guest_guide_detail, name="guest-guide"),
     path("properties/types/", views.property_types, name="property-types"),
     path(
         "properties/types/create/",
@@ -66,6 +80,7 @@ urlpatterns = [
     path("guides/create-guide/", views.create_guide, name="create-guide"),
     path("guide/<int:pk>/edit/", views.edit_guide, name="edit-guide"),
     path("guide/<int:pk>/delete/", views.delete_guide, name="delete-guide"),
+    path("guide/<int:pk>/attach/", views.attach_guide, name="attach-guide"),
     path(
         "guide/<int:guide_pk>/steps/create/",
         views.create_guide_step,

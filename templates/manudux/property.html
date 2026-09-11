@@ -100,6 +100,26 @@
             {% endfor %}
         </div>
     </section>
+
+    <section class="page-section">
+        <h2>{% trans "Guest access" %}</h2>
+        <p class="page-section-hint">{% trans "Guests can log in with a code to view this property's guest-visible locations and appliances without an account. Editing or adding information always requires an account." %}</p>
+        <a href="{% url 'manudux:create-guest-code' property_pk=property.id %}" class="btn btn-primary">{% trans "Create guest code" %}</a>
+
+        <div class="entity-list">
+            {% for guest_code in guest_codes %}
+            <div class="entity-list-item">
+                <span class="entity-list-title">{{ guest_code.name }}</span>
+                <span class="entity-list-meta">{% trans "Code" %}: <code>{{ guest_code.code }}</code> &middot; {% trans "Created" %} {{ guest_code.created_at|date:"d.m.Y" }}</span>
+                <div class="card-actions">
+                    <a href="{% url 'manudux:delete-guest-code' guest_code.id %}" class="btn btn-danger">{% trans "Revoke" %}</a>
+                </div>
+            </div>
+            {% empty %}
+            <p>{% trans "No guest codes yet." %}</p>
+            {% endfor %}
+        </div>
+    </section>
 </div>
 
 {% endblock %}

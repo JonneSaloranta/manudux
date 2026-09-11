@@ -11,6 +11,7 @@ from .maintenancetask_model import MaintenanceTask
 from .maintenancelog_model import MaintenanceLog
 from .propertydocument_model import PropertyDocument
 from .appliancedocument_model import ApplianceDocument
+from .guestcode_model import GuestCode
 
 __all__ = [
     "PropertyType",
@@ -26,4 +27,5 @@ __all__ = [
     "MaintenanceLog",
     "PropertyDocument",
     "ApplianceDocument",
+    "GuestCode",
 ]

@@ -26,6 +26,14 @@ class Guide(models.Model):
     name = models.CharField(max_length=200, unique=True)
     description = models.CharField(max_length=300, blank=True, null=True)
     qr_code = models.ImageField(upload_to="guides/qrcodes", blank=True, null=True)
+    guest_visible = models.BooleanField(
+        default=False,
+        help_text=_(
+            "Show this guide's steps to anyone browsing with a guest code, "
+            "when it's linked from a guest-visible property, location, or "
+            "appliance."
+        ),
+    )
     created_at = models.DateTimeField(auto_now_add=True, blank=True, null=True)
     updated_at = models.DateTimeField(auto_now=True, blank=True, null=True)
 

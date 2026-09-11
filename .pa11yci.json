@@ -9,6 +9,24 @@
         "http://127.0.0.1:8877/",
         "http://127.0.0.1:8877/accounts/login/",
         "http://127.0.0.1:8877/accounts/password_reset/",
+        "http://127.0.0.1:8877/guest-login/",
+        {
+            "url": "http://127.0.0.1:8877/guest-login/",
+            "actions": [
+                "set field #id_code to __A11Y_TEST_GUEST_CODE__",
+                "click element button[type=submit]",
+                "wait for url to be http://127.0.0.1:8877/guest/property/"
+            ]
+        },
+        {
+            "url": "http://127.0.0.1:8877/guest-login/",
+            "actions": [
+                "set field #id_code to __A11Y_TEST_GUEST_CODE__",
+                "click element button[type=submit]",
+                "wait for url to be http://127.0.0.1:8877/guest/property/",
+                "navigate to http://127.0.0.1:8877/guest/guide/1/"
+            ]
+        },
         {
             "url": "http://127.0.0.1:8877/accounts/login/",
             "actions": [

@@ -3,7 +3,7 @@ from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import Client, TestCase, tag
 from django.urls import reverse
 
-from manudux.models import Guide, GuideFile
+from manudux.models import Appliance, Guide, GuideFile, Location, Property
 
 
 class GuideViewsTest(TestCase):
@@ -125,4 +125,49 @@ class GuideViewsTest(TestCase):
         )
         self.assertEqual(response.status_code, 302, msg="User was not redirected")
         self.assertFalse(Guide.objects.filter(pk=self.guide.pk).exists())
+
+    @tag("views", "auth", "guide")
+    def test_attach_guide_view_public(self):
+        response = self.client.get(
+            reverse("manudux:attach-guide", kwargs={"pk": self.guide.pk})
+        )
+        self.assertEqual(response.status_code, 302)
+        self.assertTrue("accounts/login" in response.url)
+
+    @tag("views", "auth", "guide")
+    def test_attach_guide_to_property(self):
+        property_obj = Property.objects.create(name="Test Property")
+        self.client.login(username="testuser", password="testpassword")
+        response = self.client.post(
+            reverse("manudux:attach-guide", kwargs={"pk": self.guide.pk}),
+            data={"property": property_obj.pk},
+        )
+        self.assertEqual(response.status_code, 302, msg="User was not redirected")
+        property_obj.refresh_from_db()
+        self.assertEqual(property_obj.guide, self.guide)
+
+    @tag("views", "auth", "guide")
+    def test_attach_guide_to_location_and_appliance_together(self):
+        property_obj = Property.objects.create(name="Test Property")
+        location = Location.objects.create(name="Test Location", property=property_obj)
+        appliance = Appliance.objects.create(name="Test Appliance", location=location)
+        self.client.login(username="testuser", password="testpassword")
+        response = self.client.post(
+            reverse("manudux:attach-guide", kwargs={"pk": self.guide.pk}),
+            data={"location": location.pk, "appliance": appliance.pk},
+        )
+        self.assertEqual(response.status_code, 302, msg="User was not redirected")
+        location.refresh_from_db()
+        appliance.refresh_from_db()
+        self.assertEqual(location.guide, self.guide)
+        self.assertEqual(appliance.guide, self.guide)
+
+    @tag("views", "auth", "guide")
+    def test_attach_guide_requires_at_least_one_target(self):
+        self.client.login(username="testuser", password="testpassword")
+        response = self.client.post(
+            reverse("manudux:attach-guide", kwargs={"pk": self.guide.pk}), data={}
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertFalse(response.context["attach_form"].is_valid())
         self.assertFalse(GuideFile.objects.filter(guide_id=self.guide.pk).exists())
