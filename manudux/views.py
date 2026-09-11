@@ -226,7 +226,7 @@ def delete_location(request, pk):
 
 @login_required(login_url="/accounts/login/")
 def locations(request):
-    queryset = Location.objects.order_by("name")
+    queryset = Location.objects.filter(activated=True).order_by("name")
     page_obj = Paginator(queryset, PAGE_SIZE).get_page(request.GET.get("page"))
     return render(
         request, "manudux/locations.html", {"locations": page_obj, "page_obj": page_obj}

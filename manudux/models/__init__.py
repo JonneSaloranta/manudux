@@ -1,4 +1,5 @@
 from .property_type_model import PropertyType
+from .locationtype_model import LocationType
 from .guide_model import Guide
 from .guidefile_model import GuideFile
 from .property_model import Property
@@ -11,6 +12,7 @@ from .propertydocument_model import PropertyDocument
 
 __all__ = [
     "PropertyType",
+    "LocationType",
     "Guide",
     "GuideFile",
     "Property",

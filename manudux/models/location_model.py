@@ -2,7 +2,7 @@ from django.db import models, transaction
 from django.utils.timezone import now
 from django.utils.translation import gettext_lazy as _
 
-from . import Guide, Property
+from . import Guide, LocationType, Property
 
 
 class Location(models.Model):
@@ -13,6 +13,13 @@ class Location(models.Model):
     image = models.ImageField(upload_to="locations/images/", blank=True, null=True)
     property = models.ForeignKey(
         Property, on_delete=models.CASCADE, related_name="locations"
+    )
+    location_type = models.ForeignKey(
+        LocationType,
+        on_delete=models.SET_NULL,
+        related_name="locations",
+        blank=True,
+        null=True,
     )
     guide = models.ForeignKey(Guide, on_delete=models.SET_NULL, blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)

@@ -2,7 +2,7 @@ from django.contrib.auth.models import User
 from django.test import Client, TestCase, tag
 from django.urls import reverse
 
-from manudux.models import Location, Property
+from manudux.models import Location, LocationType, Property
 
 
 class LocationViewsTest(TestCase):
@@ -111,3 +111,47 @@ class LocationViewsTest(TestCase):
         self.assertEqual(response.status_code, 302, msg="User was not redirected")
         self.location.refresh_from_db()
         self.assertEqual(self.location.name, "Updated Location")
+
+    @tag("views", "auth", "location")
+    def test_create_location_view_accepts_a_type(self):
+        """Test that a location can be created with a location type."""
+        self.client.login(username="testuser", password="testpassword")
+        location_type = LocationType.objects.create(name="Garage")
+
+        response = self.client.post(
+            reverse("manudux:create-location"),
+            data={
+                "name": "Garage Location",
+                "property": self.property.pk,
+                "location_type": location_type.pk,
+            },
+        )
+
+        self.assertEqual(response.status_code, 302, msg="User was not redirected")
+        location = Location.objects.get(name="Garage Location")
+        self.assertEqual(location.location_type, location_type)
+
+    @tag("views", "auth", "location")
+    def test_locations_view_only_shows_activated_locations(self):
+        """Deactivated locations should not appear in the locations list."""
+        Location.objects.create(
+            name="Deactivated Location", property=self.property, activated=False
+        )
+        self.client.login(username="testuser", password="testpassword")
+        response = self.client.get(reverse("manudux:locations"))
+        names = [location.name for location in response.context["locations"]]
+        self.assertNotIn("Deactivated Location", names)
+        self.assertIn("Test Location", names)
+
+    @tag("views", "auth", "location")
+    def test_delete_location_link_from_detail_page_does_not_delete_immediately(self):
+        """GET-ing the delete URL (what the detail page's Delete button now
+        links to) must render the confirmation page, not delete the
+        location - it should only be deleted on POST."""
+        self.client.login(username="testuser", password="testpassword")
+        response = self.client.get(
+            reverse("manudux:delete-location", kwargs={"pk": self.location.pk})
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "manudux/location-delete.html")
+        self.assertTrue(Location.objects.filter(pk=self.location.pk).exists())
