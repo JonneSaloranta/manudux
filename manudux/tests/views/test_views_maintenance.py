@@ -1,6 +1,7 @@
 from datetime import timedelta
 
 from django.contrib.auth.models import User
+from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import Client, TestCase, tag
 from django.urls import reverse
 from django.utils import timezone
@@ -94,6 +95,37 @@ class MaintenanceTaskViewsTest(TestCase):
         )
         self.assertEqual(response.status_code, 302)
         self.assertFalse(MaintenanceTask.objects.filter(pk=self.task.pk).exists())
+
+    @tag("views", "auth", "maintenance")
+    def test_delete_maintenance_task_link_does_not_delete_immediately(self):
+        """GET-ing the delete URL (what the detail page's Delete button now
+        links to) must render the confirmation page, not delete the task -
+        it should only be deleted on POST."""
+        self.client.login(username="testuser", password="testpassword")
+        response = self.client.get(
+            reverse("manudux:delete-maintenance-task", kwargs={"pk": self.task.pk})
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "manudux/maintenance-task-delete.html")
+        self.assertTrue(MaintenanceTask.objects.filter(pk=self.task.pk).exists())
+
+    @tag("views", "auth", "maintenance")
+    def test_complete_maintenance_task_with_a_receipt(self):
+        self.client.login(username="testuser", password="testpassword")
+        response = self.client.post(
+            reverse("manudux:maintenance-task", kwargs={"pk": self.task.pk}),
+            data={
+                "notes": "All good",
+                "cost": "15.00",
+                "receipt": SimpleUploadedFile(
+                    "receipt.pdf", b"content", "application/pdf"
+                ),
+            },
+        )
+        self.assertEqual(response.status_code, 302)
+
+        log = self.task.logs.first()
+        self.assertTrue(bool(log.receipt))
 
 
 class DashboardTest(TestCase):

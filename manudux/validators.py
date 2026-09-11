@@ -63,3 +63,9 @@ validate_appliance_document = FileExtensionAndSizeValidator(
     allowed_extensions=["pdf", "doc", "docx", "xlsx", "jpg", "jpeg", "png"],
     max_size_mb=25,
 )
+
+# A receipt/invoice attached to a completed maintenance log entry.
+validate_maintenance_receipt = FileExtensionAndSizeValidator(
+    allowed_extensions=["pdf", "doc", "docx", "xlsx", "jpg", "jpeg", "png"],
+    max_size_mb=25,
+)

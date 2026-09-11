@@ -3,6 +3,7 @@ from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
 from . import MaintenanceTask, Property
+from ..validators import validate_maintenance_receipt
 
 
 class MaintenanceLog(models.Model):
@@ -21,6 +22,12 @@ class MaintenanceLog(models.Model):
     )
     notes = models.TextField(blank=True)
     cost = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
+    receipt = models.FileField(
+        upload_to="maintenance/receipts/",
+        blank=True,
+        null=True,
+        validators=[validate_maintenance_receipt],
+    )
 
     def __str__(self):
         return f"{self.task_title} completed {self.completed_at:%Y-%m-%d}"

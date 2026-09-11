@@ -6,30 +6,39 @@
 
 {% block content %}
 <div class="container">
-    <h1>{{ task.title }}</h1>
+    <div class="detail-card">
+        <h1>{{ task.title }}</h1>
 
-    {% if task.description %}<p>{{ task.description }}</p>{% endif %}
+        <div class="card-actions">
+            <a href="{% url 'manudux:edit-maintenance-task' pk=task.id %}" class="btn btn-primary">{% trans "Edit" %}</a>
+            <a href="{% url 'manudux:delete-maintenance-task' pk=task.id %}" class="btn btn-danger">{% trans "Delete" %}</a>
+        </div>
 
-    <div class="detail-grid">
-        <p>{% trans "Property" %}: <a href="{% url 'manudux:property' task.property.id %}">{{ task.property }}</a></p>
-        {% if task.location %}<p>{% trans "Location" %}: <a href="{% url 'manudux:location' task.location.id %}">{{ task.location }}</a></p>{% endif %}
-        {% if task.appliance %}<p>{% trans "Appliance" %}: <a href="{% url 'manudux:appliance' task.appliance.id %}">{{ task.appliance }}</a></p>{% endif %}
-        <p>{% trans "Priority" %}: {{ task.get_priority_display }}</p>
-        <p>{% trans "Due" %}:
-            <span class="{% if not task.is_done and task.due_date < today %}overdue{% endif %}">{{ task.due_date|date:"d.m.Y" }}</span>
-        </p>
-        {% if task.recurrence_interval_days %}
-        <p>{% trans "Repeats every" %} {{ task.recurrence_interval_days }} {% trans "days" %}</p>
-        {% else %}
-        <p>{% trans "One-off task" %}{% if task.is_done %} - {% trans "done" %}{% endif %}</p>
+        {% if task.description %}
+        <div class="detail-card-description">{{ task.description|linebreaksbr }}</div>
         {% endif %}
+
+        <div class="detail-grid">
+            <p>{% trans "Property" %}: <a href="{% url 'manudux:property' task.property.id %}">{{ task.property }}</a></p>
+            {% if task.location %}<p>{% trans "Location" %}: <a href="{% url 'manudux:location' task.location.id %}">{{ task.location }}</a></p>{% endif %}
+            {% if task.appliance %}<p>{% trans "Appliance" %}: <a href="{% url 'manudux:appliance' task.appliance.id %}">{{ task.appliance }}</a></p>{% endif %}
+            <p>{% trans "Priority" %}: {{ task.get_priority_display }}</p>
+            <p>{% trans "Due" %}:
+                <span class="{% if not task.is_done and task.due_date < today %}overdue{% endif %}">{{ task.due_date|date:"d.m.Y" }}</span>
+            </p>
+            {% if task.recurrence_interval_days %}
+            <p>{% trans "Repeats every" %} {{ task.recurrence_interval_days }} {% trans "days" %}</p>
+            {% else %}
+            <p>{% trans "One-off task" %}{% if task.is_done %} - {% trans "done" %}{% endif %}</p>
+            {% endif %}
+        </div>
     </div>
 
     {% if not task.is_done %}
-    <section class="complete-task">
+    <section class="page-section">
         <h2>{% trans "Mark complete" %}</h2>
         <div class="form-card">
-            <form action="{% url 'manudux:maintenance-task' pk=task.id %}" method="post">
+            <form action="{% url 'manudux:maintenance-task' pk=task.id %}" method="post" enctype="multipart/form-data">
                 {% csrf_token %}
                 {{ completion_form.as_div }}
                 <button class="btn btn-primary btn-large">{% trans "Mark complete" %}</button>
@@ -38,27 +47,25 @@
     </section>
     {% endif %}
 
-    <form action="{% url 'manudux:delete-maintenance-task' task.id %}" method="post">
-        {% csrf_token %}
-        <input type="submit" value="{% trans 'Delete' %}" class="btn btn-danger">
-    </form>
-
-    <a href="{% url 'manudux:edit-maintenance-task' pk=task.id %}" class="btn btn-primary">{% trans "Edit" %}</a>
-
-    <section class="maintenance-history">
+    <section class="page-section">
         <h2>{% trans "History" %}</h2>
-        <ul>
+        <div class="entity-list">
             {% for log in logs %}
-            <li>
-                {{ log.completed_at|date:"d.m.Y" }}
-                {% if log.completed_by %} - {{ log.completed_by.username }}{% endif %}
-                {% if log.cost %} - {{ log.cost }}{% endif %}
-                {% if log.notes %} - {{ log.notes }}{% endif %}
-            </li>
+            <div class="entity-list-item">
+                <span class="entity-list-title">{{ log.completed_at|date:"d.m.Y" }}</span>
+                <span class="entity-list-meta">
+                    {% if log.completed_by %}{{ log.completed_by.username }}{% endif %}
+                    {% if log.cost %} - {{ log.cost }}{% endif %}
+                </span>
+                {% if log.notes %}<p>{{ log.notes }}</p>{% endif %}
+                {% if log.receipt %}
+                <a href="{{ log.receipt.url }}" target="_blank" class="btn">{% trans "View receipt" %}</a>
+                {% endif %}
+            </div>
             {% empty %}
-            <li>{% trans "No completions logged yet." %}</li>
+            <p>{% trans "No completions logged yet." %}</p>
             {% endfor %}
-        </ul>
+        </div>
     </section>
 </div>
 {% endblock %}

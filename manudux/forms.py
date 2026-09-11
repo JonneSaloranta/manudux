@@ -19,6 +19,7 @@ from .models import (
     PropertyDocument,
     PropertyType,
 )
+from .validators import validate_maintenance_receipt
 
 
 class RegisterForm(UserCreationForm):
@@ -356,6 +357,14 @@ class MaintenanceCompletionForm(forms.Form):
     )
     cost = forms.DecimalField(
         label=_("Cost"), required=False, max_digits=10, decimal_places=2, min_value=0
+    )
+    receipt = forms.FileField(
+        label=_("Receipt"),
+        required=False,
+        validators=[validate_maintenance_receipt],
+        help_text=_(
+            "Optional: attach a receipt or invoice (PDF, Word, Excel, or an image)."
+        ),
     )
 
 

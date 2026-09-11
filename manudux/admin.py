@@ -209,8 +209,8 @@ class ApplianceDocumentAdmin(admin.ModelAdmin):
 class MaintenanceLogInline(admin.TabularInline):
     model = MaintenanceLog
     extra = 0
-    fields = ("completed_at", "completed_by", "notes", "cost")
-    readonly_fields = ("completed_at", "completed_by", "notes", "cost")
+    fields = ("completed_at", "completed_by", "notes", "cost", "receipt")
+    readonly_fields = ("completed_at", "completed_by", "notes", "cost", "receipt")
     can_delete = False
 
     def has_add_permission(self, request, obj=None):
@@ -229,7 +229,14 @@ class MaintenanceTaskAdmin(admin.ModelAdmin):
 
 @admin.register(MaintenanceLog)
 class MaintenanceLogAdmin(admin.ModelAdmin):
-    list_display = ("task_title", "property", "completed_at", "completed_by", "cost")
+    list_display = (
+        "task_title",
+        "property",
+        "completed_at",
+        "completed_by",
+        "cost",
+        "receipt",
+    )
     list_filter = ("completed_at",)
     search_fields = ("task_title", "property__name", "notes")
 

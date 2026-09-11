@@ -575,12 +575,13 @@ def maintenance_task_detail(request, pk):
     task = get_object_or_404(MaintenanceTask, pk=pk)
 
     if request.method == "POST":
-        completion_form = MaintenanceCompletionForm(request.POST)
+        completion_form = MaintenanceCompletionForm(request.POST, request.FILES)
         if completion_form.is_valid():
             task.mark_complete(
                 request.user,
                 notes=completion_form.cleaned_data["notes"],
                 cost=completion_form.cleaned_data["cost"],
+                receipt=completion_form.cleaned_data["receipt"],
             )
             return redirect("manudux:maintenance-task", pk=pk)
     else:

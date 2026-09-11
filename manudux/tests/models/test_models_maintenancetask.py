@@ -2,6 +2,7 @@ from datetime import timedelta
 
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
+from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import TestCase, tag
 from django.utils import timezone
 
@@ -62,6 +63,38 @@ class MaintenanceTaskTestCase(TestCase):
             task.due_date, timezone.localdate(), msg="one-off due_date should not move"
         )
         self.assertEqual(task.logs.count(), 1)
+
+    @tag("models", "maintenancetask")
+    def test_mark_complete_attaches_a_receipt(self):
+        task = MaintenanceTask.objects.create(
+            title="Replace filter",
+            property=self.property,
+            due_date=timezone.localdate(),
+        )
+
+        task.mark_complete(
+            self.user,
+            notes="Done",
+            cost=25,
+            receipt=SimpleUploadedFile("receipt.pdf", b"content", "application/pdf"),
+        )
+
+        log = task.logs.first()
+        self.assertTrue(bool(log.receipt))
+        self.assertIn("receipt", log.receipt.name)
+
+    @tag("models", "maintenancetask")
+    def test_mark_complete_without_a_receipt_is_still_optional(self):
+        task = MaintenanceTask.objects.create(
+            title="Replace filter",
+            property=self.property,
+            due_date=timezone.localdate(),
+        )
+
+        task.mark_complete(self.user)
+
+        log = task.logs.first()
+        self.assertFalse(bool(log.receipt))
 
     @tag("models", "maintenancetask")
     def test_log_survives_task_deletion(self):
