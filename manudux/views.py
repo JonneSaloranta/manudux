@@ -3,6 +3,7 @@ from datetime import timedelta
 from django.conf import settings
 from django.contrib.auth import login
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.models import User
 from django.core.exceptions import PermissionDenied
 from django.core.paginator import Paginator
 from django.shortcuts import get_object_or_404, redirect, render
@@ -13,6 +14,7 @@ from .forms import (
     ApplianceDocumentForm,
     ApplianceForm,
     ApplianceTypeForm,
+    CreateUserForm,
     GuideFileForm,
     GuideForm,
     GuideStepForm,
@@ -20,10 +22,12 @@ from .forms import (
     LocationTypeForm,
     MaintenanceCompletionForm,
     MaintenanceTaskForm,
+    ProfileForm,
     PropertyDocumentForm,
     PropertyForm,
     PropertyTypeForm,
     RegisterForm,
+    UserManagementForm,
 )
 from .models import (
     Appliance,
@@ -88,6 +92,65 @@ def site_settings(request):
         return render(request, "manudux/site-settings.html")
     else:
         raise PermissionDenied()
+
+
+@login_required
+def profile(request):
+    if request.method == "POST":
+        form = ProfileForm(request.POST, instance=request.user)
+        if form.is_valid():
+            form.save()
+            return redirect("manudux:profile")
+    else:
+        form = ProfileForm(instance=request.user)
+    return render(request, "manudux/profile.html", {"form": form})
+
+
+@login_required
+def user_list(request):
+    if not request.user.is_superuser:
+        raise PermissionDenied()
+    queryset = User.objects.order_by("username")
+    page_obj = Paginator(queryset, PAGE_SIZE).get_page(request.GET.get("page"))
+    context = {"users": page_obj, "page_obj": page_obj}
+    return render(request, "manudux/users.html", context)
+
+
+@login_required
+def create_user(request):
+    if not request.user.is_superuser:
+        raise PermissionDenied()
+    if request.method == "POST":
+        form = CreateUserForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect("manudux:users")
+    else:
+        form = CreateUserForm()
+    return render(request, "manudux/user-create.html", {"form": form})
+
+
+@login_required
+def edit_user(request, pk):
+    if not request.user.is_superuser:
+        raise PermissionDenied()
+    user_obj = get_object_or_404(User, pk=pk)
+    if request.method == "POST":
+        form = UserManagementForm(request.POST, instance=user_obj)
+        if form.is_valid():
+            edited_user = form.save(commit=False)
+            if edited_user.pk == request.user.pk:
+                # Don't let a superuser lock themselves out by removing
+                # their own staff access or deactivating their own account
+                # through this form.
+                edited_user.is_staff = request.user.is_staff
+                edited_user.is_active = request.user.is_active
+            edited_user.save()
+            return redirect("manudux:users")
+    else:
+        form = UserManagementForm(instance=user_obj)
+    context = {"form": form, "user_obj": user_obj}
+    return render(request, "manudux/user-edit.html", context)
 
 
 @login_required(login_url=settings.LOGIN_URL)
