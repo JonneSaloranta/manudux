@@ -134,6 +134,9 @@
                     <li>
                         <a href="{% url 'manudux:create-appliance' %}">{% trans "Add an appliance" %}</a>
                     </li>
+                    <li>
+                        <a href="{% url 'manudux:appliance-types' %}">{% trans "Manage appliance types" %}</a>
+                    </li>
                 </div>
             </ul>
         </li>
@@ -260,6 +263,7 @@
         <li><a href="{% url 'manudux:create-maintenance-task' %}">{% trans "Add a task" %}</a></li>
         <li><a href="{% url 'manudux:appliances' %}">{% trans "Appliances" %}</a></li>
         <li><a href="{% url 'manudux:create-appliance' %}">{% trans "Add an appliance" %}</a></li>
+        <li><a href="{% url 'manudux:appliance-types' %}">{% trans "Manage appliance types" %}</a></li>
 
         {% if user.is_authenticated %}
         {% if user.is_staff %}

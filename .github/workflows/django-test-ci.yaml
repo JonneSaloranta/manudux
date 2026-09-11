@@ -149,8 +149,9 @@ jobs:
                   from django.contrib.auth.models import User
                   from manudux.models import (
                       Property, PropertyType, Location, LocationType, Appliance,
-                      MaintenanceTask, Guide, GuideStep,
+                      ApplianceType, ApplianceDocument, MaintenanceTask, Guide, GuideStep,
                   )
+                  from django.core.files.base import ContentFile
                   User.objects.filter(username='a11y').delete()
                   User.objects.create_user(username='a11y', password='$A11Y_PASSWORD')
                   # Seed one of everything so list/card views render their real
@@ -158,9 +159,11 @@ jobs:
                   # property gets an address so its detail page's embedded
                   # map also renders during the scan (see .pa11yci.json). The
                   # guide gets a step so the drag/Move up/down reorder controls
-                  # render too.
+                  # render too. The appliance gets a document so its Documents
+                  # section renders too.
                   property_type = PropertyType.objects.create(name='A11y Test Property Type')
                   location_type = LocationType.objects.create(name='A11y Test Location Type')
+                  appliance_type = ApplianceType.objects.create(name='A11y Test Appliance Type')
                   p = Property.objects.create(
                       name='A11y Test Property',
                       address='Testikatu 1',
@@ -172,7 +175,14 @@ jobs:
                   l = Location.objects.create(
                       name='A11y Test Location', property=p, location_type=location_type
                   )
-                  Appliance.objects.create(name='A11y Test Appliance', location=l)
+                  a = Appliance.objects.create(
+                      name='A11y Test Appliance', location=l, appliance_type=appliance_type
+                  )
+                  ApplianceDocument.objects.create(
+                      name='A11y Test Document',
+                      appliance=a,
+                      file=ContentFile(b'%PDF-1.4 test', name='a11y-test.pdf'),
+                  )
                   MaintenanceTask.objects.create(
                       title='A11y Test Task', property=p, due_date='2030-01-01'
                   )

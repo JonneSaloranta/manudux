@@ -2,7 +2,7 @@ from django.contrib.auth.models import User
 from django.test import Client, TestCase, tag
 from django.urls import reverse
 
-from manudux.models import Appliance, Location, Property
+from manudux.models import Appliance, ApplianceType, Location, Property
 
 
 class ApplianceViewsTest(TestCase):
@@ -77,3 +77,54 @@ class ApplianceViewsTest(TestCase):
         )
         self.assertEqual(response.status_code, 302)
         self.assertFalse(Appliance.objects.filter(pk=self.appliance.pk).exists())
+
+    @tag("views", "auth", "appliance")
+    def test_delete_appliance_link_does_not_delete_immediately(self):
+        """GET-ing the delete URL (what the detail page's Delete button now
+        links to) must render the confirmation page, not delete the
+        appliance - it should only be deleted on POST."""
+        self.client.login(username="testuser", password="testpassword")
+        response = self.client.get(
+            reverse("manudux:delete-appliance", kwargs={"pk": self.appliance.pk})
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "manudux/appliance-delete.html")
+        self.assertTrue(Appliance.objects.filter(pk=self.appliance.pk).exists())
+
+    @tag("views", "auth", "appliance")
+    def test_create_appliance_accepts_a_type(self):
+        self.client.login(username="testuser", password="testpassword")
+        appliance_type = ApplianceType.objects.create(name="Kitchen")
+
+        response = self.client.post(
+            reverse("manudux:create-appliance"),
+            data={
+                "name": "Oven",
+                "location": self.location.pk,
+                "appliance_type": appliance_type.pk,
+                "activated": "on",
+            },
+        )
+
+        self.assertEqual(response.status_code, 302)
+        appliance = Appliance.objects.get(name="Oven")
+        self.assertEqual(appliance.appliance_type, appliance_type)
+
+    @tag("views", "auth", "appliance")
+    def test_edit_appliance_updates_type(self):
+        self.client.login(username="testuser", password="testpassword")
+        appliance_type = ApplianceType.objects.create(name="Kitchen")
+
+        response = self.client.post(
+            reverse("manudux:edit-appliance", kwargs={"pk": self.appliance.pk}),
+            data={
+                "name": self.appliance.name,
+                "location": self.location.pk,
+                "appliance_type": appliance_type.pk,
+                "activated": "on",
+            },
+        )
+
+        self.assertEqual(response.status_code, 302)
+        self.appliance.refresh_from_db()
+        self.assertEqual(self.appliance.appliance_type, appliance_type)

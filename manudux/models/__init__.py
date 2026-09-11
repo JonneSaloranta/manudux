@@ -1,5 +1,6 @@
 from .property_type_model import PropertyType
 from .locationtype_model import LocationType
+from .appliancetype_model import ApplianceType
 from .guide_model import Guide
 from .guidefile_model import GuideFile
 from .property_model import Property
@@ -9,10 +10,12 @@ from .appliance_model import Appliance
 from .maintenancetask_model import MaintenanceTask
 from .maintenancelog_model import MaintenanceLog
 from .propertydocument_model import PropertyDocument
+from .appliancedocument_model import ApplianceDocument
 
 __all__ = [
     "PropertyType",
     "LocationType",
+    "ApplianceType",
     "Guide",
     "GuideFile",
     "Property",
@@ -22,4 +25,5 @@ __all__ = [
     "MaintenanceTask",
     "MaintenanceLog",
     "PropertyDocument",
+    "ApplianceDocument",
 ]

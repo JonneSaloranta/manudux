@@ -57,3 +57,9 @@ validate_property_document = FileExtensionAndSizeValidator(
     allowed_extensions=["pdf", "doc", "docx", "xlsx", "jpg", "jpeg", "png"],
     max_size_mb=25,
 )
+
+# Receipts, warranty certificates, manuals - same shape as property documents.
+validate_appliance_document = FileExtensionAndSizeValidator(
+    allowed_extensions=["pdf", "doc", "docx", "xlsx", "jpg", "jpeg", "png"],
+    max_size_mb=25,
+)

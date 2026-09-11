@@ -1,0 +1,32 @@
+{% extends "manudux/base.html" %}
+{% load i18n %}
+{% load static %}
+
+{% block title %}{% trans "Appliance Types" %}{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1 class="title">{% trans "Appliance Types" %}</h1>
+
+    <a href="{% url 'manudux:create-appliance-type' %}" class="btn btn-primary">{% trans "Create a new appliance type" %}</a>
+
+    <div class="entity-list">
+        {% for appliance_type in appliance_types %}
+        <div class="entity-list-item">
+            <span class="entity-list-title">{{ appliance_type.name }}</span>
+            {% if appliance_type.description %}
+            <span class="entity-list-meta">{{ appliance_type.description }}</span>
+            {% endif %}
+            <div class="card-actions">
+                <a href="{% url 'manudux:edit-appliance-type' pk=appliance_type.id %}" class="btn btn-primary">{% trans "Edit" %}</a>
+                <a href="{% url 'manudux:delete-appliance-type' pk=appliance_type.id %}" class="btn btn-danger">{% trans "Delete" %}</a>
+            </div>
+        </div>
+        {% empty %}
+        <p>{% trans "No appliance types yet." %}</p>
+        {% endfor %}
+    </div>
+
+    {% include "manudux/_pagination.html" %}
+</div>
+{% endblock %}

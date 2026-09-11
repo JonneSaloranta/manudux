@@ -10,7 +10,9 @@ from django.urls import reverse
 from django.utils import timezone
 
 from .forms import (
+    ApplianceDocumentForm,
     ApplianceForm,
+    ApplianceTypeForm,
     GuideFileForm,
     GuideForm,
     GuideStepForm,
@@ -25,6 +27,8 @@ from .forms import (
 )
 from .models import (
     Appliance,
+    ApplianceDocument,
+    ApplianceType,
     Guide,
     GuideFile,
     GuideStep,
@@ -395,10 +399,11 @@ def create_appliance(request):
 def appliance_detail(request, pk):
     appliance = get_object_or_404(Appliance, pk=pk)
     tasks = appliance.maintenance_tasks.all()
+    documents = appliance.documents.all()
     return render(
         request,
         "manudux/appliance.html",
-        {"appliance": appliance, "maintenance_tasks": tasks},
+        {"appliance": appliance, "maintenance_tasks": tasks, "documents": documents},
     )
 
 
@@ -426,6 +431,82 @@ def delete_appliance(request, pk):
         "manudux/appliance-delete.html",
         "appliance",
     )
+
+
+@login_required(login_url="/accounts/login/")
+def appliance_types(request):
+    queryset = ApplianceType.objects.order_by("name")
+    page_obj = Paginator(queryset, PAGE_SIZE).get_page(request.GET.get("page"))
+    context = {"appliance_types": page_obj, "page_obj": page_obj}
+    return render(request, "manudux/appliance-types.html", context)
+
+
+@login_required(login_url="/accounts/login/")
+def create_appliance_type(request):
+    if request.method == "POST":
+        form = ApplianceTypeForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect("manudux:appliance-types")
+    else:
+        form = ApplianceTypeForm()
+    context = {"form": form}
+    return render(request, "manudux/appliance-type-create.html", context)
+
+
+@login_required(login_url="/accounts/login/")
+def edit_appliance_type(request, pk):
+    appliance_type = get_object_or_404(ApplianceType, pk=pk)
+    if request.method == "POST":
+        form = ApplianceTypeForm(request.POST, instance=appliance_type)
+        if form.is_valid():
+            form.save()
+            return redirect("manudux:appliance-types")
+    else:
+        form = ApplianceTypeForm(instance=appliance_type)
+    context = {"form": form, "appliance_type": appliance_type}
+    return render(request, "manudux/appliance-type-edit.html", context)
+
+
+@login_required(login_url="/accounts/login/")
+def delete_appliance_type(request, pk):
+    return delete_obj(
+        request,
+        pk,
+        ApplianceType,
+        "manudux:appliance-types",
+        "manudux/appliance-type-delete.html",
+        "appliance_type",
+    )
+
+
+@login_required(login_url="/accounts/login/")
+def create_appliance_document(request, appliance_pk):
+    appliance_obj = get_object_or_404(Appliance, pk=appliance_pk)
+
+    if request.method == "POST":
+        form = ApplianceDocumentForm(request.POST, request.FILES)
+        if form.is_valid():
+            document = form.save(commit=False)
+            document.appliance = appliance_obj
+            document.save()
+            return redirect("manudux:appliance", pk=appliance_obj.pk)
+    else:
+        form = ApplianceDocumentForm()
+
+    context = {"form": form, "appliance": appliance_obj}
+    return render(request, "manudux/appliance-document-create.html", context)
+
+
+@login_required(login_url="/accounts/login/")
+def delete_appliance_document(request, pk):
+    document = get_object_or_404(ApplianceDocument, pk=pk)
+    if request.method == "POST":
+        appliance_pk = document.appliance_id
+        document.delete()
+        return redirect("manudux:appliance", pk=appliance_pk)
+    context = {"document": document}
+    return render(request, "manudux/appliance-document-delete.html", context)
 
 
 @login_required(login_url="/accounts/login/")

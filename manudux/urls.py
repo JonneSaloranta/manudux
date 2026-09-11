@@ -100,6 +100,32 @@ urlpatterns = [
     ),
     path("appliance/<int:pk>/edit/", views.edit_appliance, name="edit-appliance"),
     path("appliance/<int:pk>/delete/", views.delete_appliance, name="delete-appliance"),
+    path("appliances/types/", views.appliance_types, name="appliance-types"),
+    path(
+        "appliances/types/create/",
+        views.create_appliance_type,
+        name="create-appliance-type",
+    ),
+    path(
+        "appliance-type/<int:pk>/edit/",
+        views.edit_appliance_type,
+        name="edit-appliance-type",
+    ),
+    path(
+        "appliance-type/<int:pk>/delete/",
+        views.delete_appliance_type,
+        name="delete-appliance-type",
+    ),
+    path(
+        "appliance/<int:appliance_pk>/documents/create/",
+        views.create_appliance_document,
+        name="create-appliance-document",
+    ),
+    path(
+        "appliance-document/<int:pk>/delete/",
+        views.delete_appliance_document,
+        name="delete-appliance-document",
+    ),
     path("appliance/<int:pk>/", views.appliance_detail, name="appliance"),
     path("maintenance/", views.maintenance_tasks, name="maintenance-tasks"),
     path(

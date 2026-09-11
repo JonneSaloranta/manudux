@@ -1,7 +1,7 @@
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
-from . import Guide, Location
+from . import ApplianceType, Guide, Location
 
 
 class Appliance(models.Model):
@@ -10,6 +10,13 @@ class Appliance(models.Model):
     name = models.CharField(max_length=255)
     location = models.ForeignKey(
         Location, on_delete=models.CASCADE, related_name="appliances"
+    )
+    appliance_type = models.ForeignKey(
+        ApplianceType,
+        on_delete=models.SET_NULL,
+        related_name="appliances",
+        blank=True,
+        null=True,
     )
     brand = models.CharField(max_length=255, blank=True)
     model_number = models.CharField(max_length=255, blank=True)

@@ -7,6 +7,8 @@ from django.shortcuts import redirect
 from django.urls import path, reverse
 
 from manudux.models.appliance_model import Appliance
+from manudux.models.appliancedocument_model import ApplianceDocument
+from manudux.models.appliancetype_model import ApplianceType
 from manudux.models.guide_model import Guide
 from manudux.models.guidefile_model import GuideFile
 from manudux.models.guidestep_model import GuideStep
@@ -26,6 +28,12 @@ class LocationInline(admin.TabularInline):
 
 class PropertyDocumentInline(admin.TabularInline):
     model = PropertyDocument
+    extra = 0
+    fields = ("name", "category", "file", "notes")
+
+
+class ApplianceDocumentInline(admin.TabularInline):
+    model = ApplianceDocument
     extra = 0
     fields = ("name", "category", "file", "notes")
 
@@ -169,11 +177,33 @@ class GuideStepAdmin(admin.ModelAdmin):
 
 @admin.register(Appliance)
 class ApplianceAdmin(admin.ModelAdmin):
-    list_display = ("name", "location", "brand", "warranty_expires", "activated")
-    list_filter = ("activated", "brand")
+    list_display = (
+        "name",
+        "location",
+        "appliance_type",
+        "brand",
+        "warranty_expires",
+        "activated",
+    )
+    list_filter = ("appliance_type", "activated", "brand")
     search_fields = ("name", "brand", "model_number", "serial_number", "location__name")
     ordering = ("name",)
     readonly_fields = ("created_at", "updated_at")
+    inlines = [ApplianceDocumentInline]
+
+
+@admin.register(ApplianceType)
+class ApplianceTypeAdmin(admin.ModelAdmin):
+    list_display = ("name", "description")
+    search_fields = ("name", "description")
+    ordering = ("name",)
+
+
+@admin.register(ApplianceDocument)
+class ApplianceDocumentAdmin(admin.ModelAdmin):
+    list_display = ("name", "appliance", "category", "uploaded_at")
+    list_filter = ("category", "uploaded_at")
+    search_fields = ("name", "appliance__name", "notes")
 
 
 class MaintenanceLogInline(admin.TabularInline):
