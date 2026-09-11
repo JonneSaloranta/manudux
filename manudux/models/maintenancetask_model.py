@@ -80,7 +80,7 @@ class MaintenanceTask(models.Model):
                 }
             )
 
-    def mark_complete(self, user, notes="", cost=None):
+    def mark_complete(self, user, notes="", cost=None, receipt=None):
         """Log a completion and, for recurring tasks, roll the due date forward."""
         from . import MaintenanceLog
 
@@ -94,6 +94,7 @@ class MaintenanceTask(models.Model):
                 completed_by=user,
                 notes=notes,
                 cost=cost,
+                receipt=receipt,
             )
             self.last_completed_at = now
             if self.recurrence_interval_days:
