@@ -325,12 +325,29 @@ footer .row a:hover {
   color: var(--color-white);
 }
 .card .card-content {
+  position: relative;
   flex: 1;
   padding: 2rem;
   border: 1px solid var(--accent-color);
   border-block-start: none;
   background-color: var(--primary-color);
   border-radius: 1rem;
+}
+.card .card-link {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+}
+.card .card-actions {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+.card .card-actions .btn {
+  width: auto;
+  flex: 1;
 }
 .card .card-title h2 {
   margin: 1rem 0;

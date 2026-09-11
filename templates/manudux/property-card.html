@@ -25,6 +25,11 @@
         <div class="card-body">{% trans "No description available" %}</div>
         {% endif %}
 
+        <div class="card-actions">
+            <a href="{% url 'manudux:edit-property' pk=property.id %}" class="btn btn-primary">{% trans "Edit" %}</a>
+            <a href="{% url 'manudux:delete-property' pk=property.id %}" class="btn btn-danger">{% trans "Delete" %}</a>
+        </div>
+
         <a href="{% url 'manudux:property' pk=property.id %}" class="card-link" aria-label="{% blocktrans with name=property.name %}View {{ name }}{% endblocktrans %}"></a>
     </div>
 </div>

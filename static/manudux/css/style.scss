@@ -366,12 +366,37 @@ footer {
     color: var(--color-white);
 
     .card-content {
+        position: relative;
         flex: 1;
         padding: 2rem;
         border: 1px solid var(--accent-color);
         border-block-start: none;
         background-color: var(--primary-color);
         border-radius: 1rem;
+    }
+
+    // Stretched-link: makes the whole card clickable (card-link is an
+    // empty anchor sized to cover .card-content via inset: 0) while
+    // .card-actions sits in a higher stacking layer so its Edit/Delete
+    // buttons stay independently clickable instead of being shadowed by
+    // the full-card link underneath them.
+    .card-link {
+        position: absolute;
+        inset: 0;
+        z-index: 1;
+    }
+
+    .card-actions {
+        position: relative;
+        z-index: 2;
+        display: flex;
+        gap: 1rem;
+        margin-top: 1rem;
+
+        .btn {
+            width: auto;
+            flex: 1;
+        }
     }
 
     .card-title {
