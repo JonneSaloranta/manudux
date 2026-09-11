@@ -1,0 +1,32 @@
+{% extends "manudux/base.html" %}
+{% load i18n %}
+{% load static %}
+
+{% block title %}{% trans "Property Types" %}{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1 class="title">{% trans "Property Types" %}</h1>
+
+    <a href="{% url 'manudux:create-property-type' %}" class="btn btn-primary">{% trans "Create a new property type" %}</a>
+
+    <div class="entity-list">
+        {% for property_type in property_types %}
+        <div class="entity-list-item">
+            <span class="entity-list-title">{{ property_type.name }}</span>
+            {% if property_type.description %}
+            <span class="entity-list-meta">{{ property_type.description }}</span>
+            {% endif %}
+            <div class="card-actions">
+                <a href="{% url 'manudux:edit-property-type' pk=property_type.id %}" class="btn btn-primary">{% trans "Edit" %}</a>
+                <a href="{% url 'manudux:delete-property-type' pk=property_type.id %}" class="btn btn-danger">{% trans "Delete" %}</a>
+            </div>
+        </div>
+        {% empty %}
+        <p>{% trans "No property types yet." %}</p>
+        {% endfor %}
+    </div>
+
+    {% include "manudux/_pagination.html" %}
+</div>
+{% endblock %}

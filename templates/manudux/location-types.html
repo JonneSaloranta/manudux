@@ -1,0 +1,32 @@
+{% extends "manudux/base.html" %}
+{% load i18n %}
+{% load static %}
+
+{% block title %}{% trans "Location Types" %}{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1 class="title">{% trans "Location Types" %}</h1>
+
+    <a href="{% url 'manudux:create-location-type' %}" class="btn btn-primary">{% trans "Create a new location type" %}</a>
+
+    <div class="entity-list">
+        {% for location_type in location_types %}
+        <div class="entity-list-item">
+            <span class="entity-list-title">{{ location_type.name }}</span>
+            {% if location_type.description %}
+            <span class="entity-list-meta">{{ location_type.description }}</span>
+            {% endif %}
+            <div class="card-actions">
+                <a href="{% url 'manudux:edit-location-type' pk=location_type.id %}" class="btn btn-primary">{% trans "Edit" %}</a>
+                <a href="{% url 'manudux:delete-location-type' pk=location_type.id %}" class="btn btn-danger">{% trans "Delete" %}</a>
+            </div>
+        </div>
+        {% empty %}
+        <p>{% trans "No location types yet." %}</p>
+        {% endfor %}
+    </div>
+
+    {% include "manudux/_pagination.html" %}
+</div>
+{% endblock %}
