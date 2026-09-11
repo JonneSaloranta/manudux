@@ -7,6 +7,9 @@ from django.utils.translation import gettext_lazy as _
 
 from .models import (
     Appliance,
+    Guide,
+    GuideFile,
+    GuideStep,
     Location,
     LocationType,
     MaintenanceTask,
@@ -55,6 +58,7 @@ class PropertyForm(ModelForm):
             "insurance_company",
             "insurance_policy_number",
             "insurance_expires",
+            "guide",
             "activated",
         ]
         widgets = {
@@ -80,6 +84,7 @@ class PropertyForm(ModelForm):
             "insurance_company": _("Insurance Company"),
             "insurance_policy_number": _("Insurance Policy Number"),
             "insurance_expires": _("Insurance Expires"),
+            "guide": _("Manual"),
             "activated": _("Activated"),
         }
         help_texts = {
@@ -92,6 +97,7 @@ class PropertyForm(ModelForm):
             "zip_code": _("Enter the zip code of the property."),
             "property_type": _("Select the type of property."),
             "parcel_number": _("The property's registry/parcel identifier."),
+            "guide": _("Optionally link an existing guide as this property's manual."),
             "activated": _("Check to activate the property."),
         }
 
@@ -110,13 +116,21 @@ class PropertyForm(ModelForm):
 class LocationForm(ModelForm):
     class Meta:
         model = Location
-        fields = ["name", "description", "image", "property", "location_type"]
+        fields = [
+            "name",
+            "description",
+            "image",
+            "property",
+            "location_type",
+            "guide",
+        ]
         labels = {
             "name": _("Location Name"),
             "description": _("Description"),
             "image": _("Image"),
             "property": _("Property"),
             "location_type": _("Location Type"),
+            "guide": _("Manual"),
         }
         help_texts = {
             "name": _("Enter the name of the location."),
@@ -126,6 +140,7 @@ class LocationForm(ModelForm):
             "location_type": _(
                 "What kind of space this is, e.g. garage, boiler room, storage."
             ),
+            "guide": _("Optionally link an existing guide as this location's manual."),
         }
 
 
@@ -154,6 +169,50 @@ class PropertyTypeForm(ModelForm):
         help_texts = {
             "name": _("E.g. residential, commercial."),
             "description": _("Optional extra detail about this type."),
+        }
+
+
+class GuideForm(ModelForm):
+    class Meta:
+        model = Guide
+        fields = ["name", "description"]
+        labels = {
+            "name": _("Name"),
+            "description": _("Description"),
+        }
+        help_texts = {
+            "name": _("Enter a name for this guide."),
+            "description": _("A short description of what this guide covers."),
+        }
+
+
+class GuideStepForm(ModelForm):
+    class Meta:
+        model = GuideStep
+        fields = ["step_number", "title", "description", "image", "video"]
+        labels = {
+            "step_number": _("Step Number"),
+            "title": _("Title"),
+            "description": _("Description"),
+            "image": _("Image"),
+            "video": _("Video URL"),
+        }
+        help_texts = {
+            "step_number": _("The order this step appears in."),
+            "video": _("Optional link to a video for this step."),
+        }
+
+
+class GuideFileForm(ModelForm):
+    class Meta:
+        model = GuideFile
+        fields = ["name", "file"]
+        labels = {
+            "name": _("Name"),
+            "file": _("File"),
+        }
+        help_texts = {
+            "file": _("PDF, Word, or image file."),
         }
 
 

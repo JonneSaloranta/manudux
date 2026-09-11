@@ -107,3 +107,66 @@ document.querySelectorAll(".img-skeleton").forEach((wrapper) => {
         img.addEventListener("error", reveal, { once: true });
     }
 });
+
+// Guide step reordering: drag a step by its handle to move it. Uses
+// Pointer Events (not native HTML5 drag-and-drop) so it works on touch as
+// well as mouse. The Move up/down buttons rendered on each step are the
+// keyboard/screen-reader-accessible way to do the same thing and work
+// without any of this JS.
+const guideSteps = document.getElementById("guide-steps");
+
+if (guideSteps) {
+    let draggingStep = null;
+
+    function onStepPointerMove(event) {
+        if (!draggingStep) return;
+        event.preventDefault();
+
+        const afterElement = Array.from(
+            guideSteps.querySelectorAll(".step-item:not(.dragging)")
+        ).find((item) => {
+            const rect = item.getBoundingClientRect();
+            return event.clientY < rect.top + rect.height / 2;
+        });
+
+        if (afterElement) {
+            guideSteps.insertBefore(draggingStep, afterElement);
+        } else {
+            guideSteps.appendChild(draggingStep);
+        }
+    }
+
+    function onStepPointerUp() {
+        if (!draggingStep) return;
+        draggingStep.classList.remove("dragging");
+        draggingStep = null;
+        document.removeEventListener("pointermove", onStepPointerMove);
+        document.removeEventListener("pointerup", onStepPointerUp);
+
+        const stepIds = Array.from(guideSteps.querySelectorAll(".step-item")).map(
+            (item) => item.dataset.stepId
+        );
+        const params = new URLSearchParams();
+        stepIds.forEach((id) => params.append("step_id", id));
+        const csrfToken = guideSteps.querySelector("[name=csrfmiddlewaretoken]").value;
+
+        fetch(guideSteps.dataset.reorderUrl, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/x-www-form-urlencoded",
+                "X-CSRFToken": csrfToken,
+            },
+            body: params.toString(),
+        }).then(() => window.location.reload());
+    }
+
+    guideSteps.querySelectorAll(".step-item-drag-handle").forEach((handle) => {
+        handle.addEventListener("pointerdown", (event) => {
+            event.preventDefault();
+            draggingStep = handle.closest(".step-item");
+            draggingStep.classList.add("dragging");
+            document.addEventListener("pointermove", onStepPointerMove);
+            document.addEventListener("pointerup", onStepPointerUp);
+        });
+    });
+}

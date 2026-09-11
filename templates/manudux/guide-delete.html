@@ -1,0 +1,20 @@
+{% extends "manudux/base.html" %}
+{% load i18n %}
+{% load static %}
+
+{% block title %}{% trans "Delete" %} - {{ guide.name }}{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1>{% trans "Delete Guide" %}</h1>
+
+    <p>{% blocktrans %}Are you sure you want to delete "{{ guide }}"? This cannot be undone. Any files attached to this guide will also be deleted.{% endblocktrans %}</p>
+
+    <form action="{% url 'manudux:delete-guide' guide.id %}" method="post">
+        {% csrf_token %}
+        <input type="submit" value="{% trans 'Delete' %}" class="btn btn-danger">
+    </form>
+
+    <a href="{% url 'manudux:guide' pk=guide.id %}" class="btn">{% trans "Cancel" %}</a>
+</div>
+{% endblock %}

@@ -2,57 +2,122 @@
 {% load i18n %}
 {% load static %}
 
+{% block title %}{{ guide.name }}{% endblock %}
+
 {% block content %}
 <div class="container">
-    <h1>{{ guide.name }}</h1>
-    <p>{{ guide.description }}</p>
+    <div class="detail-card">
+        <h1>{{ guide.name }}</h1>
 
+        <div class="card-actions">
+            <a href="{% url 'manudux:edit-guide' pk=guide.id %}" class="btn btn-primary">{% trans "Edit" %}</a>
+            <a href="{% url 'manudux:delete-guide' pk=guide.id %}" class="btn btn-danger">{% trans "Delete" %}</a>
+        </div>
 
-    {% for step in guide.steps.all %}
-    <p>{{ step.step_number }}. {{ step.title }}</p>
-    <p>{{ step.description }}</p>
-    {% if step.image %}
-    <div class="img-skeleton">
-        <img src="{{ step.image.url }}" alt="{{ step.title }}">
-    </div>
-    {% endif %}
-    {% if step.video %}
-    <a href="{{ step.video }}" target="_blank">{% trans "Watch Video" %}</a>
-    {% endif %}
-    {% endfor %}
-
-
-
-    <!--
-        <h3>QR Code:</h3>
-    <div class="card-image">
-        {% if guide.qr_code %}
-        <img src="{{ guide.qr_code.url }}" alt="QR Code for {{ guide.name }}" height="200">
-        {% else %}
-        <p>No QR Code available.</p>
+        {% if guide.description %}
+        <div class="detail-card-description">{{ guide.description|linebreaksbr }}</div>
         {% endif %}
+
+        {% if guide.qr_code %}
+        <div class="img-skeleton img-skeleton--square">
+            <img src="{{ guide.qr_code.url }}" alt="{% blocktrans with name=guide.name %}QR code for {{ name }}{% endblocktrans %}">
+        </div>
+        <a href="{{ guide.qr_code.url }}" download="qr_code-{{ guide.pk }}.png" class="btn">{% trans "Download QR Code" %}</a>
+        {% endif %}
+
+        <div class="timestamps">
+            <p>{% trans "Created" %}: {{ guide.created_at|date:"d.m.Y H:i" }}</p>
+            <p>{% trans "Updated" %}: {{ guide.updated_at|date:"d.m.Y H:i" }}</p>
+        </div>
     </div>
--->
-    {% if guide.property %}
-    <p>{% trans "Property" %}: {{ guide.property }}</p>
-    {% endif %}
-    {% if guide.location %}
-    <p>Location: {{ guide.location }}</p>
+
+    {% if used_by %}
+    <section class="page-section">
+        <h2>{% trans "Used by" %}</h2>
+        <div class="entity-list">
+            {% for item in used_by %}
+            <a class="entity-list-item" href="{{ item.url }}">
+                <span class="entity-list-title">{{ item.label }}</span>
+            </a>
+            {% endfor %}
+        </div>
+    </section>
     {% endif %}
 
-    <h3>{% trans "Guide Files" %}:</h3>
-    <ul>
-        {% for guide_file in guide.guidefile_set.all %}
-        <li>
-            <a href="{{ guide_file.file.url }}" target="_blank">{{ guide_file.name }}</a>
-        </li>
-        {% empty %}
-        <p>{% trans "No files available for this guide" %}.</p>
-        {% endfor %}
-    </ul>
-    <p>{% trans "Created" %}: {{ guide.created_at|date:"d.m.Y H:i" }}</p>
-    <p>{% trans "Updated" %}: {{ guide.updated_at|date:"d.m.Y H:i" }}</p>
-    <hr>
-    <p><a href="{% url 'manudux:guides' %}">{% trans "Back to Guide List" %}</a></p>
+    <section class="page-section">
+        <h2>{% trans "Steps" %}</h2>
+        <a href="{% url 'manudux:create-guide-step' guide_pk=guide.id %}" class="btn btn-primary">{% trans "Add a step" %}</a>
+
+        {% if guide.steps.all %}
+        <p class="page-section-hint">{% trans "Drag a step to reorder it, or use the Move up/down buttons." %}</p>
+        {% endif %}
+
+        <div class="entity-list" id="guide-steps" data-reorder-url="{% url 'manudux:reorder-guide-steps' guide_pk=guide.id %}">
+            {% csrf_token %}
+            {% for step in guide.steps.all %}
+            <div class="entity-list-item step-item" data-step-id="{{ step.id }}">
+                <button type="button" class="step-item-drag-handle" aria-hidden="true" tabindex="-1" title="{% trans 'Drag to reorder' %}">
+                    <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="currentColor">
+                        <path d="M360-160q-33 0-56.5-23.5T280-240q0-33 23.5-56.5T360-320q33 0 56.5 23.5T440-240q0 33-23.5 56.5T360-160Zm240 0q-33 0-56.5-23.5T520-240q0-33 23.5-56.5T600-320q33 0 56.5 23.5T680-240q0 33-23.5 56.5T600-160ZM360-400q-33 0-56.5-23.5T280-480q0-33 23.5-56.5T360-560q33 0 56.5 23.5T440-480q0 33-23.5 56.5T360-400Zm240 0q-33 0-56.5-23.5T520-480q0-33 23.5-56.5T600-560q33 0 56.5 23.5T680-480q0 33-23.5 56.5T600-400ZM360-640q-33 0-56.5-23.5T280-720q0-33 23.5-56.5T360-800q33 0 56.5 23.5T440-720q0 33-23.5 56.5T360-640Zm240 0q-33 0-56.5-23.5T520-720q0-33 23.5-56.5T600-800q33 0 56.5 23.5T680-720q0 33-23.5 56.5T600-640Z" />
+                    </svg>
+                </button>
+
+                <span class="entity-list-title">{{ step.step_number }}. {{ step.title }}</span>
+                {% if step.description %}
+                <span class="entity-list-meta">{{ step.description }}</span>
+                {% endif %}
+                {% if step.image %}
+                <div class="img-skeleton">
+                    <img src="{{ step.image.url }}" alt="{{ step.title }}">
+                </div>
+                {% endif %}
+                {% if step.video %}
+                <a href="{{ step.video }}" target="_blank" rel="noopener" class="btn">{% trans "Watch Video" %}</a>
+                {% endif %}
+
+                <div class="step-reorder-controls">
+                    {% if not forloop.first %}
+                    <form action="{% url 'manudux:move-guide-step' pk=step.id direction='up' %}" method="post">
+                        {% csrf_token %}
+                        <button type="submit" aria-label="{% trans 'Move up' %}">&uarr;</button>
+                    </form>
+                    {% endif %}
+                    {% if not forloop.last %}
+                    <form action="{% url 'manudux:move-guide-step' pk=step.id direction='down' %}" method="post">
+                        {% csrf_token %}
+                        <button type="submit" aria-label="{% trans 'Move down' %}">&darr;</button>
+                    </form>
+                    {% endif %}
+                </div>
+
+                <div class="card-actions">
+                    <a href="{% url 'manudux:edit-guide-step' pk=step.id %}" class="btn btn-primary">{% trans "Edit" %}</a>
+                    <a href="{% url 'manudux:delete-guide-step' pk=step.id %}" class="btn btn-danger">{% trans "Delete" %}</a>
+                </div>
+            </div>
+            {% empty %}
+            <p>{% trans "No steps yet." %}</p>
+            {% endfor %}
+        </div>
+    </section>
+
+    <section class="page-section">
+        <h2>{% trans "Files" %}</h2>
+        <a href="{% url 'manudux:create-guide-file' guide_pk=guide.id %}" class="btn btn-primary">{% trans "Upload a file" %}</a>
+
+        <div class="entity-list">
+            {% for guide_file in guide.guidefile_set.all %}
+            <div class="entity-list-item">
+                <span class="entity-list-title">{{ guide_file.name }}</span>
+                <div class="card-actions">
+                    <a href="{{ guide_file.file.url }}" target="_blank" class="btn">{% trans "View" %}</a>
+                    <a href="{% url 'manudux:delete-guide-file' pk=guide_file.id %}" class="btn btn-danger">{% trans "Delete" %}</a>
+                </div>
+            </div>
+            {% empty %}
+            <p>{% trans "No files available for this guide." %}</p>
+            {% endfor %}
+        </div>
+    </section>
 </div>
 {% endblock %}

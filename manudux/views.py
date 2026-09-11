@@ -6,10 +6,14 @@ from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
 from django.core.paginator import Paginator
 from django.shortcuts import get_object_or_404, redirect, render
+from django.urls import reverse
 from django.utils import timezone
 
 from .forms import (
     ApplianceForm,
+    GuideFileForm,
+    GuideForm,
+    GuideStepForm,
     LocationForm,
     LocationTypeForm,
     MaintenanceCompletionForm,
@@ -22,6 +26,8 @@ from .forms import (
 from .models import (
     Appliance,
     Guide,
+    GuideFile,
+    GuideStep,
     Location,
     LocationType,
     MaintenanceTask,
@@ -534,6 +540,7 @@ def delete_maintenance_task(request, pk):
     )
 
 
+@login_required(login_url="/accounts/login/")
 def guide_list(request):
     queryset = Guide.objects.order_by("name")
     page_obj = Paginator(queryset, PAGE_SIZE).get_page(request.GET.get("page"))
@@ -541,9 +548,188 @@ def guide_list(request):
     return render(request, "manudux/guide-list.html", context=context)
 
 
+@login_required(login_url="/accounts/login/")
 def guide_detail(request, pk):
     guide = get_object_or_404(Guide, pk=pk)
 
-    context = {"guide": guide}
+    # What this guide is actually linked from - Property/Location/Appliance
+    # each have an optional FK to Guide (not the other way around), so this
+    # is built from their reverse managers rather than a field on Guide.
+    used_by = []
+    for prop in guide.property_set.all():
+        used_by.append(
+            {
+                "label": str(prop),
+                "url": reverse("manudux:property", kwargs={"pk": prop.pk}),
+            }
+        )
+    for location in guide.location_set.all():
+        used_by.append(
+            {
+                "label": str(location),
+                "url": reverse("manudux:location", kwargs={"pk": location.pk}),
+            }
+        )
+    for appliance in guide.appliance_set.all():
+        used_by.append(
+            {
+                "label": str(appliance),
+                "url": reverse("manudux:appliance", kwargs={"pk": appliance.pk}),
+            }
+        )
+
+    context = {"guide": guide, "used_by": used_by}
 
     return render(request, "manudux/guide-details.html", context=context)
+
+
+@login_required(login_url="/accounts/login/")
+def create_guide(request):
+    if request.method == "POST":
+        form = GuideForm(request.POST)
+        if form.is_valid():
+            guide = form.save()
+            return redirect("manudux:guide", pk=guide.pk)
+    else:
+        form = GuideForm()
+    context = {"form": form}
+    return render(request, "manudux/guide-create.html", context)
+
+
+@login_required(login_url="/accounts/login/")
+def edit_guide(request, pk):
+    guide = get_object_or_404(Guide, pk=pk)
+    if request.method == "POST":
+        form = GuideForm(request.POST, instance=guide)
+        if form.is_valid():
+            form.save()
+            return redirect("manudux:guide", pk=pk)
+    else:
+        form = GuideForm(instance=guide)
+    context = {"form": form, "guide": guide}
+    return render(request, "manudux/guide-edit.html", context)
+
+
+@login_required(login_url="/accounts/login/")
+def delete_guide(request, pk):
+    guide = get_object_or_404(Guide, pk=pk)
+    if request.method == "POST":
+        # GuideFile.guide is on_delete=PROTECT, so any attached files have
+        # to go first or guide.delete() below would raise ProtectedError.
+        guide.guidefile_set.all().delete()
+        guide.delete()
+        return redirect("manudux:guides")
+    context = {"guide": guide}
+    return render(request, "manudux/guide-delete.html", context)
+
+
+@login_required(login_url="/accounts/login/")
+def create_guide_step(request, guide_pk):
+    guide = get_object_or_404(Guide, pk=guide_pk)
+    next_step_number = guide.steps.count() + 1
+
+    if request.method == "POST":
+        form = GuideStepForm(request.POST, request.FILES)
+        if form.is_valid():
+            step = form.save(commit=False)
+            step.guide = guide
+            step.save()
+            return redirect("manudux:guide", pk=guide.pk)
+    else:
+        form = GuideStepForm(initial={"step_number": next_step_number})
+
+    context = {"form": form, "guide": guide}
+    return render(request, "manudux/guide-step-create.html", context)
+
+
+@login_required(login_url="/accounts/login/")
+def edit_guide_step(request, pk):
+    step = get_object_or_404(GuideStep, pk=pk)
+    if request.method == "POST":
+        form = GuideStepForm(request.POST, request.FILES, instance=step)
+        if form.is_valid():
+            form.save()
+            return redirect("manudux:guide", pk=step.guide_id)
+    else:
+        form = GuideStepForm(instance=step)
+    context = {"form": form, "step": step}
+    return render(request, "manudux/guide-step-edit.html", context)
+
+
+@login_required(login_url="/accounts/login/")
+def delete_guide_step(request, pk):
+    step = get_object_or_404(GuideStep, pk=pk)
+    if request.method == "POST":
+        guide_pk = step.guide_id
+        step.delete()
+        return redirect("manudux:guide", pk=guide_pk)
+    context = {"step": step}
+    return render(request, "manudux/guide-step-delete.html", context)
+
+
+@login_required(login_url="/accounts/login/")
+def move_guide_step(request, pk, direction):
+    """Swap a step's position with its previous/next sibling. The
+    keyboard/screen-reader-accessible way to reorder steps - always
+    rendered as plain buttons, no JS required."""
+    step = get_object_or_404(GuideStep, pk=pk)
+    if request.method == "POST" and direction in ("up", "down"):
+        siblings = step.guide.steps
+        if direction == "up":
+            neighbor = siblings.filter(step_number__lt=step.step_number).last()
+        else:
+            neighbor = siblings.filter(step_number__gt=step.step_number).first()
+        if neighbor:
+            step.step_number, neighbor.step_number = (
+                neighbor.step_number,
+                step.step_number,
+            )
+            step.save(update_fields=["step_number"])
+            neighbor.save(update_fields=["step_number"])
+    return redirect("manudux:guide", pk=step.guide_id)
+
+
+@login_required(login_url="/accounts/login/")
+def reorder_guide_steps(request, guide_pk):
+    """Persist a full new step order, posted as a repeated step_id field in
+    the desired order. Used by the drag-to-reorder JS in scripts.js."""
+    guide = get_object_or_404(Guide, pk=guide_pk)
+    if request.method == "POST":
+        steps_by_id = {step.pk: step for step in guide.steps.all()}
+        for position, raw_step_id in enumerate(
+            request.POST.getlist("step_id"), start=1
+        ):
+            step = steps_by_id.get(int(raw_step_id))
+            if step and step.step_number != position:
+                step.step_number = position
+                step.save(update_fields=["step_number"])
+    return redirect("manudux:guide", pk=guide.pk)
+
+
+@login_required(login_url="/accounts/login/")
+def create_guide_file(request, guide_pk):
+    guide = get_object_or_404(Guide, pk=guide_pk)
+
+    if request.method == "POST":
+        form = GuideFileForm(request.POST, request.FILES)
+        if form.is_valid():
+            guide_file = form.save(commit=False)
+            guide_file.guide = guide
+            guide_file.save()
+            return redirect("manudux:guide", pk=guide.pk)
+    else:
+        form = GuideFileForm()
+
+    context = {"form": form, "guide": guide}
+    return render(request, "manudux/guide-file-create.html", context)
+
+
+@login_required(login_url="/accounts/login/")
+def delete_guide_file(request, pk):
+    guide_file = get_object_or_404(GuideFile, pk=pk)
+    if request.method == "POST":
+        guide_pk = guide_file.guide_id
+        guide_file.delete()
+        return redirect("manudux:guide", pk=guide_pk)
+    context = {"guide_file": guide_file}
+    return render(request, "manudux/guide-file-delete.html", context)
