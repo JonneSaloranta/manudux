@@ -147,21 +147,29 @@ jobs:
                   echo "A11Y_PASSWORD=$A11Y_PASSWORD" >> "$GITHUB_ENV"
                   python manage.py shell -c "
                   from django.contrib.auth.models import User
-                  from manudux.models import Property, Location, Appliance, MaintenanceTask
+                  from manudux.models import (
+                      Property, PropertyType, Location, LocationType, Appliance,
+                      MaintenanceTask,
+                  )
                   User.objects.filter(username='a11y').delete()
                   User.objects.create_user(username='a11y', password='$A11Y_PASSWORD')
                   # Seed one of everything so list/card views render their real
                   # markup during the scan, not just their empty states. The
                   # property gets an address so its detail page's embedded
                   # map also renders during the scan (see .pa11yci.json).
+                  property_type = PropertyType.objects.create(name='A11y Test Property Type')
+                  location_type = LocationType.objects.create(name='A11y Test Location Type')
                   p = Property.objects.create(
                       name='A11y Test Property',
                       address='Testikatu 1',
                       city='Helsinki',
                       state='Uusimaa',
                       zip_code='00100',
+                      property_type=property_type,
                   )
-                  l = Location.objects.create(name='A11y Test Location', property=p)
+                  l = Location.objects.create(
+                      name='A11y Test Location', property=p, location_type=location_type
+                  )
                   Appliance.objects.create(name='A11y Test Appliance', location=l)
                   MaintenanceTask.objects.create(
                       title='A11y Test Task', property=p, due_date='2030-01-01'

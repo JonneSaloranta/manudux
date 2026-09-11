@@ -5,7 +5,15 @@ from django.core.exceptions import ValidationError
 from django.forms import CharField, EmailField, ModelForm
 from django.utils.translation import gettext_lazy as _
 
-from .models import Appliance, Location, MaintenanceTask, Property, PropertyDocument
+from .models import (
+    Appliance,
+    Location,
+    LocationType,
+    MaintenanceTask,
+    Property,
+    PropertyDocument,
+    PropertyType,
+)
 
 
 class RegisterForm(UserCreationForm):
@@ -118,6 +126,34 @@ class LocationForm(ModelForm):
             "location_type": _(
                 "What kind of space this is, e.g. garage, boiler room, storage."
             ),
+        }
+
+
+class LocationTypeForm(ModelForm):
+    class Meta:
+        model = LocationType
+        fields = ["name", "description"]
+        labels = {
+            "name": _("Name"),
+            "description": _("Description"),
+        }
+        help_texts = {
+            "name": _("E.g. garage, boiler room, storage."),
+            "description": _("Optional extra detail about this type."),
+        }
+
+
+class PropertyTypeForm(ModelForm):
+    class Meta:
+        model = PropertyType
+        fields = ["name", "description"]
+        labels = {
+            "name": _("Name"),
+            "description": _("Description"),
+        }
+        help_texts = {
+            "name": _("E.g. residential, commercial."),
+            "description": _("Optional extra detail about this type."),
         }
 
 

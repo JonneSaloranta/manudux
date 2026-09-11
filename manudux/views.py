@@ -11,19 +11,23 @@ from django.utils import timezone
 from .forms import (
     ApplianceForm,
     LocationForm,
+    LocationTypeForm,
     MaintenanceCompletionForm,
     MaintenanceTaskForm,
     PropertyDocumentForm,
     PropertyForm,
+    PropertyTypeForm,
     RegisterForm,
 )
 from .models import (
     Appliance,
     Guide,
     Location,
+    LocationType,
     MaintenanceTask,
     Property,
     PropertyDocument,
+    PropertyType,
 )
 
 PAGE_SIZE = 20
@@ -168,6 +172,53 @@ def delete_property_document(request, pk):
 
 
 @login_required(login_url="/accounts/login/")
+def property_types(request):
+    queryset = PropertyType.objects.order_by("name")
+    page_obj = Paginator(queryset, PAGE_SIZE).get_page(request.GET.get("page"))
+    context = {"property_types": page_obj, "page_obj": page_obj}
+    return render(request, "manudux/property-types.html", context)
+
+
+@login_required(login_url="/accounts/login/")
+def create_property_type(request):
+    if request.method == "POST":
+        form = PropertyTypeForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect("manudux:property-types")
+    else:
+        form = PropertyTypeForm()
+    context = {"form": form}
+    return render(request, "manudux/property-type-create.html", context)
+
+
+@login_required(login_url="/accounts/login/")
+def edit_property_type(request, pk):
+    property_type = get_object_or_404(PropertyType, pk=pk)
+    if request.method == "POST":
+        form = PropertyTypeForm(request.POST, instance=property_type)
+        if form.is_valid():
+            form.save()
+            return redirect("manudux:property-types")
+    else:
+        form = PropertyTypeForm(instance=property_type)
+    context = {"form": form, "property_type": property_type}
+    return render(request, "manudux/property-type-edit.html", context)
+
+
+@login_required(login_url="/accounts/login/")
+def delete_property_type(request, pk):
+    return delete_obj(
+        request,
+        pk,
+        PropertyType,
+        "manudux:property-types",
+        "manudux/property-type-delete.html",
+        "property_type",
+    )
+
+
+@login_required(login_url="/accounts/login/")
 def create_location(request):
     property_obj = None
     property_id = request.GET.get("property_id")  # Get property_id from URL parameters
@@ -230,6 +281,53 @@ def locations(request):
     page_obj = Paginator(queryset, PAGE_SIZE).get_page(request.GET.get("page"))
     return render(
         request, "manudux/locations.html", {"locations": page_obj, "page_obj": page_obj}
+    )
+
+
+@login_required(login_url="/accounts/login/")
+def location_types(request):
+    queryset = LocationType.objects.order_by("name")
+    page_obj = Paginator(queryset, PAGE_SIZE).get_page(request.GET.get("page"))
+    context = {"location_types": page_obj, "page_obj": page_obj}
+    return render(request, "manudux/location-types.html", context)
+
+
+@login_required(login_url="/accounts/login/")
+def create_location_type(request):
+    if request.method == "POST":
+        form = LocationTypeForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect("manudux:location-types")
+    else:
+        form = LocationTypeForm()
+    context = {"form": form}
+    return render(request, "manudux/location-type-create.html", context)
+
+
+@login_required(login_url="/accounts/login/")
+def edit_location_type(request, pk):
+    location_type = get_object_or_404(LocationType, pk=pk)
+    if request.method == "POST":
+        form = LocationTypeForm(request.POST, instance=location_type)
+        if form.is_valid():
+            form.save()
+            return redirect("manudux:location-types")
+    else:
+        form = LocationTypeForm(instance=location_type)
+    context = {"form": form, "location_type": location_type}
+    return render(request, "manudux/location-type-edit.html", context)
+
+
+@login_required(login_url="/accounts/login/")
+def delete_location_type(request, pk):
+    return delete_obj(
+        request,
+        pk,
+        LocationType,
+        "manudux:location-types",
+        "manudux/location-type-delete.html",
+        "location_type",
     )
 
 
