@@ -1,0 +1,30 @@
+{% extends "manudux/base.html" %}
+{% load i18n %}
+{% load static %}
+
+{% block title %}{% trans "Users" %}{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1 class="title">{% trans "Users" %}</h1>
+
+    <a href="{% url 'manudux:create-user' %}" class="btn btn-primary">{% trans "Create a new user" %}</a>
+
+    <div class="entity-list">
+        {% for user_obj in users %}
+        <a class="entity-list-item" href="{% url 'manudux:edit-user' pk=user_obj.id %}">
+            <span class="entity-list-title">{{ user_obj.username }}</span>
+            <span class="entity-list-meta">
+                {{ user_obj.get_full_name }}{% if user_obj.get_full_name %} - {% endif %}{{ user_obj.email }}
+                {% if user_obj.is_staff %} - {% trans "Staff" %}{% endif %}
+                {% if not user_obj.is_active %} - {% trans "Inactive" %}{% endif %}
+            </span>
+        </a>
+        {% empty %}
+        <p>{% trans "No users yet." %}</p>
+        {% endfor %}
+    </div>
+
+    {% include "manudux/_pagination.html" %}
+</div>
+{% endblock %}

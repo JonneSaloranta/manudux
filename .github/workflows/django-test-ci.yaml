@@ -153,14 +153,15 @@ jobs:
                   )
                   from django.core.files.base import ContentFile
                   User.objects.filter(username='a11y').delete()
-                  User.objects.create_user(username='a11y', password='$A11Y_PASSWORD')
+                  User.objects.create_superuser(username='a11y', email='a11y@example.com', password='$A11Y_PASSWORD')
                   # Seed one of everything so list/card views render their real
                   # markup during the scan, not just their empty states. The
                   # property gets an address so its detail page's embedded
                   # map also renders during the scan (see .pa11yci.json). The
                   # guide gets a step so the drag/Move up/down reorder controls
                   # render too. The appliance gets a document so its Documents
-                  # section renders too.
+                  # section renders too. Superuser so it can also reach the
+                  # staff-only pages (site-settings, users) during the scan.
                   property_type = PropertyType.objects.create(name='A11y Test Property Type')
                   location_type = LocationType.objects.create(name='A11y Test Location Type')
                   appliance_type = ApplianceType.objects.create(name='A11y Test Appliance Type')

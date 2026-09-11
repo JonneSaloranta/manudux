@@ -39,6 +39,69 @@ class RegisterForm(UserCreationForm):
         ]
 
 
+class ProfileForm(ModelForm):
+    """Lets a user edit their own name and email - not username or password,
+    which have their own dedicated flows (accounts:password_change)."""
+
+    class Meta:
+        model = User
+        fields = ["first_name", "last_name", "email"]
+        labels = {
+            "first_name": _("First Name"),
+            "last_name": _("Last Name"),
+            "email": _("Email"),
+        }
+
+
+class CreateUserForm(UserCreationForm):
+    """Like RegisterForm, but lets a superuser grant staff access at
+    creation time - self-registration (RegisterForm) never does."""
+
+    email = EmailField(required=True, label=_("Email"))
+    first_name = CharField(label=_("First Name"))
+    last_name = CharField(label=_("Last Name"))
+    is_staff = forms.BooleanField(
+        label=_("Staff access"), required=False, help_text=_("Can access Django admin.")
+    )
+
+    class Meta:
+        model = User
+        fields = [
+            "username",
+            "email",
+            "first_name",
+            "last_name",
+            "password1",
+            "password2",
+            "is_staff",
+        ]
+
+
+class UserManagementForm(ModelForm):
+    class Meta:
+        model = User
+        fields = [
+            "username",
+            "first_name",
+            "last_name",
+            "email",
+            "is_staff",
+            "is_active",
+        ]
+        labels = {
+            "username": _("Username"),
+            "first_name": _("First Name"),
+            "last_name": _("Last Name"),
+            "email": _("Email"),
+            "is_staff": _("Staff access"),
+            "is_active": _("Active"),
+        }
+        help_texts = {
+            "is_staff": _("Can access Django admin."),
+            "is_active": _("Uncheck to deactivate this account without deleting it."),
+        }
+
+
 class PropertyForm(ModelForm):
     class Meta:
         model = Property
