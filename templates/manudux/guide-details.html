@@ -12,7 +12,9 @@
     <p>{{ step.step_number }}. {{ step.title }}</p>
     <p>{{ step.description }}</p>
     {% if step.image %}
-    <img src="{{ step.image.url }}" alt="{{ step.title }}">
+    <div class="img-skeleton">
+        <img src="{{ step.image.url }}" alt="{{ step.title }}">
+    </div>
     {% endif %}
     {% if step.video %}
     <a href="{{ step.video }}" target="_blank">{% trans "Watch Video" %}</a>

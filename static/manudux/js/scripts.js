@@ -89,3 +89,21 @@ if (mobileMenuBtn) {
     mobileMenuClose.addEventListener("click", closeMobileMenu);
     mobileMenuOverlay.addEventListener("click", closeMobileMenu);
 }
+
+// Skeleton loading: every .img-skeleton wrapper starts with a shimmering
+// placeholder background and its <img> hidden (see style.scss); reveal the
+// image (and drop the shimmer) once it has actually finished loading, so
+// slow/large photos don't pop in over broken-image icons or blank space.
+document.querySelectorAll(".img-skeleton").forEach((wrapper) => {
+    const img = wrapper.querySelector("img");
+    if (!img) return;
+
+    const reveal = () => wrapper.classList.add("loaded");
+
+    if (img.complete && img.naturalWidth > 0) {
+        reveal();
+    } else {
+        img.addEventListener("load", reveal, { once: true });
+        img.addEventListener("error", reveal, { once: true });
+    }
+});

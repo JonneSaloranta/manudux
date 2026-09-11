@@ -20,7 +20,9 @@
             <h3>{% trans "QR Code" %}:</h3>
             <div class="qr-code-card">
                 {% if guide.qr_code %}
-                <img src="{{ guide.qr_code.url }}" alt="QR Code for {{ guide.name }}" class="qr-code-img">
+                <div class="img-skeleton img-skeleton--square">
+                    <img src="{{ guide.qr_code.url }}" alt="QR Code for {{ guide.name }}" class="qr-code-img">
+                </div>
                 {% else %}
                 <p>{% trans "No QR Code available." %}</p>
                 {% endif %}

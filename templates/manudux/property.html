@@ -11,11 +11,11 @@
     <div class="">
 
 
-        <div class="">
+        <div class="img-skeleton">
             {% if not property.image %}
-            <img src="{% static 'manudux/img/placeholder300x200.png'%}" alt="placeholder image">
+            <img src="{% static 'manudux/img/placeholder300x200.png'%}" alt="{% trans 'Placeholder image' %}">
             {% else %}
-            <img src="{{ property.image.url }}" alt="real image" height="200">
+            <img src="{{ property.image.url }}" alt="{% blocktrans with name=property.name %}{{ name }}{% endblocktrans %}">
             {% endif %}
         </div>
 
