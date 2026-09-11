@@ -7,6 +7,8 @@
 {% block content %}
 <div class="container">
     <h1 class="title">{% trans "Properties" %}</h1>
+
+    <a href="{% url 'manudux:create-property' %}" class="btn btn-primary">{% trans "Create a new property" %}</a>
 </div>
 
 <hr>
@@ -14,6 +16,8 @@
 <div class="container-grid">
     {% for property in properties %}
     {% include "manudux/property-card.html" %}
+    {% empty %}
+    <p>{% trans "No properties yet." %}</p>
     {% endfor %}
 </div>
 
