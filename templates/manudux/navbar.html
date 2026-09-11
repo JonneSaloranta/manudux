@@ -59,7 +59,7 @@
                         <a href="{% url 'manudux:locations' %}">{% trans "Locations" %}</a>
                     </li>
                     <li>
-                        <a href="{% url 'manudux:properties' %}">{% trans "Create location" %}</a>
+                        <a href="{% url 'manudux:create-location' %}">{% trans "Create location" %}</a>
                     </li>
                 </div>
             </ul>
@@ -80,9 +80,6 @@
                 <div>
                     <li>
                         <a href="{% url 'manudux:guides' %}">{% trans "Guides" %}</a>
-                    </li>
-                    <li>
-                        <a href="{% url 'manudux:properties' %}">{% trans "Create guide" %}</a>
                     </li>
                 </div>
             </ul>
@@ -196,3 +193,76 @@
         {% endif %}
     </ul>
 </nav>
+
+<nav id="mobile-nav" aria-label="{% trans 'Primary' %}">
+    <a href="{% url 'manudux:index' %}" class="mobile-nav-item">
+        <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e3e3e3">
+            <path d="M240-200h120v-240h240v240h120v-360L480-740 240-560v360Zm-80 80v-480l320-240 320 240v480H520v-240h-80v240H160Zm320-350Z" />
+        </svg>
+        <span>{% trans "Home" %}</span>
+    </a>
+    <a href="{% url 'manudux:properties' %}" class="mobile-nav-item">
+        <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e3e3e3">
+            <path
+                d="M120-120v-560h160v-160h400v320h160v400H520v-160h-80v160H120Zm80-80h80v-80h-80v80Zm0-160h80v-80h-80v80Zm0-160h80v-80h-80v80Zm160 160h80v-80h-80v80Zm0-160h80v-80h-80v80Zm0-160h80v-80h-80v80Zm160 320h80v-80h-80v80Zm0-160h80v-80h-80v80Zm0-160h80v-80h-80v80Zm160 480h80v-80h-80v80Zm0-160h80v-80h-80v80Z" />
+        </svg>
+        <span>{% trans "Properties" %}</span>
+    </a>
+    <a href="{% url 'manudux:locations' %}" class="mobile-nav-item">
+        <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e3e3e3">
+            <path
+                d="M480-480q33 0 56.5-23.5T560-560q0-33-23.5-56.5T480-640q-33 0-56.5 23.5T400-560q0 33 23.5 56.5T480-480Zm0 294q122-112 181-203.5T720-552q0-109-69.5-178.5T480-800q-101 0-170.5 69.5T240-552q0 71 59 162.5T480-186Zm0 106Q319-217 239.5-334.5T160-552q0-150 96.5-239T480-880q127 0 223.5 89T800-552q0 100-79.5 217.5T480-80Zm0-480Z" />
+        </svg>
+        <span>{% trans "Locations" %}</span>
+    </a>
+    <a href="{% url 'manudux:maintenance-tasks' %}" class="mobile-nav-item">
+        <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e3e3e3">
+            <path d="M480-80q-33 0-56.5-23.5T400-160h160q0 33-23.5 56.5T480-80Zm-320-120v-80h80v-280q0-83 50-147.5T420-792v-28q0-25 17.5-42.5T480-880q25 0 42.5 17.5T540-820v28q80 20 130 84.5T720-560v280h80v80H160Z" />
+        </svg>
+        <span>{% trans "Maintenance" %}</span>
+    </a>
+    <button type="button" id="mobile-menu-btn" class="mobile-nav-item" aria-haspopup="dialog" aria-expanded="false"
+        aria-controls="mobile-menu-drawer">
+        <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e3e3e3">
+            <path d="M120-240v-80h720v80H120Zm0-200v-80h720v80H120Zm0-200v-80h720v80H120Z" />
+        </svg>
+        <span>{% trans "Menu" %}</span>
+    </button>
+</nav>
+
+<div id="mobile-menu-overlay" hidden></div>
+
+<div id="mobile-menu-drawer" role="dialog" aria-modal="true" aria-labelledby="mobile-menu-heading" hidden>
+    <div class="mobile-menu-header">
+        <h2 id="mobile-menu-heading">{% trans "Menu" %}</h2>
+        <button type="button" id="mobile-menu-close" aria-label="{% trans 'Close menu' %}">
+            <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e3e3e3">
+                <path d="m256-200-56-56 224-224-224-224 56-56 224 224 224-224 56 56-224 224 224 224-56 56-224-224-224 224Z" />
+            </svg>
+        </button>
+    </div>
+    <ul class="mobile-menu-list">
+        <li><a href="{% url 'manudux:create-property' %}">{% trans "Create a new property" %}</a></li>
+        <li><a href="{% url 'manudux:create-location' %}">{% trans "Create location" %}</a></li>
+        <li><a href="{% url 'manudux:guides' %}">{% trans "Guides" %}</a></li>
+        <li><a href="{% url 'manudux:create-maintenance-task' %}">{% trans "Add a task" %}</a></li>
+        <li><a href="{% url 'manudux:appliances' %}">{% trans "Appliances" %}</a></li>
+        <li><a href="{% url 'manudux:create-appliance' %}">{% trans "Add an appliance" %}</a></li>
+
+        {% if user.is_authenticated %}
+        {% if user.is_staff %}
+        <li><a href="{% url 'admin:index' %}">{% trans "Admin Dashboard" %}</a></li>
+        <li><a href="{% url 'manudux:site-settings' %}">{% trans "Site settings" %}</a></li>
+        {% endif %}
+        <li class="mobile-menu-account">{% trans "Hi" %}, {{ user.username }}!</li>
+        <li>
+            <form action="{% url 'accounts:logout' %}" method="post">
+                {% csrf_token %}
+                <button type="submit">{% trans "Logout" %}</button>
+            </form>
+        </li>
+        {% else %}
+        <li><a href="{% url 'accounts:login' %}">{% trans "Login" %}</a></li>
+        {% endif %}
+    </ul>
+</div>
