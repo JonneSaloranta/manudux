@@ -374,16 +374,6 @@ footer {
         border-radius: 1rem;
     }
 
-    .card-image {
-        img {
-            inline-size: 100%;
-            aspect-ratio: 1;
-            display: block;
-            object-fit: cover;
-            border-radius: 1rem;
-        }
-    }
-
     .card-title {
         h2 {
             margin: 1rem 0;
@@ -412,6 +402,60 @@ footer {
         border: none;
         font: inherit;
         cursor: pointer;
+    }
+}
+
+// Skeleton loading: every entity photo (property/location/appliance,
+// guide QR codes and step images) shares this wrapper. It reserves a
+// fixed-ratio box up front - so there's no layout shift once the image
+// loads - and shows a shimmering placeholder until the <img> inside it
+// actually finishes loading (see the .img-skeleton handling in
+// scripts.js), rather than a blank box or a pop-in broken-image icon.
+.img-skeleton {
+    position: relative;
+    overflow: hidden;
+    aspect-ratio: 3 / 2;
+    max-width: 40rem;
+    border-radius: 1rem;
+    background-color: var(--tetriary-color);
+
+    &--square {
+        aspect-ratio: 1;
+    }
+
+    img {
+        display: block;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        opacity: 0;
+        transition: opacity 300ms ease;
+    }
+
+    &:not(.loaded) {
+        background: linear-gradient(100deg, var(--tetriary-color) 30%, rgba(255, 255, 255, 0.55) 50%, var(--tetriary-color) 70%);
+        background-size: 250% 100%;
+        animation: skeleton-shimmer 1.6s ease-in-out infinite;
+    }
+
+    &.loaded img {
+        opacity: 1;
+    }
+}
+
+@keyframes skeleton-shimmer {
+    0% {
+        background-position: 200% 0;
+    }
+
+    100% {
+        background-position: -200% 0;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .img-skeleton:not(.loaded) {
+        animation: none;
     }
 }
 

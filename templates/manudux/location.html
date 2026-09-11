@@ -8,11 +8,13 @@
 <div class="container">
     <h1>{% trans "Location" %}</h1>
 
-    {% if not location.image %}
-    <img src="{% static 'manudux/img/placeholder300x200.png'%}" alt="placeholder image">
-    {% else %}
-    <img src="{{ location.image.url }}" alt="{{location.name}}" height="200">
-    {% endif %}
+    <div class="img-skeleton">
+        {% if not location.image %}
+        <img src="{% static 'manudux/img/placeholder300x200.png'%}" alt="{% trans 'Placeholder image' %}">
+        {% else %}
+        <img src="{{ location.image.url }}" alt="{{ location.name }}">
+        {% endif %}
+    </div>
     <h2>{{location.name}}</h2>
     <p>{{ location.description }}</p>
 
