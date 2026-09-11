@@ -377,26 +377,14 @@ footer {
 
     // Stretched-link: makes the whole card clickable (card-link is an
     // empty anchor sized to cover .card-content via inset: 0) while
-    // .card-actions sits in a higher stacking layer so its Edit/Delete
-    // buttons stay independently clickable instead of being shadowed by
-    // the full-card link underneath them.
+    // .card-actions (see below - a standalone, reusable class) sits in a
+    // higher stacking layer so its Edit/Delete buttons stay independently
+    // clickable instead of being shadowed by the full-card link
+    // underneath them.
     .card-link {
         position: absolute;
         inset: 0;
         z-index: 1;
-    }
-
-    .card-actions {
-        position: relative;
-        z-index: 2;
-        display: flex;
-        gap: 1rem;
-        margin-top: 1rem;
-
-        .btn {
-            width: auto;
-            flex: 1;
-        }
     }
 
     .card-title {
@@ -730,6 +718,23 @@ footer {
     }
 }
 
+// A row of action buttons (Edit/Delete, View/Delete, ...). Standalone and
+// reusable - used both inside .card (with position: relative; z-index: 2;
+// so it stays clickable above that card's stretched .card-link) and on its
+// own elsewhere, e.g. the property detail page and its document list.
+.card-actions {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    gap: 1rem;
+    margin-top: 1rem;
+
+    .btn {
+        width: auto;
+        flex: 1;
+    }
+}
+
 .entity-list-item-overdue {
     border-color: var(--danger-color);
 
@@ -800,13 +805,17 @@ footer {
 // maintenance-task/login/signup) looks consistent without editing each
 // one field-by-field.
 
-.form-card {
+%card-panel {
     max-width: 60rem;
     margin: 2rem auto;
     padding: 2rem;
     background-color: var(--color-white);
     border: 1px solid var(--tetriary-color);
     border-radius: 1rem;
+}
+
+.form-card {
+    @extend %card-panel;
 
     form > div {
         margin-bottom: 1.5rem;
@@ -893,5 +902,90 @@ footer {
         height: 1.6rem;
         margin-right: 0.5em;
         accent-color: var(--primary-color);
+    }
+}
+
+// Read-only counterpart to .form-card - same white card container, but for
+// a single entity's detail page (image + name + data + related lists)
+// instead of a form. property-details-card.html renders into this
+// unchanged, so its h3/.detail-grid/.timestamps are styled here too.
+.detail-card {
+    @extend %card-panel;
+
+    h1 {
+        font-size: 2.8rem;
+    }
+
+    h3 {
+        margin: 1.5rem 0 0.5rem;
+        font-size: 1.8rem;
+        color: var(--primary-color);
+    }
+
+    .card-actions {
+        margin-bottom: 1.5rem;
+    }
+}
+
+.detail-card-header {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+
+    .img-skeleton {
+        max-width: 16rem;
+    }
+}
+
+.detail-card-subtitle {
+    color: var(--secondary-color);
+    font-weight: 600;
+}
+
+.detail-card-description {
+    margin-top: 1rem;
+    white-space: pre-line;
+}
+
+.timestamps {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem 1.5rem;
+    margin-top: 1.5rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--tetriary-color);
+    color: var(--secondary-color);
+    font-size: 1.4rem;
+
+    p {
+        margin: 0;
+    }
+}
+
+.page-section {
+    max-width: 60rem;
+    margin: 2.5rem auto;
+
+    h2 {
+        margin-bottom: 1rem;
+        font-size: 2.2rem;
+        color: var(--primary-color);
+    }
+
+    .btn {
+        width: auto;
+        margin-bottom: 1rem;
+    }
+}
+
+.map-embed {
+    overflow: hidden;
+    border: 1px solid var(--tetriary-color);
+    border-radius: 1rem;
+    margin-bottom: 1rem;
+
+    iframe {
+        display: block;
     }
 }
