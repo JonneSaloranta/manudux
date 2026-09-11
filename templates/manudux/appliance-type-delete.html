@@ -1,0 +1,20 @@
+{% extends "manudux/base.html" %}
+{% load i18n %}
+{% load static %}
+
+{% block title %}{% trans "Delete" %} - {{ appliance_type.name }}{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1>{% trans "Delete Appliance Type" %}</h1>
+
+    <p>{% blocktrans %}Are you sure you want to delete "{{ appliance_type }}"? This cannot be undone. Any appliances using this type will keep their other data but lose this type.{% endblocktrans %}</p>
+
+    <form action="{% url 'manudux:delete-appliance-type' appliance_type.id %}" method="post">
+        {% csrf_token %}
+        <input type="submit" value="{% trans 'Delete' %}" class="btn btn-danger">
+    </form>
+
+    <a href="{% url 'manudux:appliance-types' %}" class="btn">{% trans "Cancel" %}</a>
+</div>
+{% endblock %}

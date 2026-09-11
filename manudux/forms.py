@@ -7,6 +7,8 @@ from django.utils.translation import gettext_lazy as _
 
 from .models import (
     Appliance,
+    ApplianceDocument,
+    ApplianceType,
     Guide,
     GuideFile,
     GuideStep,
@@ -222,6 +224,7 @@ class ApplianceForm(ModelForm):
         fields = [
             "name",
             "location",
+            "appliance_type",
             "brand",
             "model_number",
             "serial_number",
@@ -239,6 +242,7 @@ class ApplianceForm(ModelForm):
         labels = {
             "name": _("Appliance Name"),
             "location": _("Location"),
+            "appliance_type": _("Appliance Type"),
             "brand": _("Brand"),
             "model_number": _("Model Number"),
             "serial_number": _("Serial Number"),
@@ -252,8 +256,41 @@ class ApplianceForm(ModelForm):
         help_texts = {
             "name": _("Enter the name of the appliance."),
             "location": _("Select the location this appliance is at."),
+            "appliance_type": _(
+                "What kind of appliance this is, e.g. HVAC, kitchen, water heater."
+            ),
             "guide": _("Optionally link an existing guide as this appliance's manual."),
             "activated": _("Check to keep this appliance active."),
+        }
+
+
+class ApplianceTypeForm(ModelForm):
+    class Meta:
+        model = ApplianceType
+        fields = ["name", "description"]
+        labels = {
+            "name": _("Name"),
+            "description": _("Description"),
+        }
+        help_texts = {
+            "name": _("E.g. HVAC, kitchen, water heater."),
+            "description": _("Optional extra detail about this type."),
+        }
+
+
+class ApplianceDocumentForm(ModelForm):
+    class Meta:
+        model = ApplianceDocument
+        fields = ["name", "category", "file", "notes"]
+        labels = {
+            "name": _("Document Name"),
+            "category": _("Category"),
+            "file": _("File"),
+            "notes": _("Notes"),
+        }
+        help_texts = {
+            "name": _('E.g. "Purchase receipt" or "Warranty certificate".'),
+            "file": _("PDF, Word, Excel, or an image scan (max 25MB)."),
         }
 
 
