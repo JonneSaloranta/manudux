@@ -100,27 +100,24 @@ class PropertyForm(ModelForm):
 
 
 class LocationForm(ModelForm):
-    # name = models.CharField(max_length=255)
-    # description = models.TextField(blank=True, null=True)
-    # property = models.ForeignKey(
-    #     Property, on_delete=models.CASCADE, related_name='locations'
-    # )
-    # created_at = models.DateTimeField(auto_now_add=True)
-    # updated_at = models.DateTimeField(auto_now=True)
-    # activated = models.BooleanField(default=True)
-
     class Meta:
         model = Location
-        fields = ["name", "description", "property"]
+        fields = ["name", "description", "image", "property", "location_type"]
         labels = {
             "name": _("Location Name"),
             "description": _("Description"),
+            "image": _("Image"),
             "property": _("Property"),
+            "location_type": _("Location Type"),
         }
         help_texts = {
             "name": _("Enter the name of the location."),
             "description": _("Enter a description of the location."),
+            "image": _("Upload an image of the location."),
             "property": _("Select the property associated with this location."),
+            "location_type": _(
+                "What kind of space this is, e.g. garage, boiler room, storage."
+            ),
         }
 
 

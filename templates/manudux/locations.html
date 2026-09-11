@@ -5,21 +5,24 @@
 {% block content %}
 
 <div class="container">
-    <div class="container-title">
-        <h1>{% trans "Locations" %}</h1>
-    </div>
-    <div class="create-button">
-        <a href="{% url 'manudux:create-location' %}">{% trans "Create a new location" %}</a>
-    </div>
-    <div class="locations">
-        {% if locations %}
+    <h1 class="title">{% trans "Locations" %}</h1>
+
+    <a href="{% url 'manudux:create-location' %}" class="btn btn-primary">{% trans "Create a new location" %}</a>
+
+    <div class="entity-list">
         {% for location in locations %}
-        <p>{{location.name}} <a href="{% url 'manudux:location' location.id %}">{% trans "View" %}</a></p>
-        {% endfor %}
-        {% else %}
+        <a class="entity-list-item" href="{% url 'manudux:location' location.id %}">
+            <span class="entity-list-title">{{ location.name }}</span>
+            <span class="entity-list-meta">
+                {{ location.property }}
+                {% if location.location_type %} - {{ location.location_type }}{% endif %}
+            </span>
+        </a>
+        {% empty %}
         <p>{% trans "No locations available" %}</p>
-        {% endif %}
+        {% endfor %}
     </div>
+
     {% include "manudux/_pagination.html" %}
 </div>
 

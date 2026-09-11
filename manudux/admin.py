@@ -11,6 +11,7 @@ from manudux.models.guide_model import Guide
 from manudux.models.guidefile_model import GuideFile
 from manudux.models.guidestep_model import GuideStep
 from manudux.models.location_model import Location
+from manudux.models.locationtype_model import LocationType
 from manudux.models.maintenancelog_model import MaintenanceLog
 from manudux.models.maintenancetask_model import MaintenanceTask
 from manudux.models.property_model import Property
@@ -96,8 +97,15 @@ class PropertyAdmin(admin.ModelAdmin):
 
 @admin.register(Location)
 class LocationAdmin(admin.ModelAdmin):
-    list_display = ("name", "property", "created_at", "updated_at", "activated")
-    list_filter = ("created_at", "updated_at", "activated")
+    list_display = (
+        "name",
+        "property",
+        "location_type",
+        "created_at",
+        "updated_at",
+        "activated",
+    )
+    list_filter = ("location_type", "created_at", "updated_at", "activated")
     search_fields = ("name", "property")
     ordering = ("name", "created_at", "updated_at")
     date_hierarchy = "created_at"
@@ -106,6 +114,13 @@ class LocationAdmin(admin.ModelAdmin):
 
 @admin.register(PropertyType)
 class PropertyTypeAdmin(admin.ModelAdmin):
+    list_display = ("name", "description")
+    search_fields = ("name", "description")
+    ordering = ("name",)
+
+
+@admin.register(LocationType)
+class LocationTypeAdmin(admin.ModelAdmin):
     list_display = ("name", "description")
     search_fields = ("name", "description")
     ordering = ("name",)
