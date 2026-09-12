@@ -7,22 +7,28 @@
 {% block content %}
 <div class="container">
     <div class="detail-card">
-        <h1>{{ guide.name }}</h1>
+        <div class="detail-card-header">
+            {% if guide.qr_code %}
+            <div class="img-skeleton img-skeleton--square">
+                <img src="{{ guide.qr_code.url }}" alt="{% blocktrans with name=guide.name %}QR code for {{ name }}{% endblocktrans %}">
+            </div>
+            {% endif %}
+
+            <div>
+                <h1>{{ guide.name }}</h1>
+            </div>
+        </div>
 
         <div class="card-actions">
             <a href="{% url 'manudux:edit-guide' pk=guide.id %}" class="btn btn-primary">{% trans "Edit" %}</a>
             <a href="{% url 'manudux:delete-guide' pk=guide.id %}" class="btn btn-danger">{% trans "Delete" %}</a>
+            {% if guide.qr_code %}
+            <a href="{{ guide.qr_code.url }}" download="qr_code-{{ guide.pk }}.png" class="btn">{% trans "Download QR code" %}</a>
+            {% endif %}
         </div>
 
         {% if guide.description %}
         <div class="detail-card-description">{{ guide.description|linebreaksbr }}</div>
-        {% endif %}
-
-        {% if guide.qr_code %}
-        <div class="img-skeleton img-skeleton--square">
-            <img src="{{ guide.qr_code.url }}" alt="{% blocktrans with name=guide.name %}QR code for {{ name }}{% endblocktrans %}">
-        </div>
-        <a href="{{ guide.qr_code.url }}" download="qr_code-{{ guide.pk }}.png" class="btn">{% trans "Download QR Code" %}</a>
         {% endif %}
 
         <div class="timestamps">

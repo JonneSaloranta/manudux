@@ -189,12 +189,14 @@ body.mobile-menu-open {
    below the login form) otherwise fall back to the browser's default
    blue/underline, which clashes with the rest of the app's own
    pine-green/amber palette. */
-.page-intro a {
+.page-intro a,
+.page-section-hint a {
   color: var(--primary-color);
   font-weight: 600;
   text-decoration: underline;
 }
-.page-intro a:hover {
+.page-intro a:hover,
+.page-section-hint a:hover {
   text-decoration-thickness: 2px;
 }
 
@@ -475,15 +477,12 @@ footer {
   }
   .container {
     border: none;
-    padding: 0;
-  }
-  /* .container drops its own padding above, but a bare heading/intro
-     paragraph sitting directly in it (e.g. the guest login and
-     password reset pages) has nothing else to keep it off the screen
-     edge - unlike a .form-card/.detail-card, which carry their own
-     padding regardless of the container's. */
-  .page-intro {
-    padding-inline: 2rem;
+    /* Not 0 - a bare heading/hint/link sitting directly in .container
+       (nothing else to give it any inset) would otherwise touch the
+       screen edge. Smaller than the desktop 2rem just to leave more
+       room for content on a narrow screen; .form-card/.detail-card
+       etc. carry their own 2rem padding regardless of this. */
+    padding: 1.5rem;
   }
   #sidebar {
     display: none;
