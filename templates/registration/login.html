@@ -6,7 +6,7 @@
 
 {% block content %}
 <div class="container">
-    <h2>{% trans "Login" %}</h2>
+    <h2 class="page-intro">{% trans "Login" %}</h2>
     <div class="form-card">
         <form method="post">
             {% csrf_token %}
@@ -16,8 +16,8 @@
         </form>
     </div>
     {% if ALLOW_REGISTRATION %}
-    <p>{% trans "Don't have an account? Create one" %} <a href="{% url 'manudux:register' %}">{% trans "here" %}</a>.</p>
+    <p class="page-intro">{% trans "Don't have an account? Create one" %} <a href="{% url 'manudux:register' %}">{% trans "here" %}</a>.</p>
     {% endif %}
-    <p><a href="{% url 'accounts:password_reset' %}">{% trans "Lost password?" %}</a></p>
+    <p class="page-intro"><a href="{% url 'accounts:password_reset' %}">{% trans "Lost password?" %}</a></p>
 </div>
 {% endblock %}

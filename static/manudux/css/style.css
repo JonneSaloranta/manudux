@@ -164,7 +164,14 @@ body.mobile-menu-open {
 .container {
   display: flex;
   flex-direction: column;
-  margin: auto;
+  /* `margin: auto` alone, inside main's flex layout, makes .container
+     shrink-wrap to its own content instead of filling main - so its
+     width silently changes (and everything in it re-centers) whenever
+     the content's own preferred width changes, e.g. a grid row getting
+     taller when a <details> is opened. An explicit width pins it to
+     main's width (capped by max-width), independent of content. */
+  width: 100%;
+  margin: 0 auto;
   padding: 2rem;
   max-width: 130rem;
 }
@@ -176,6 +183,19 @@ body.mobile-menu-open {
   align-self: center;
   justify-self: center;
   margin: 3rem;
+}
+
+/* Plain-text links outside a styled component (e.g. "Lost password?"
+   below the login form) otherwise fall back to the browser's default
+   blue/underline, which clashes with the rest of the app's own
+   pine-green/amber palette. */
+.page-intro a {
+  color: var(--primary-color);
+  font-weight: 600;
+  text-decoration: underline;
+}
+.page-intro a:hover {
+  text-decoration-thickness: 2px;
 }
 
 .border-dark-green {
@@ -290,6 +310,7 @@ footer {
 }
 
 .page-hero {
+  width: 100%;
   border-radius: 1rem;
   padding: 2rem;
   margin: auto 2rem;
@@ -455,6 +476,14 @@ footer {
   .container {
     border: none;
     padding: 0;
+  }
+  /* .container drops its own padding above, but a bare heading/intro
+     paragraph sitting directly in it (e.g. the guest login and
+     password reset pages) has nothing else to keep it off the screen
+     edge - unlike a .form-card/.detail-card, which carry their own
+     padding regardless of the container's. */
+  .page-intro {
+    padding-inline: 2rem;
   }
   #sidebar {
     display: none;
@@ -645,6 +674,12 @@ footer {
 .entity-list {
   display: grid;
   grid-template-columns: 1fr;
+  /* Grid rows stretch every cell in the row to match the tallest one
+     by default - without this, expanding one <details> card (e.g. on
+     the guest property page) also visually stretches whatever sits
+     next to it in the same row, even though that neighbor's own
+     content never changed. */
+  align-items: start;
   gap: 1rem;
   margin: 1rem 0;
 }
@@ -777,7 +812,10 @@ details[open] > .tree-summary .tree-chevron {
   margin: 2rem 0;
 }
 
+/* width: 100% keeps these from shrink-wrapping to their own content
+   inside .container's flex layout - see the .container rule above. */
 .detail-card, .form-card {
+  width: 100%;
   max-width: 60rem;
   margin: 2rem auto;
   padding: 2rem;
@@ -913,7 +951,9 @@ details[open] > .tree-summary .tree-chevron {
   margin: 0;
 }
 
+/* width: 100% - see the .container rule near the top of this file. */
 .page-section {
+  width: 100%;
   max-width: 60rem;
   margin: 2.5rem auto;
 }

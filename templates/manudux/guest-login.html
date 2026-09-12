@@ -6,8 +6,8 @@
 
 {% block content %}
 <div class="container">
-    <h2>{% trans "Guest login" %}</h2>
-    <p>{% trans "Enter the guest code you were given to view a property's information." %}</p>
+    <h2 class="page-intro">{% trans "Guest login" %}</h2>
+    <p class="page-intro">{% trans "Enter the guest code you were given to view a property's information." %}</p>
     <div class="form-card">
         <form method="post">
             {% csrf_token %}
