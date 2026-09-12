@@ -82,6 +82,11 @@ urlpatterns = [
     path("guide/<int:pk>/delete/", views.delete_guide, name="delete-guide"),
     path("guide/<int:pk>/attach/", views.attach_guide, name="attach-guide"),
     path(
+        "guide/<int:guide_pk>/detach/<str:model>/<int:target_pk>/",
+        views.detach_guide,
+        name="detach-guide",
+    ),
+    path(
         "guide/<int:guide_pk>/steps/create/",
         views.create_guide_step,
         name="create-guide-step",

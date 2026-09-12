@@ -705,6 +705,16 @@ def guide_list(request):
     return render(request, "manudux/guide-list.html", context=context)
 
 
+# Keyed by the same short name used in the detach-guide URL, so
+# _guide_used_by and detach_guide agree on what "model" means without
+# either one hard-coding the other's assumptions.
+_GUIDE_ATTACHABLE_MODELS = {
+    "property": Property,
+    "location": Location,
+    "appliance": Appliance,
+}
+
+
 def _guide_used_by(guide):
     """What this guide is actually linked from - Property/Location/Appliance
     each have an optional FK to Guide (not the other way around), so this
@@ -715,6 +725,14 @@ def _guide_used_by(guide):
             {
                 "label": str(prop),
                 "url": reverse("manudux:property", kwargs={"pk": prop.pk}),
+                "detach_url": reverse(
+                    "manudux:detach-guide",
+                    kwargs={
+                        "guide_pk": guide.pk,
+                        "model": "property",
+                        "target_pk": prop.pk,
+                    },
+                ),
             }
         )
     for location in guide.location_set.all():
@@ -722,6 +740,14 @@ def _guide_used_by(guide):
             {
                 "label": str(location),
                 "url": reverse("manudux:location", kwargs={"pk": location.pk}),
+                "detach_url": reverse(
+                    "manudux:detach-guide",
+                    kwargs={
+                        "guide_pk": guide.pk,
+                        "model": "location",
+                        "target_pk": location.pk,
+                    },
+                ),
             }
         )
     for appliance in guide.appliance_set.all():
@@ -729,6 +755,14 @@ def _guide_used_by(guide):
             {
                 "label": str(appliance),
                 "url": reverse("manudux:appliance", kwargs={"pk": appliance.pk}),
+                "detach_url": reverse(
+                    "manudux:detach-guide",
+                    kwargs={
+                        "guide_pk": guide.pk,
+                        "model": "appliance",
+                        "target_pk": appliance.pk,
+                    },
+                ),
             }
         )
     return used_by
@@ -769,6 +803,29 @@ def attach_guide(request, pk):
 
     context = {"guide": guide, "used_by": _guide_used_by(guide), "attach_form": form}
     return render(request, "manudux/guide-details.html", context=context)
+
+
+@login_required(login_url="/accounts/login/")
+def detach_guide(request, guide_pk, model, target_pk):
+    """Removes this guide from a property/location/appliance's "Manual"
+    field - the reverse of attach_guide. Only unlinks the two; neither the
+    guide nor the target is deleted."""
+    guide = get_object_or_404(Guide, pk=guide_pk)
+    model_class = _GUIDE_ATTACHABLE_MODELS.get(model)
+    if model_class is None:
+        raise Http404()
+    # Filtering on guide=guide as well as pk means a stale/tampered-with
+    # link (the target's own guide has since changed) 404s here instead
+    # of silently detaching whatever it's actually linked to now.
+    target = get_object_or_404(model_class, pk=target_pk, guide=guide)
+
+    if request.method == "POST":
+        target.guide = None
+        target.save(update_fields=["guide"])
+        return redirect("manudux:guide", pk=guide.pk)
+
+    context = {"guide": guide, "target": target, "model": model}
+    return render(request, "manudux/guide-detach-confirm.html", context)
 
 
 @login_required(login_url="/accounts/login/")

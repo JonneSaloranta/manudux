@@ -702,6 +702,18 @@ footer {
   font-weight: 600;
   font-size: 1.8rem;
 }
+/* Used-by items (guide-details.html) put the title itself in an <a>
+   next to a Remove button in the same card, instead of making the
+   whole card a link like every other entity-list-item - a link and a
+   button can't both be interactive descendants of one <a>. Without
+   this it'd fall back to the browser's default blue/underline. */
+a.entity-list-title {
+  color: var(--color-black);
+  text-decoration: none;
+}
+a.entity-list-title:hover {
+  text-decoration: underline;
+}
 .entity-list-item .entity-list-meta {
   color: var(--primary-color);
 }

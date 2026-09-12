@@ -171,3 +171,152 @@ class GuideViewsTest(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertFalse(response.context["attach_form"].is_valid())
         self.assertFalse(GuideFile.objects.filter(guide_id=self.guide.pk).exists())
+
+    @tag("views", "auth", "guide")
+    def test_detach_guide_view_requires_login(self):
+        property_obj = Property.objects.create(name="Test Property", guide=self.guide)
+        response = self.client.get(
+            reverse(
+                "manudux:detach-guide",
+                kwargs={
+                    "guide_pk": self.guide.pk,
+                    "model": "property",
+                    "target_pk": property_obj.pk,
+                },
+            )
+        )
+        self.assertEqual(response.status_code, 302)
+        self.assertTrue("accounts/login" in response.url)
+
+    @tag("views", "auth", "guide")
+    def test_detach_guide_confirmation_page(self):
+        property_obj = Property.objects.create(name="Test Property", guide=self.guide)
+        self.client.login(username="testuser", password="testpassword")
+        response = self.client.get(
+            reverse(
+                "manudux:detach-guide",
+                kwargs={
+                    "guide_pk": self.guide.pk,
+                    "model": "property",
+                    "target_pk": property_obj.pk,
+                },
+            )
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "manudux/guide-detach-confirm.html")
+        property_obj.refresh_from_db()
+        self.assertEqual(property_obj.guide, self.guide, msg="Nothing detached yet")
+
+    @tag("views", "auth", "guide")
+    def test_detach_guide_from_property(self):
+        property_obj = Property.objects.create(name="Test Property", guide=self.guide)
+        self.client.login(username="testuser", password="testpassword")
+        response = self.client.post(
+            reverse(
+                "manudux:detach-guide",
+                kwargs={
+                    "guide_pk": self.guide.pk,
+                    "model": "property",
+                    "target_pk": property_obj.pk,
+                },
+            )
+        )
+        self.assertRedirects(
+            response, reverse("manudux:guide", kwargs={"pk": self.guide.pk})
+        )
+        property_obj.refresh_from_db()
+        self.assertIsNone(property_obj.guide)
+
+    @tag("views", "auth", "guide")
+    def test_detach_guide_from_location_and_appliance(self):
+        property_obj = Property.objects.create(name="Test Property")
+        location = Location.objects.create(
+            name="Test Location", property=property_obj, guide=self.guide
+        )
+        appliance = Appliance.objects.create(
+            name="Test Appliance", location=location, guide=self.guide
+        )
+        self.client.login(username="testuser", password="testpassword")
+
+        self.client.post(
+            reverse(
+                "manudux:detach-guide",
+                kwargs={
+                    "guide_pk": self.guide.pk,
+                    "model": "location",
+                    "target_pk": location.pk,
+                },
+            )
+        )
+        self.client.post(
+            reverse(
+                "manudux:detach-guide",
+                kwargs={
+                    "guide_pk": self.guide.pk,
+                    "model": "appliance",
+                    "target_pk": appliance.pk,
+                },
+            )
+        )
+        location.refresh_from_db()
+        appliance.refresh_from_db()
+        self.assertIsNone(location.guide)
+        self.assertIsNone(appliance.guide)
+
+    @tag("views", "auth", "guide")
+    def test_detach_guide_rejects_unknown_model(self):
+        property_obj = Property.objects.create(name="Test Property", guide=self.guide)
+        self.client.login(username="testuser", password="testpassword")
+        response = self.client.post(
+            reverse(
+                "manudux:detach-guide",
+                kwargs={
+                    "guide_pk": self.guide.pk,
+                    "model": "not-a-real-model",
+                    "target_pk": property_obj.pk,
+                },
+            )
+        )
+        self.assertEqual(response.status_code, 404)
+
+    @tag("views", "auth", "guide")
+    def test_detach_guide_404s_if_not_actually_attached(self):
+        """A guide can't be detached from something it isn't currently
+        the manual for - e.g. a stale link, or a mismatched pk/model."""
+        property_obj = Property.objects.create(name="Test Property")
+        other_guide = Guide.objects.create(name="Other Guide")
+        property_obj.guide = other_guide
+        property_obj.save()
+        self.client.login(username="testuser", password="testpassword")
+        response = self.client.post(
+            reverse(
+                "manudux:detach-guide",
+                kwargs={
+                    "guide_pk": self.guide.pk,
+                    "model": "property",
+                    "target_pk": property_obj.pk,
+                },
+            )
+        )
+        self.assertEqual(response.status_code, 404)
+        property_obj.refresh_from_db()
+        self.assertEqual(property_obj.guide, other_guide)
+
+    @tag("views", "guide")
+    def test_guide_detail_shows_remove_link_for_used_by_items(self):
+        property_obj = Property.objects.create(name="Test Property", guide=self.guide)
+        self.client.login(username="testuser", password="testpassword")
+        response = self.client.get(
+            reverse("manudux:guide", kwargs={"pk": self.guide.pk})
+        )
+        self.assertContains(
+            response,
+            reverse(
+                "manudux:detach-guide",
+                kwargs={
+                    "guide_pk": self.guide.pk,
+                    "model": "property",
+                    "target_pk": property_obj.pk,
+                },
+            ),
+        )
