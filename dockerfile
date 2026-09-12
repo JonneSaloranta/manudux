@@ -1,4 +1,4 @@
-FROM python:3.11-bookworm
+FROM python:3.12-bookworm
 
 # Update system packages
 RUN apt-get update && apt-get upgrade -y && apt-get clean && rm -rf /var/lib/apt/lists/*
@@ -26,6 +26,8 @@ RUN chown -R myuser:myuser /var/manudux/
 
 # Switch to non-root user
 USER myuser
+
+EXPOSE 8866
 
 # Entrypoint for the container
 ENTRYPOINT ["/bin/sh", "/var/manudux/runserver.sh"]

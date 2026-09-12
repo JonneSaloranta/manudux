@@ -6,11 +6,13 @@
     <div class="card-content">
 
         <div class="card-image">
-            {% if not property.image %}
-            <img src="{% static 'manudux/img/placeholder300x200.png'%}" alt="placeholder image">
-            {% else %}
-            <img src="{{ property.image.url }}" alt="real image" height="200">
-            {% endif %}
+            <div class="img-skeleton img-skeleton--square">
+                {% if not property.image %}
+                <img src="{% static 'manudux/img/placeholder300x200.png'%}" alt="{% trans 'Placeholder image' %}">
+                {% else %}
+                <img src="{{ property.image.url }}" alt="{% blocktrans with name=property.name %}{{ name }}{% endblocktrans %}">
+                {% endif %}
+            </div>
         </div>
 
         <div class="card-title">
@@ -23,6 +25,11 @@
         <div class="card-body">{% trans "No description available" %}</div>
         {% endif %}
 
-        <a href="{% url 'manudux:property' pk=property.id %}" class="card-link"></a>
+        <div class="card-actions">
+            <a href="{% url 'manudux:edit-property' pk=property.id %}" class="btn btn-primary">{% trans "Edit" %}</a>
+            <a href="{% url 'manudux:delete-property' pk=property.id %}" class="btn btn-danger">{% trans "Delete" %}</a>
+        </div>
+
+        <a href="{% url 'manudux:property' pk=property.id %}" class="card-link" aria-label="{% blocktrans with name=property.name %}View {{ name }}{% endblocktrans %}"></a>
     </div>
 </div>

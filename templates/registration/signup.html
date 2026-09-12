@@ -1,0 +1,18 @@
+{% extends "manudux/base.html" %}
+{% load i18n %}
+{% load static %}
+
+{% block title %}{% trans "Register" %}{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h2>{% trans "Register" %}</h2>
+    <div class="form-card">
+        <form method="post">
+            {% csrf_token %}
+            {{ form.as_div }}
+            <button type="submit" class="btn btn-primary">{% trans "Register" %}</button>
+        </form>
+    </div>
+</div>
+{% endblock %}

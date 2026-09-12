@@ -1,17 +1,14 @@
-from django.db import models
-from django.contrib.auth.models import User
-from django.utils.translation import gettext_lazy as _
-from django.utils.timezone import now
-import qrcode
-from io import BytesIO
-from django.core.files.base import ContentFile
-from PIL import Image, ImageDraw, ImageFont
-from django.urls import reverse
-from django.conf import settings
-from urllib.parse import urlencode
-import textwrap
-from django.conf import settings
 import os
+import textwrap
+from io import BytesIO
+
+import qrcode
+from django.conf import settings
+from django.core.files.base import ContentFile
+from django.db import models
+from django.urls import reverse
+from django.utils.translation import gettext_lazy as _
+from PIL import Image, ImageDraw, ImageFont
 
 
 class Guide(models.Model):
@@ -29,6 +26,14 @@ class Guide(models.Model):
     name = models.CharField(max_length=200, unique=True)
     description = models.CharField(max_length=300, blank=True, null=True)
     qr_code = models.ImageField(upload_to="guides/qrcodes", blank=True, null=True)
+    guest_visible = models.BooleanField(
+        default=False,
+        help_text=_(
+            "Show this guide's steps to anyone browsing with a guest code, "
+            "when it's linked from a guest-visible property, location, or "
+            "appliance."
+        ),
+    )
     created_at = models.DateTimeField(auto_now_add=True, blank=True, null=True)
     updated_at = models.DateTimeField(auto_now=True, blank=True, null=True)
 
@@ -42,7 +47,8 @@ class Guide(models.Model):
         is_new = self.pk is None
 
         if is_new:
-            # Save initially to get a primary key
+            # Save initially to get a primary key, needed to build the QR
+            # code's target URL and filename below.
             super().save(*args, **kwargs)
 
         # Generate QR Code
@@ -61,7 +67,7 @@ class Guide(models.Model):
         try:
             text_font = ImageFont.truetype(font_path, 16)  # Title/Description
             url_font = ImageFont.truetype(font_path, 16)  # URL
-        except IOError as e:
+        except OSError as e:
             text_font = ImageFont.load_default()
             url_font = ImageFont.load_default()
             print(e)
@@ -101,9 +107,14 @@ class Guide(models.Model):
         )
         canvas.close()
 
-        # Save updated model (only if not already saved with pk and we need to write qr_code)
-        if not is_new:
-            super().save(update_fields=["qr_code"])
+        # Persist the guide - the regenerated qr_code plus any other field
+        # changes made before calling save() (e.g. editing name/
+        # description). Previously this write only happened for existing
+        # guides and was restricted to update_fields=["qr_code"], silently
+        # discarding any other pending changes; brand-new guides never got
+        # a second save at all, so qr_code stayed empty in the database
+        # despite the file having been written to storage.
+        super().save()
 
     class Meta:
         verbose_name = _("Guide")

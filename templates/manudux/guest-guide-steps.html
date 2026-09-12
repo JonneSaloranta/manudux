@@ -1,0 +1,32 @@
+{% load i18n %}
+{% comment %}
+Read-only rendering of a guide's steps for the guest view - no edit/delete
+controls, no reorder handles, unlike the owner-facing guide-details.html.
+{% endcomment %}
+<div class="detail-card">
+    <h1>{{ guide.name }}</h1>
+    {% if guide.description %}
+    <div class="detail-card-description">{{ guide.description|linebreaksbr }}</div>
+    {% endif %}
+
+    <div class="entity-list">
+        {% for step in guide.steps.all %}
+        <div class="entity-list-item">
+            <span class="entity-list-title">{{ step.step_number }}. {{ step.title }}</span>
+            {% if step.description %}
+            <span class="entity-list-meta">{{ step.description }}</span>
+            {% endif %}
+            {% if step.image %}
+            <div class="img-skeleton">
+                <img src="{{ step.image.url }}" alt="{{ step.title }}">
+            </div>
+            {% endif %}
+            {% if step.video %}
+            <a href="{{ step.video }}" target="_blank" rel="noopener" class="btn">{% trans "Watch Video" %}</a>
+            {% endif %}
+        </div>
+        {% empty %}
+        <p>{% trans "No steps yet." %}</p>
+        {% endfor %}
+    </div>
+</div>

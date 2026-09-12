@@ -18,17 +18,25 @@ jobs:
             - name: 🔖 Get latest tag
               id: get_latest_tag
               run: |
-                  latest_tag=$(git describe --tags --abbrev=0 || echo "v1.0.0")
+                  latest_tag=$(git describe --tags --abbrev=0 2>/dev/null || echo "v1.0.0")
                   echo "latest_tag=$latest_tag" >> "$GITHUB_OUTPUT"
 
             - name: 🆕 Create new tag (optional on master push)
               if: github.event_name == 'push'
+              id: create_new_tag
               run: |
-                  new_tag=$(echo "${{ steps.get_latest_tag.outputs.latest_tag }}" | awk -F. -v OFS=. '{$NF += 1 ; print}')
+                  latest_tag="${{ steps.get_latest_tag.outputs.latest_tag }}"
+                  version_without_v="${latest_tag#v}"
+
+                  new_version=$(echo "$version_without_v" | awk -F. -v OFS=. '{$NF += 1 ; print}')
+                  new_tag="v$new_version"
+
                   git config user.name "GitHub Actions"
                   git config user.email "actions@github.com"
                   git tag "$new_tag"
                   git push origin "$new_tag"
+
+                  echo "new_tag=$new_tag" >> "$GITHUB_OUTPUT"
               env:
                   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -43,8 +51,8 @@ jobs:
             - name: 🚀 Create GitHub Release
               uses: softprops/action-gh-release@v2
               with:
-                  tag_name: ${{ steps.get_latest_tag.outputs.latest_tag }}
-                  name: Release ${{ steps.get_latest_tag.outputs.latest_tag }}
+                  tag_name: ${{ steps.create_new_tag.outputs.new_tag || steps.get_latest_tag.outputs.latest_tag }}
+                  name: Release ${{ steps.create_new_tag.outputs.new_tag || steps.get_latest_tag.outputs.latest_tag }}
                   body: ${{ steps.changelog.outputs.changelog }}
               env:
                   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

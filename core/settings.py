@@ -11,18 +11,26 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 """
 
 from pathlib import Path
+
 from decouple import config
 from django.utils.translation import gettext_lazy as _
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+# Single source of truth for the running version, also read by CI
+# (.github/workflows/django-test-ci.yaml) to decide whether to publish a
+# new ghcr.io image. Bump this file by hand to cut a release.
+APP_VERSION = (BASE_DIR / "VERSION").read_text().strip()
+
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = config("SECRET_KEY", default="django-insecure-fallback-key-here")
+# No insecure fallback on purpose - the app must refuse to start rather than
+# silently run with a known, public key when SECRET_KEY isn't configured.
+SECRET_KEY = config("SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = config("DEBUG", default=False, cast=bool)
@@ -31,13 +39,48 @@ ALLOWED_HOSTS = config(
     "ALLOWED_HOSTS", cast=lambda v: [s.strip() for s in v.split(",")]
 )
 
-INTERNAL_IPS = config(
-    "INTERNAL_IPS", cast=lambda v: [s.strip() for s in v.split(",")]
-)
+INTERNAL_IPS = config("INTERNAL_IPS", cast=lambda v: [s.strip() for s in v.split(",")])
 
 SITE_URL = config("SITE_URL", cast=str)
 
 ALLOW_REGISTRATION = config("ALLOW_REGISTRATION", default=False, cast=bool)
+
+# Off by default so a plain self-hosted instance without TLS in front keeps
+# working out of the box. Set to True once the deployment is served over
+# HTTPS (e.g. the hosted offering, or a self-hosted instance behind a
+# TLS-terminating reverse proxy).
+SECURE_SSL_REDIRECT = config("SECURE_SSL_REDIRECT", default=False, cast=bool)
+SESSION_COOKIE_SECURE = config("SESSION_COOKIE_SECURE", default=False, cast=bool)
+CSRF_COOKIE_SECURE = config("CSRF_COOKIE_SECURE", default=False, cast=bool)
+SECURE_HSTS_SECONDS = config("SECURE_HSTS_SECONDS", default=0, cast=int)
+CSRF_TRUSTED_ORIGINS = config(
+    "CSRF_TRUSTED_ORIGINS",
+    default="",
+    cast=lambda v: [s.strip() for s in v.split(",") if s.strip()],
+)
+
+# Email - used for the maintenance reminder digest (see
+# manudux/management/commands/send_maintenance_reminders.py). Defaults to
+# printing to the console when DEBUG so self-hosted instances work without
+# any SMTP setup until an operator configures one.
+EMAIL_BACKEND = config(
+    "EMAIL_BACKEND",
+    default=(
+        "django.core.mail.backends.console.EmailBackend"
+        if DEBUG
+        else "django.core.mail.backends.smtp.EmailBackend"
+    ),
+)
+EMAIL_HOST = config("EMAIL_HOST", default="localhost")
+EMAIL_PORT = config("EMAIL_PORT", default=587, cast=int)
+EMAIL_HOST_USER = config("EMAIL_HOST_USER", default="")
+EMAIL_HOST_PASSWORD = config("EMAIL_HOST_PASSWORD", default="")
+EMAIL_USE_TLS = config("EMAIL_USE_TLS", default=True, cast=bool)
+DEFAULT_FROM_EMAIL = config("DEFAULT_FROM_EMAIL", default="manudux@localhost")
+
+MAINTENANCE_REMINDER_LOOKAHEAD_DAYS = config(
+    "MAINTENANCE_REMINDER_LOOKAHEAD_DAYS", default=7, cast=int
+)
 
 
 # Application definition
@@ -60,10 +103,11 @@ if DEBUG:
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
+    "whitenoise.middleware.WhiteNoiseMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.locale.LocaleMiddleware",
     "django.middleware.common.CommonMiddleware",
-    'debug_toolbar.middleware.DebugToolbarMiddleware',
+    "debug_toolbar.middleware.DebugToolbarMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
@@ -83,6 +127,7 @@ TEMPLATES = [
                 "django.template.context_processors.request",
                 "django.contrib.auth.context_processors.auth",
                 "django.contrib.messages.context_processors.messages",
+                "manudux.context_processors.site_settings",
             ],
         },
     },
@@ -98,6 +143,12 @@ DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.sqlite3",
         "NAME": BASE_DIR / "data/db.sqlite3",
+        # File-backed rather than in-memory so the backup/restore management
+        # commands, which read the file path off the live connection, can be
+        # exercised against a real database file in tests too.
+        "TEST": {
+            "NAME": BASE_DIR / "data/test_db.sqlite3",
+        },
     }
 }
 
@@ -134,6 +185,15 @@ USE_L10N = True
 
 USE_TZ = True
 
+LOCALE_PATHS = [BASE_DIR / "locale"]
+
+# Only languages with an actual translation catalog under locale/ - add
+# sv/ru back here once locale/sv and locale/ru exist.
+LANGUAGES = [
+    ("en", _("English")),
+    ("fi", _("Finnish")),
+]
+
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
 
@@ -142,6 +202,15 @@ STATIC_URL = "static/"
 STATICFILES_DIRS = [BASE_DIR / "static/"]
 
 STATIC_ROOT = BASE_DIR / "staticfiles"
+
+STORAGES = {
+    "default": {
+        "BACKEND": "django.core.files.storage.FileSystemStorage",
+    },
+    "staticfiles": {
+        "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
+    },
+}
 
 MEDIA_URL = "/media/"
 
@@ -152,16 +221,41 @@ MEDIA_ROOT = BASE_DIR / "media"
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
+LOGIN_URL = "/accounts/login"
 LOGIN_REDIRECT_URL = "/"
 LOGOUT_REDIRECT_URL = "/"
 
-LOCALE_PATHS = [BASE_DIR / "locale"]
-
-LANGUAGES = [
-    ("en", _("English")),
-    ("fi", _("Finnish")),
-    ("sv", _("Swedish")),
-    ("ru", _("Russian")),
-]
-
-LOGIN_URL = "/accounts/login"
+# Logs to stdout so container logs pick errors up without requiring an
+# ADMINS/email setup, which self-hosted instances typically don't have.
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "formatters": {
+        "verbose": {
+            "format": "{levelname} {asctime} {module} {message}",
+            "style": "{",
+        },
+    },
+    "handlers": {
+        "console": {
+            "class": "logging.StreamHandler",
+            "formatter": "verbose",
+        },
+    },
+    "root": {
+        "handlers": ["console"],
+        "level": "INFO",
+    },
+    "loggers": {
+        "django": {
+            "handlers": ["console"],
+            "level": config("DJANGO_LOG_LEVEL", default="INFO"),
+            "propagate": False,
+        },
+        "django.request": {
+            "handlers": ["console"],
+            "level": "ERROR",
+            "propagate": False,
+        },
+    },
+}

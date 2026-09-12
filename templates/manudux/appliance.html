@@ -1,13 +1,85 @@
 {% extends "manudux/base.html" %}
+{% load i18n %}
 {% load static %}
+
+{% block title %}{% trans "Appliance" %} - {{ appliance.name }}{% endblock %}
 
 {% block content %}
 <div class="container">
-    <h1>Appliance</h1>
+    <div class="detail-card">
+        <div class="detail-card-header">
+            <div class="img-skeleton">
+                {% if not appliance.image %}
+                <img src="{% static 'manudux/img/placeholder300x200.png'%}" alt="{% trans 'Placeholder image' %}">
+                {% else %}
+                <img src="{{ appliance.image.url }}" alt="{{ appliance.name }}">
+                {% endif %}
+            </div>
 
-    <div class="card">
-        <p>{{appliance.name}} - {{appliance.description}}</p>
+            <div>
+                <h1>{{ appliance.name }}</h1>
+                {% if appliance.appliance_type %}
+                <p class="detail-card-subtitle">{{ appliance.appliance_type }}</p>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="card-actions">
+            <a href="{% url 'manudux:edit-appliance' pk=appliance.id %}" class="btn btn-primary">{% trans "Edit" %}</a>
+            <a href="{% url 'manudux:delete-appliance' pk=appliance.id %}" class="btn btn-danger">{% trans "Delete" %}</a>
+        </div>
+
+        <div class="detail-grid">
+            {% if appliance.brand %}<p>{% trans "Brand" %}: {{ appliance.brand }}</p>{% endif %}
+            {% if appliance.model_number %}<p>{% trans "Model Number" %}: {{ appliance.model_number }}</p>{% endif %}
+            {% if appliance.serial_number %}<p>{% trans "Serial Number" %}: {{ appliance.serial_number }}</p>{% endif %}
+            {% if appliance.purchase_date %}<p>{% trans "Purchased" %}: {{ appliance.purchase_date|date:"d.m.Y" }}</p>{% endif %}
+            {% if appliance.warranty_expires %}<p>{% trans "Warranty expires" %}: {{ appliance.warranty_expires|date:"d.m.Y" }}</p>{% endif %}
+            <p>{% trans "Location" %}: <a href="{% url 'manudux:location' appliance.location.id %}">{{ appliance.location }}</a></p>
+            {% if appliance.guide %}
+            <p>{% trans "Manual" %}: <a href="{% url 'manudux:guide' pk=appliance.guide.pk %}">{{ appliance.guide }}</a></p>
+            {% endif %}
+        </div>
+
+        {% if appliance.notes %}
+        <div class="detail-card-description">{{ appliance.notes|linebreaksbr }}</div>
+        {% endif %}
     </div>
-</div>
 
+    <section class="page-section">
+        <h2>{% trans "Documents" %}</h2>
+        <a href="{% url 'manudux:create-appliance-document' appliance_pk=appliance.id %}" class="btn btn-primary">{% trans "Upload a document" %}</a>
+
+        <div class="entity-list">
+            {% for document in documents %}
+            <div class="entity-list-item">
+                <span class="entity-list-title">{{ document.name }}</span>
+                <span class="entity-list-meta">{{ document.get_category_display }}</span>
+                <div class="card-actions">
+                    <a href="{{ document.file.url }}" target="_blank" class="btn">{% trans "View" %}</a>
+                    <a href="{% url 'manudux:delete-appliance-document' pk=document.id %}" class="btn btn-danger">{% trans "Delete" %}</a>
+                </div>
+            </div>
+            {% empty %}
+            <p>{% trans "No documents uploaded yet." %}</p>
+            {% endfor %}
+        </div>
+    </section>
+
+    <section class="page-section">
+        <h2>{% trans "Maintenance tasks" %}</h2>
+        <a href="{% url 'manudux:create-maintenance-task' %}?appliance_id={{ appliance.id }}" class="btn btn-primary">{% trans "Add a maintenance task" %}</a>
+
+        <div class="entity-list">
+            {% for task in maintenance_tasks %}
+            <a class="entity-list-item" href="{% url 'manudux:maintenance-task' pk=task.id %}">
+                <span class="entity-list-title">{{ task.title }}</span>
+                <span class="entity-list-meta">{% trans "Due" %} {{ task.due_date|date:"d.m.Y" }}</span>
+            </a>
+            {% empty %}
+            <p>{% trans "No maintenance tasks for this appliance yet." %}</p>
+            {% endfor %}
+        </div>
+    </section>
+</div>
 {% endblock %}

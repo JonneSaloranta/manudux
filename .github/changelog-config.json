@@ -1,6 +1,13 @@
 {
     "template": "## 📦 $TITLE ($TAG)\n\n### ✨ Changes\n$CHANGES\n",
     "change-template": "- $TITLE (#$NUMBER)",
+    "label_extractor": [
+        {
+            "pattern": "^(build|chore|ci|docs|feat|fix|perf|refactor|revert|style|test)(\\(.+\\))?(!)?:",
+            "target": "$1",
+            "on_property": "title"
+        }
+    ],
     "categories": [
         {
             "title": "🚀 Features",
@@ -12,7 +19,7 @@
         },
         {
             "title": "🧹 Other",
-            "labels": ["chore", "docs", "refactor"]
+            "labels": ["chore", "docs", "ci", "build", "perf", "refactor", "revert", "style", "test"]
         }
     ]
 }

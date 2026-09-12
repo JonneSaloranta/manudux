@@ -1,18 +1,9 @@
-from django.db import models
-from django.contrib.auth.models import User
-from django.utils.translation import gettext_lazy as _
-from django.utils.timezone import now
-import qrcode
-from io import BytesIO
-from django.core.files.base import ContentFile
-from PIL import Image, ImageDraw, ImageFont
-from django.urls import reverse
-from django.conf import settings
 from urllib.parse import urlencode
-import textwrap
-from django.conf import settings
-import os
-from . import PropertyType, Guide
+
+from django.db import models
+from django.utils.translation import gettext_lazy as _
+
+from . import Guide, PropertyType
 
 
 class Property(models.Model):
@@ -33,6 +24,31 @@ class Property(models.Model):
         blank=True,
         null=True,
     )
+
+    # Identification
+    parcel_number = models.CharField(max_length=100, blank=True)
+    year_built = models.PositiveIntegerField(blank=True, null=True)
+    size_sqm = models.DecimalField(
+        max_digits=8, decimal_places=1, blank=True, null=True
+    )
+    lot_size_sqm = models.DecimalField(
+        max_digits=10, decimal_places=1, blank=True, null=True
+    )
+
+    # Financial
+    purchase_date = models.DateField(blank=True, null=True)
+    purchase_price = models.DecimalField(
+        max_digits=12, decimal_places=2, blank=True, null=True
+    )
+    estimated_value = models.DecimalField(
+        max_digits=12, decimal_places=2, blank=True, null=True
+    )
+
+    # Insurance
+    insurance_company = models.CharField(max_length=255, blank=True)
+    insurance_policy_number = models.CharField(max_length=100, blank=True)
+    insurance_expires = models.DateField(blank=True, null=True)
+
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     activated = models.BooleanField(default=True)
@@ -41,7 +57,11 @@ class Property(models.Model):
         return self.name
 
     def get_map(self):
-        """Returns an embeddable Google Maps iframe for the property."""
+        """Returns an embeddable Google Maps iframe src URL for the property.
+
+        Building this as a URL rather than a chunk of HTML lets the template
+        render the iframe itself, so it never needs the |safe filter.
+        """
         if not self.address or not self.city or not self.state or not self.zip_code:
             return None
 
@@ -51,15 +71,7 @@ class Property(models.Model):
         # URL encode the address for Google Maps
         params = urlencode({"q": full_address})
 
-        # Generate the iframe with the dynamic address
-        return (
-            f'<div style="width: 100%;">'
-            f'<iframe width="100%" height="400" frameborder="0" scrolling="no" '
-            f'marginheight="0" marginwidth="0" '
-            f'src="https://maps.google.com/maps?{params}&amp;t=&amp;z=14&amp;ie=UTF8&amp;iwloc=B&amp;output=embed">'
-            f"</iframe>"
-            f"</div>"
-        )
+        return f"https://maps.google.com/maps?{params}&t=&z=14&ie=UTF8&iwloc=B&output=embed"
 
     def google_maps_link(self):
         """Generates a Google Maps link for the property's address."""
@@ -73,15 +85,6 @@ class Property(models.Model):
         params = urlencode({"q": full_address})
 
         return f"https://www.google.com/maps/search/?{params}"
-
-    def zipcode_is_negative(self):
-        if self.zip_code is None or "":
-            return False
-        else:
-            if int(self.zip_code) < 0:
-                raise ValueError(f"Zipcode cannot be negative {int(self.zip_code)}")
-            else:
-                return False
 
     class Meta:
         verbose_name = _("Property")

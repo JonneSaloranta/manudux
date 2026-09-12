@@ -1,8 +1,8 @@
-from django.test import TestCase, tag, Client
-from manudux.models import Property, Location
-from django.urls import reverse
 from django.contrib.auth.models import User
-from django.contrib.auth.views import LoginView, LogoutView
+from django.test import Client, TestCase, tag
+from django.urls import reverse
+
+from manudux.models import Property
 
 
 class PropertyTestCase(TestCase):
@@ -74,14 +74,16 @@ class PropertyTestCase(TestCase):
 
     @tag("views", "slow", "auth", "property")
     def test_property_view_is_private(self):
-        """Test if logged in users can see properties"""
+        """Test if logged in users can see activated properties"""
         self.client.login(username="testuser", password="testpassword")
         response = self.client.get(reverse("manudux:properties"))
         self.assertEqual(response.status_code, 200)
         self.assertIn("properties", response.context)
 
         properties = response.context["properties"]
-        self.assertEqual(len(properties), 5)
+        self.assertEqual(
+            len(properties), 4, msg="Only activated properties should be listed"
+        )
 
     @tag("views", "slow", "auth", "property")
     def test_property_detail_view_public(self):
@@ -133,7 +135,6 @@ class PropertyTestCase(TestCase):
         property_data = {
             "name": "Test Property1111",
             "description": "Description",
-            "address": "12345",
             "address": "Test Address",
             "city": "Test City",
             "state": "Test State",
@@ -161,40 +162,84 @@ class PropertyTestCase(TestCase):
         # check if the response url contains the property detail url
         self.assertTrue("property-detail", response.url)
 
-        @tag("views", "slow", "auth", "property")
-        def test_property_user_create_propery_object(self):
-            self.client.login(username="testuser", password="testpassword")
+    @tag("views", "slow", "auth", "property")
+    def test_property_create_rejects_negative_zip_code(self):
+        """Test that a negative zip code is rejected with a form error, not saved"""
+        self.client.login(username="testuser", password="testpassword")
 
-            # delete all properties
-            Property.objects.all().delete()
+        property_data = {
+            "name": "Negative Zip Property",
+            "description": "Description",
+            "address": "Test Address",
+            "city": "Test City",
+            "state": "Test State",
+            "zip_code": -12345,
+        }
 
-            property_data = {
-                "name": "",
-                "description": "Description",
-                "address": "12345",
-                "address": "Test Address",
-                "city": "Test City",
-                "state": "Test State",
-                "zip_code": -12345,
-            }
+        response = self.client.post(
+            reverse("manudux:create-property"), data=property_data
+        )
 
-            response = self.client.post(
-                reverse("manudux:create-property"), data=property_data
-            )
+        self.assertEqual(
+            response.status_code,
+            200,
+            msg="User should have stayed on page for invalid data entry",
+        )
+        self.assertTrue(
+            "form" in response.context, msg="No form context variable found"
+        )
 
-            self.assertEqual(
-                response.status_code,
-                200,
-                msg="User should have stayed on page for invalid data entry",
-            )
-            self.assertTrue(
-                "form" in response.context, msg="No form context variable found"
-            )
+        form = response.context["form"]
+        self.assertFormError(form, "zip_code", "Zipcode should be a positive integer")
 
-            form = response.context["form"]
-            self.assertFormError(form, "name", "This field is required")
-            self.assertFormError(
-                form, "zip_code", "Zipcode should be a positive integer"
-            )
+        self.assertFalse(Property.objects.filter(name="Negative Zip Property").exists())
 
-            self.assertFalse(Property.objects.exists())
+    @tag("views", "slow", "auth", "property")
+    def test_properties_view_is_paginated(self):
+        """Test that the properties list is paginated once there are enough of them"""
+        for i in range(25):
+            Property.objects.create(name=f"Bulk Property {i}", activated=True)
+
+        self.client.login(username="testuser", password="testpassword")
+        response = self.client.get(reverse("manudux:properties"))
+        self.assertEqual(response.status_code, 200)
+
+        page_obj = response.context["page_obj"]
+        self.assertTrue(page_obj.has_next())
+        self.assertEqual(len(page_obj), 20)
+
+        second_page = self.client.get(reverse("manudux:properties"), {"page": 2})
+        self.assertEqual(second_page.status_code, 200)
+        self.assertEqual(len(second_page.context["page_obj"]), 9)
+
+    @tag("views", "slow", "auth", "property")
+    def test_property_card_link_has_an_accessible_name(self):
+        """The whole-card overlay link on the properties list must not be an
+        empty <a> with no accessible name (WCAG 2.4.4/4.1.2)."""
+        self.client.login(username="testuser", password="testpassword")
+        response = self.client.get(reverse("manudux:properties"))
+        self.assertContains(response, 'aria-label="View Test Property"')
+
+    @tag("views", "slow", "auth", "property")
+    def test_edit_property_saves_extended_fields(self):
+        """Test that the registry/financial/insurance fields save via the edit form"""
+        self.client.login(username="testuser", password="testpassword")
+        property_obj = Property.objects.get(name="Test Property")
+
+        response = self.client.post(
+            reverse("manudux:edit-property", kwargs={"pk": property_obj.pk}),
+            data={
+                "name": "Test Property",
+                "parcel_number": "123-456-789",
+                "year_built": "1998",
+                "size_sqm": "120.5",
+                "purchase_price": "250000",
+                "insurance_company": "Acme Insurance",
+            },
+        )
+
+        self.assertEqual(response.status_code, 302)
+        property_obj.refresh_from_db()
+        self.assertEqual(property_obj.parcel_number, "123-456-789")
+        self.assertEqual(property_obj.year_built, 1998)
+        self.assertEqual(property_obj.insurance_company, "Acme Insurance")

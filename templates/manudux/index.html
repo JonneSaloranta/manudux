@@ -1,10 +1,44 @@
 {% extends "manudux/base.html" %}
+{% load i18n %}
 {% load static %}
 
 {% block content %}
 <div class="container">
-    <h1>Manudux</h1>
-    <p>Manudux is live!</p>
-</div>
+    <h1 class="title">Manudux</h1>
 
+    {% if user.is_authenticated %}
+    <section class="dashboard-section">
+        <h2>{% trans "Overdue maintenance" %}</h2>
+        <div class="entity-list">
+            {% for task in overdue_tasks %}
+            <a class="entity-list-item entity-list-item-overdue" href="{% url 'manudux:maintenance-task' pk=task.id %}">
+                <span class="entity-list-title">{{ task.title }}</span>
+                <span class="entity-list-meta">{{ task.property.name }} - {% trans "Due" %} {{ task.due_date|date:"d.m.Y" }}</span>
+            </a>
+            {% empty %}
+            <p>{% trans "Nothing overdue." %}</p>
+            {% endfor %}
+        </div>
+
+        <h2>{% trans "Coming up" %}</h2>
+        <div class="entity-list">
+            {% for task in upcoming_tasks %}
+            <a class="entity-list-item" href="{% url 'manudux:maintenance-task' pk=task.id %}">
+                <span class="entity-list-title">{{ task.title }}</span>
+                <span class="entity-list-meta">{{ task.property.name }} - {% trans "Due" %} {{ task.due_date|date:"d.m.Y" }}</span>
+            </a>
+            {% empty %}
+            <p>{% trans "Nothing coming up." %}</p>
+            {% endfor %}
+        </div>
+
+        <a href="{% url 'manudux:maintenance-tasks' %}" class="btn btn-primary">{% trans "View all maintenance tasks" %}</a>
+    </section>
+    {% else %}
+    <div class="page-hero bg-dark-green text-color-white">
+        <h2>{% trans "Manudux" %}</h2>
+        <p>{% trans "Manudux is a self-hostable tool for managing documentation and maintenance of your properties." %}</p>
+    </div>
+    {% endif %}
+</div>
 {% endblock %}

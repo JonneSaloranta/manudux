@@ -1,34 +1,38 @@
-"""
-URL configuration for core project.
+import re
 
-The `urlpatterns` list routes URLs to views. For more information please see:
-    https://docs.djangoproject.com/en/5.1/topics/http/urls/
-Examples:
-Function views
-    1. Add an import:  from my_app import views
-    2. Add a URL to urlpatterns:  path('', views.home, name='home')
-Class-based views
-    1. Add an import:  from other_app.views import Home
-    2. Add a URL to urlpatterns:  path('', Home.as_view(), name='home')
-Including another URLconf
-    1. Import the include() function: from django.urls import include, path
-    2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
-"""
-
-from django.contrib import admin
-from django.urls import path, include
-from django.conf import settings
-from django.conf.urls.static import static
-from schema_graph.views import Schema
 from debug_toolbar.toolbar import debug_toolbar_urls
+from django.conf import settings
+from django.contrib import admin
+from django.urls import include, path, re_path
+from django.views.static import serve
+from schema_graph.views import Schema
+
+from .views import healthz
+
+# Media (user-uploaded) files have no dedicated web server or CDN in front of
+# this project, so they are served by Django itself in every environment.
+# django.conf.urls.static.static() only wires this up when DEBUG=True, which
+# left uploaded property images, guide files and QR codes unreachable in
+# production - hence the explicit pattern below instead of that helper.
+media_urlpatterns = [
+    re_path(
+        r"^%s(?P<path>.*)$" % re.escape(settings.MEDIA_URL.lstrip("/")),
+        serve,
+        {"document_root": settings.MEDIA_ROOT},
+    ),
+]
 
 urlpatterns = [
     path("admin/", admin.site.urls),
-    path("accounts/", include("django.contrib.auth.urls")),
+    path(
+        "accounts/",
+        include(("django.contrib.auth.urls", "accounts"), namespace="accounts"),
+    ),
+    path("healthz/", healthz, name="healthz"),
     path("", include(("manudux.urls", "manudux"), namespace="manudux")),
-] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+] + media_urlpatterns
 
-if  settings.DEBUG:
+if settings.DEBUG:
     urlpatterns = [
         *urlpatterns,
         path("schema/", Schema.as_view()),

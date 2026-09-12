@@ -1,0 +1,181 @@
+{
+    "defaults": {
+        "timeout": 30000,
+        "chromeLaunchConfig": {
+            "args": ["--no-sandbox"]
+        }
+    },
+    "urls": [
+        "http://127.0.0.1:8877/",
+        "http://127.0.0.1:8877/accounts/login/",
+        "http://127.0.0.1:8877/accounts/password_reset/",
+        "http://127.0.0.1:8877/guest-login/",
+        {
+            "url": "http://127.0.0.1:8877/guest-login/",
+            "actions": [
+                "set field #id_code to __A11Y_TEST_GUEST_CODE__",
+                "click element button[type=submit]",
+                "wait for url to be http://127.0.0.1:8877/guest/property/"
+            ]
+        },
+        {
+            "url": "http://127.0.0.1:8877/guest-login/",
+            "actions": [
+                "set field #id_code to __A11Y_TEST_GUEST_CODE__",
+                "click element button[type=submit]",
+                "wait for url to be http://127.0.0.1:8877/guest/property/",
+                "navigate to http://127.0.0.1:8877/guest/guide/1/"
+            ]
+        },
+        {
+            "url": "http://127.0.0.1:8877/accounts/login/",
+            "actions": [
+                "set field #id_username to a11y",
+                "set field #id_password to __A11Y_TEST_PASSWORD__",
+                "click element button[type=submit]",
+                "wait for url to be http://127.0.0.1:8877/",
+                "navigate to http://127.0.0.1:8877/properties/"
+            ]
+        },
+        {
+            "url": "http://127.0.0.1:8877/accounts/login/",
+            "actions": [
+                "set field #id_username to a11y",
+                "set field #id_password to __A11Y_TEST_PASSWORD__",
+                "click element button[type=submit]",
+                "wait for url to be http://127.0.0.1:8877/",
+                "navigate to http://127.0.0.1:8877/properties/create-property/"
+            ]
+        },
+        {
+            "url": "http://127.0.0.1:8877/accounts/login/",
+            "actions": [
+                "set field #id_username to a11y",
+                "set field #id_password to __A11Y_TEST_PASSWORD__",
+                "click element button[type=submit]",
+                "wait for url to be http://127.0.0.1:8877/",
+                "navigate to http://127.0.0.1:8877/property/1/"
+            ]
+        },
+        {
+            "url": "http://127.0.0.1:8877/accounts/login/",
+            "actions": [
+                "set field #id_username to a11y",
+                "set field #id_password to __A11Y_TEST_PASSWORD__",
+                "click element button[type=submit]",
+                "wait for url to be http://127.0.0.1:8877/",
+                "navigate to http://127.0.0.1:8877/properties/types/"
+            ]
+        },
+        {
+            "url": "http://127.0.0.1:8877/accounts/login/",
+            "actions": [
+                "set field #id_username to a11y",
+                "set field #id_password to __A11Y_TEST_PASSWORD__",
+                "click element button[type=submit]",
+                "wait for url to be http://127.0.0.1:8877/",
+                "navigate to http://127.0.0.1:8877/locations/"
+            ]
+        },
+        {
+            "url": "http://127.0.0.1:8877/accounts/login/",
+            "actions": [
+                "set field #id_username to a11y",
+                "set field #id_password to __A11Y_TEST_PASSWORD__",
+                "click element button[type=submit]",
+                "wait for url to be http://127.0.0.1:8877/",
+                "navigate to http://127.0.0.1:8877/locations/types/"
+            ]
+        },
+        {
+            "url": "http://127.0.0.1:8877/accounts/login/",
+            "actions": [
+                "set field #id_username to a11y",
+                "set field #id_password to __A11Y_TEST_PASSWORD__",
+                "click element button[type=submit]",
+                "wait for url to be http://127.0.0.1:8877/",
+                "navigate to http://127.0.0.1:8877/appliances/"
+            ]
+        },
+        {
+            "url": "http://127.0.0.1:8877/accounts/login/",
+            "actions": [
+                "set field #id_username to a11y",
+                "set field #id_password to __A11Y_TEST_PASSWORD__",
+                "click element button[type=submit]",
+                "wait for url to be http://127.0.0.1:8877/",
+                "navigate to http://127.0.0.1:8877/appliance/1/"
+            ]
+        },
+        {
+            "url": "http://127.0.0.1:8877/accounts/login/",
+            "actions": [
+                "set field #id_username to a11y",
+                "set field #id_password to __A11Y_TEST_PASSWORD__",
+                "click element button[type=submit]",
+                "wait for url to be http://127.0.0.1:8877/",
+                "navigate to http://127.0.0.1:8877/appliances/types/"
+            ]
+        },
+        {
+            "url": "http://127.0.0.1:8877/accounts/login/",
+            "actions": [
+                "set field #id_username to a11y",
+                "set field #id_password to __A11Y_TEST_PASSWORD__",
+                "click element button[type=submit]",
+                "wait for url to be http://127.0.0.1:8877/",
+                "navigate to http://127.0.0.1:8877/maintenance/"
+            ]
+        },
+        {
+            "url": "http://127.0.0.1:8877/accounts/login/",
+            "actions": [
+                "set field #id_username to a11y",
+                "set field #id_password to __A11Y_TEST_PASSWORD__",
+                "click element button[type=submit]",
+                "wait for url to be http://127.0.0.1:8877/",
+                "navigate to http://127.0.0.1:8877/maintenance/1/"
+            ]
+        },
+        {
+            "url": "http://127.0.0.1:8877/accounts/login/",
+            "actions": [
+                "set field #id_username to a11y",
+                "set field #id_password to __A11Y_TEST_PASSWORD__",
+                "click element button[type=submit]",
+                "wait for url to be http://127.0.0.1:8877/",
+                "navigate to http://127.0.0.1:8877/guides/"
+            ]
+        },
+        {
+            "url": "http://127.0.0.1:8877/accounts/login/",
+            "actions": [
+                "set field #id_username to a11y",
+                "set field #id_password to __A11Y_TEST_PASSWORD__",
+                "click element button[type=submit]",
+                "wait for url to be http://127.0.0.1:8877/",
+                "navigate to http://127.0.0.1:8877/guide/1/"
+            ]
+        },
+        {
+            "url": "http://127.0.0.1:8877/accounts/login/",
+            "actions": [
+                "set field #id_username to a11y",
+                "set field #id_password to __A11Y_TEST_PASSWORD__",
+                "click element button[type=submit]",
+                "wait for url to be http://127.0.0.1:8877/",
+                "navigate to http://127.0.0.1:8877/account/"
+            ]
+        },
+        {
+            "url": "http://127.0.0.1:8877/accounts/login/",
+            "actions": [
+                "set field #id_username to a11y",
+                "set field #id_password to __A11Y_TEST_PASSWORD__",
+                "click element button[type=submit]",
+                "wait for url to be http://127.0.0.1:8877/",
+                "navigate to http://127.0.0.1:8877/users/"
+            ]
+        }
+    ]
+}

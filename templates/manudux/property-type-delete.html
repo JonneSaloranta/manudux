@@ -1,0 +1,20 @@
+{% extends "manudux/base.html" %}
+{% load i18n %}
+{% load static %}
+
+{% block title %}{% trans "Delete" %} - {{ property_type.name }}{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1>{% trans "Delete Property Type" %}</h1>
+
+    <p>{% blocktrans %}Are you sure you want to delete "{{ property_type }}"? This cannot be undone. Any properties using this type will keep their other data but lose this type.{% endblocktrans %}</p>
+
+    <form action="{% url 'manudux:delete-property-type' property_type.id %}" method="post">
+        {% csrf_token %}
+        <input type="submit" value="{% trans 'Delete' %}" class="btn btn-danger">
+    </form>
+
+    <a href="{% url 'manudux:property-types' %}" class="btn">{% trans "Cancel" %}</a>
+</div>
+{% endblock %}

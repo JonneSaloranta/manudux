@@ -1,0 +1,28 @@
+{% extends "manudux/base.html" %}
+{% load i18n %}
+{% load static %}
+
+{% block content %}
+
+<div class="container">
+    <h1 class="title">{% trans "Site settings" %}</h1>
+
+    <div class="page-hero bg-dark-green text-color-white">
+        <h2>Details</h2>
+        <p>Lorem ipsum dolor sit amet consectetur, adipisicing elit. Nobis dolorem magnam hic, ex atque necessitatibus accusamus voluptate error, cum, perspiciatis sunt omnis harum ducimus et ut. Eos odit vero
+            voluptatum.</p>
+    </div>
+</div>
+
+<div class="container">
+    <div class="page-hero border-dark-green">
+        <h1>Details</h1>
+        <p>URL: http://manudux.com</p>
+        <p>Up-to-date version: v0.1.2</p>
+        <p>Installed version: <span style="color: orange;">v0.1.0</span></p>
+        <p>LDAP: <span style="color: red;">Disabled</span></p>
+        <p>Database: <span style="color: green;">Connected</span></p>
+    </div>
+</div>
+
+{% endblock %}

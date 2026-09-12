@@ -1,8 +1,6 @@
-from django.test import TestCase, tag, Client
-from manudux.models import Property, Location
-from django.urls import reverse
-from django.contrib.auth.models import User
-from django.contrib.auth.views import LoginView, LogoutView
+from django.test import TestCase, tag
+
+from manudux.models import Location, LocationType, Property
 
 
 class LocationModelsTest(TestCase):
@@ -19,10 +17,15 @@ class LocationModelsTest(TestCase):
             activated=True,
         )
 
+        self.location_type = LocationType.objects.create(
+            name="Garage", description="A place to park a car."
+        )
+
         Location.objects.create(
             name="Test Location",
             description="Test Description",
             property=test_property,
+            location_type=self.location_type,
             activated=True,
         )
 
@@ -67,3 +70,26 @@ class LocationModelsTest(TestCase):
         """Tests for location string method"""
         test_location = Location.objects.get(name="Test Location")
         self.assertEqual(str(test_location), "Test Location -> Test Property")
+
+    @tag("models", "Location")
+    def test_location_type(self):
+        """Tests that a location can be assigned a type"""
+        test_location = Location.objects.get(name="Test Location")
+        self.assertEqual(test_location.location_type.name, "Garage")
+
+    @tag("models", "Location")
+    def test_location_type_can_be_blank(self):
+        """Tests that a location's type is optional"""
+        test_property = Property.objects.get(name="Test Property")
+        location = Location.objects.create(
+            name="No Type Location", property=test_property
+        )
+        self.assertIsNone(location.location_type)
+
+    @tag("models", "Location")
+    def test_location_type_set_null_on_delete(self):
+        """Deleting a LocationType should not delete the locations using it."""
+        test_location = Location.objects.get(name="Test Location")
+        self.location_type.delete()
+        test_location.refresh_from_db()
+        self.assertIsNone(test_location.location_type)

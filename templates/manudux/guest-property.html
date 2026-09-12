@@ -1,0 +1,103 @@
+{% extends "manudux/base.html" %}
+{% load i18n %}
+{% load static %}
+
+{% block title %}{{ property.name }}{% endblock %}
+
+{% block content %}
+<div class="container">
+    <p class="page-section-hint">
+        {% blocktrans with name=guest_code.name %}You're viewing this property as a guest ({{ name }}).{% endblocktrans %}
+        <a href="{% url 'manudux:guest-logout' %}">{% trans "Exit guest view" %}</a>
+    </p>
+
+    <div class="detail-card">
+        <div class="detail-card-header">
+            <div class="img-skeleton">
+                {% if not property.image %}
+                <img src="{% static 'manudux/img/placeholder300x200.png'%}" alt="{% trans 'Placeholder image' %}">
+                {% else %}
+                <img src="{{ property.image.url }}" alt="{{ property.name }}">
+                {% endif %}
+            </div>
+
+            <div>
+                <h1>{{ property.name }}</h1>
+                {% if property.property_type %}
+                <p class="detail-card-subtitle">{{ property.property_type }}</p>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="detail-grid">
+            {% if property.address %}<p>{% trans "Address" %}: {{ property.address }}</p>{% endif %}
+            {% if property.city %}<p>{% trans "City" %}: {{ property.city }}</p>{% endif %}
+            {% if property.state %}<p>{% trans "State" %}: {{ property.state }}</p>{% endif %}
+            {% if property.zip_code %}<p>{% trans "Zipcode" %}: {{ property.zip_code }}</p>{% endif %}
+            {% if property.year_built %}<p>{% trans "Year Built" %}: {{ property.year_built }}</p>{% endif %}
+            {% if property.size_sqm %}<p>{% trans "Living Area" %}: {{ property.size_sqm }} m²</p>{% endif %}
+            {% if property.lot_size_sqm %}<p>{% trans "Lot Size" %}: {{ property.lot_size_sqm }} m²</p>{% endif %}
+        </div>
+
+        {% if property.description %}
+        <div class="detail-card-description">{{ property.description|linebreaksbr }}</div>
+        {% endif %}
+    </div>
+
+    {% if property_guide %}
+    {% include "manudux/guest-guide-link.html" with guide=property_guide %}
+    {% endif %}
+
+    {% if locations %}
+    <section class="page-section">
+        <h2>{% trans "Locations" %}</h2>
+
+        <div class="entity-list">
+            {% for item in locations %}
+            <details class="entity-list-item">
+                <summary class="tree-summary">
+                    <span class="entity-list-title">{{ item.location.name }}</span>
+                    {% if item.location.location_type %}
+                    <span class="entity-list-meta">{{ item.location.location_type }}</span>
+                    {% endif %}
+                    <svg class="tree-chevron" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px">
+                        <path d="M480-344 240-584l56-56 184 184 184-184 56 56-240 240Z" />
+                    </svg>
+                </summary>
+
+                <div class="tree-node-body">
+                    {% if item.location.description %}
+                    <p>{{ item.location.description|linebreaksbr }}</p>
+                    {% endif %}
+
+                    {% if item.guide %}
+                    {% include "manudux/guest-guide-link.html" with guide=item.guide %}
+                    {% endif %}
+
+                    {% for appliance_item in item.appliances %}
+                    {% include "manudux/guest-appliance-card.html" with appliance=appliance_item.appliance guide=appliance_item.guide %}
+                    {% endfor %}
+                </div>
+            </details>
+            {% endfor %}
+        </div>
+    </section>
+    {% endif %}
+
+    {% if orphan_appliances %}
+    <section class="page-section">
+        <h2>{% trans "Appliances" %}</h2>
+
+        <div class="entity-list">
+            {% for appliance_item in orphan_appliances %}
+            {% include "manudux/guest-appliance-card.html" with appliance=appliance_item.appliance guide=appliance_item.guide show_location=True %}
+            {% endfor %}
+        </div>
+    </section>
+    {% endif %}
+
+    {% if not has_shared_content %}
+    <p>{% trans "Nothing has been shared with guests yet." %}</p>
+    {% endif %}
+</div>
+{% endblock %}

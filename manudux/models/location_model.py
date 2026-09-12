@@ -1,18 +1,8 @@
-from django.db import models
-from django.contrib.auth.models import User
-from django.utils.translation import gettext_lazy as _
+from django.db import models, transaction
 from django.utils.timezone import now
-import qrcode
-from io import BytesIO
-from django.core.files.base import ContentFile
-from PIL import Image, ImageDraw, ImageFont
-from django.urls import reverse
-from django.conf import settings
-from urllib.parse import urlencode
-import textwrap
-from django.conf import settings
-import os
-from . import Property, Guide
+from django.utils.translation import gettext_lazy as _
+
+from . import Guide, LocationType, Property
 
 
 class Location(models.Model):
@@ -24,10 +14,21 @@ class Location(models.Model):
     property = models.ForeignKey(
         Property, on_delete=models.CASCADE, related_name="locations"
     )
+    location_type = models.ForeignKey(
+        LocationType,
+        on_delete=models.SET_NULL,
+        related_name="locations",
+        blank=True,
+        null=True,
+    )
     guide = models.ForeignKey(Guide, on_delete=models.SET_NULL, blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     activated = models.BooleanField(default=True)
+    guest_visible = models.BooleanField(
+        default=False,
+        help_text=_("Show this location to anyone browsing with a guest code."),
+    )
 
     def __str__(self):
         if self.property:
@@ -37,20 +38,21 @@ class Location(models.Model):
 
     def save(self, *args, **kwargs):
         """Update the property's updated_at field when a location is created or updated."""
-        if self.pk:  # If location already exists (update)
-            old_instance = Location.objects.get(pk=self.pk)
-            if (
-                old_instance.name != self.name
-                or old_instance.description != self.description
-                or old_instance.activated != self.activated
-            ):
+        with transaction.atomic():
+            if self.pk:  # If location already exists (update)
+                old_instance = Location.objects.get(pk=self.pk)
+                if (
+                    old_instance.name != self.name
+                    or old_instance.description != self.description
+                    or old_instance.activated != self.activated
+                ):
+                    self.property.updated_at = now()
+                    self.property.save(update_fields=["updated_at"])
+            else:  # If creating a new location
                 self.property.updated_at = now()
-                self.property.save()
-        else:  # If creating a new location
-            self.property.updated_at = now()
-            self.property.save()
+                self.property.save(update_fields=["updated_at"])
 
-        super().save(*args, **kwargs)  # Call the original save method
+            super().save(*args, **kwargs)  # Call the original save method
 
     class Meta:
         verbose_name = _("Location")

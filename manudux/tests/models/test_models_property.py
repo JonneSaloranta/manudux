@@ -1,8 +1,7 @@
-from django.test import TestCase, tag, Client
-from manudux.models.property_model import Property
-from django.urls import reverse
 from django.contrib.auth.models import User
-from django.contrib.auth.views import LoginView, LogoutView
+from django.test import Client, TestCase, tag
+
+from manudux.models.property_model import Property
 
 
 class PropertyTestCase(TestCase):
@@ -79,7 +78,7 @@ class PropertyTestCase(TestCase):
         self.assertEqual(
             str(test_property),
             "Test Property",
-            msg=f"The property name should be 'Test Property', but got {str(test_property)}",
+            msg=f"The property name should be 'Test Property', but got {test_property!s}",
         )
 
     @tag("models", "property")
@@ -168,24 +167,6 @@ class PropertyTestCase(TestCase):
         )
 
     @tag("models", "property")
-    def test_if_property_zipcode_is_negative(self):
-        """Test if negative property zipcode raises an valueerror"""
-        pt = Property.objects.create(
-            name="Property",
-            description="testdescription",
-            address="456 Test St",
-            city="Test City2",
-            state="Test State3",
-            zip_code=-900,
-            activated=True,
-        )
-        pt.save()
-        self.assertRaises(
-            ValueError,
-            msg=f"The negative property zipcode should raise a ValueError, but did not",
-        )
-
-    @tag("models", "property")
     def test_if_get_map_function_works_correctly(self):
         """Test if property get_map function works"""
         pt = Property.objects.get(name="Test Property")
@@ -224,7 +205,7 @@ class PropertyTestCase(TestCase):
         self.assertIsNone(
             pt.state, msg=f"The state should be None, returned {pt.state}"
         )
-        self.assertIsNone(pt.get_map(), msg=f"The get_map function should return None")
+        self.assertIsNone(pt.get_map(), msg="The get_map function should return None")
 
         pt.state = "Test State5"
         pt.zip_code = None
@@ -232,4 +213,4 @@ class PropertyTestCase(TestCase):
         self.assertIsNone(
             pt.zip_code, msg=f"The zipcode should be None, returned {pt.zip_code}"
         )
-        self.assertIsNone(pt.get_map(), msg=f"The get_map function should return None")
+        self.assertIsNone(pt.get_map(), msg="The get_map function should return None")

@@ -1,391 +1,1044 @@
+:root {
+  --color-white: #ffffff;
+  --color-black: #1b1b17;
+  --color-background: #f2f0ea;
+  --primary-color: #1f3a2c;
+  --secondary-color: #3c7a5a;
+  --tetriary-color: #8fb8a0;
+  --accent-color: #c97a2e;
+  --danger-color: #b23a2e;
+  --danger-color-hover: #8a2c22;
+}
+
+@font-face {
+  font-family: Poppins;
+  src: url(../fonts/Poppins-Regular.ttf);
+}
 *,
 *::before,
 *::after {
   box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+:focus-visible {
+  outline: 3px solid var(--accent-color);
+  outline-offset: 2px;
 }
 
 html {
   font-size: 62.5%;
-  font-family: "Roboto", sans-serif;
+  font-family: Poppins;
 }
 
 body {
-  display: flex;
-  justify-content: center;
-  min-height: 100vh;
-  margin: 0;
-  background-color: #f5f5f5;
-  flex-direction: column;
   font-size: 1.6rem;
+  min-height: 100vh;
+  min-height: 100dvh;
+  background-color: var(--color-background);
+  color: var(--color-black);
+  display: grid;
+  grid-template-columns: auto 1fr;
 }
 
-.navbar {
-  background: #222;
-  padding: 1rem;
-  max-width: 100vw;
-}
-.navbar nav {
+main {
+  height: 100%;
   display: flex;
-  justify-content: space-between;
-  align-items: center;
-  max-width: 1200px;
-  margin: auto;
+  flex-direction: column;
 }
-.navbar nav .nav-logo {
-  font-size: 2.5rem;
-  color: white;
-  text-decoration: none;
+
+#sidebar {
+  box-sizing: border-box;
+  height: 100vh;
+  width: 250px;
+  padding: 5px 1em;
+  color: var(--color-white);
+  background-color: var(--primary-color);
+  border-right: 1px solid var(--secondary-color);
+  position: sticky;
+  top: 0;
+  align-self: start;
+  transition: 300ms ease-in-out;
+  overflow: hidden;
+  text-wrap: nowrap;
 }
-.navbar nav .nav-logo a {
-  color: white;
-  text-decoration: none;
+#sidebar.close {
+  padding: 5px;
+  width: 60px;
 }
-.navbar ul {
+#sidebar ul {
   list-style: none;
-  display: flex;
-  gap: 1rem;
-  padding: 0;
-  margin: 0;
 }
-.navbar ul li a {
+#sidebar ul li.active a {
+  border-left: 3px solid var(--accent-color);
+  background-color: rgba(201, 122, 30, 0.16);
+}
+#sidebar > ul > li:first-child {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 16px;
+}
+#sidebar > ul > li:first-child .logo {
+  font-weight: 600;
+}
+#sidebar a,
+#sidebar .dropdown-btn,
+#sidebar .logo {
+  border-radius: 0.5em;
+  padding: 0.85em;
   text-decoration: none;
-  color: white;
-  padding: 0.5rem;
-  transition: 0.2s;
-}
-.navbar ul li a:hover {
-  background: rgba(255, 255, 255, 0.2);
-  border-radius: 5px;
-}
-.navbar .nav-user {
+  color: var(--color-white);
   display: flex;
-  gap: 1rem;
-  color: #fff;
+  align-items: center;
+  gap: 1em;
 }
-.navbar .nav-user button {
-  background: red;
-  color: white;
+#sidebar svg {
+  flex-shrink: 0;
+  fill: var(--color-white);
+}
+#sidebar a span,
+#sidebar .dropdown-btn span {
+  flex-grow: 1;
+}
+#sidebar a:hover,
+#sidebar .dropdown-btn:hover {
+  background-color: var(--secondary-color);
+}
+#sidebar .sub-menu {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: 300ms ease-in-out;
+}
+#sidebar .sub-menu > div {
+  overflow: hidden;
+}
+#sidebar .sub-menu.show {
+  grid-template-rows: 1fr;
+}
+#sidebar .sub-menu a {
+  padding-left: 2em;
+}
+
+#mobile-nav,
+#mobile-menu-overlay,
+#mobile-menu-drawer {
+  display: none;
+}
+
+body.mobile-menu-open {
+  overflow: hidden;
+}
+
+.dropdown-btn {
+  width: 100%;
+  text-align: left;
+  background: none;
   border: none;
-  padding: 0.5rem 1rem;
+  font: inherit;
   cursor: pointer;
 }
-.navbar .nav-user .admin-link {
-  color: white;
-  text-decoration: none;
+.dropdown-btn svg {
+  transition: 200ms ease;
+}
+
+.rotate svg:last-child {
+  rotate: 180deg;
+}
+
+#toggle-btn {
+  margin-left: auto;
+  padding: 1em;
+  border: none;
+  border-radius: 0.5em;
+  background: none;
+  cursor: pointer;
+}
+#toggle-btn svg {
+  transition: rotate 150ms ease;
+}
+#toggle-btn:hover {
+  background-color: var(--secondary-color);
 }
 
 .container {
-  min-width: 1200px;
-  margin: 0 auto;
-  padding: 0 15px;
-  font-size: 2rem;
   display: flex;
   flex-direction: column;
-  align-items: center;
+  /* `margin: auto` alone, inside main's flex layout, makes .container
+     shrink-wrap to its own content instead of filling main - so its
+     width silently changes (and everything in it re-centers) whenever
+     the content's own preferred width changes, e.g. a grid row getting
+     taller when a <details> is opened. An explicit width pins it to
+     main's width (capped by max-width), independent of content. */
+  width: 100%;
+  margin: 0 auto;
+  padding: 2rem;
+  max-width: 130rem;
 }
-.container .property-details {
-  flex-direction: row;
-  justify-content: space-between;
+.container .title {
+  font-weight: 500;
+  font-size: 3rem;
+  font-weight: bold;
+  list-style: none;
+  align-self: center;
+  justify-self: center;
+  margin: 3rem;
 }
 
-.property-details .timestamps p {
-  padding: 0;
-  margin: 0;
-  font-size: small;
-  color: #333;
-  font-style: italic;
+/* Plain-text links outside a styled component (e.g. "Lost password?"
+   below the login form) otherwise fall back to the browser's default
+   blue/underline, which clashes with the rest of the app's own
+   pine-green/amber palette. */
+.page-intro a,
+.page-section-hint a {
+  color: var(--primary-color);
+  font-weight: 600;
+  text-decoration: underline;
+}
+.page-intro a:hover,
+.page-section-hint a:hover {
+  text-decoration-thickness: 2px;
+}
+
+.border-dark-green {
+  border: 1px solid var(--primary-color);
+  border-radius: 1rem;
 }
 
 footer {
-  background-color: #333;
-  color: #fff;
-  padding: 20px 0;
-  text-align: center;
-  font-size: 1.6rem;
+  display: flex;
+  flex-direction: column;
   width: 100%;
   margin-top: auto;
+  padding: 2.5rem 2rem 1.5rem;
+  background-color: var(--primary-color);
+  color: var(--color-white);
+  font-size: 1.6rem;
+  border-top: 1px solid var(--secondary-color);
 }
-footer .row {
+
+.footer-inner {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
   flex-direction: column;
+  align-items: center;
+  gap: 1.5rem;
+  width: 100%;
+  max-width: 130rem;
+  margin: 0 auto;
+  text-align: center;
 }
-footer .row a {
-  color: #fff;
+
+.footer-logo {
+  font-weight: 600;
+  font-size: 2rem;
+}
+
+.footer-links {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+.footer-links a {
+  color: var(--color-white);
   text-decoration: none;
   padding: 0.5rem;
 }
-footer .row a:hover {
+.footer-links a:hover, .footer-links a:focus-visible {
+  color: var(--accent-color);
   text-decoration: underline;
 }
 
-.grid-container {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(20rem, 1fr));
-  gap: 1rem;
-  margin: auto;
-  margin-bottom: 5rem;
-  justify-items: center;
-  max-width: 120rem;
+.footer-bottom {
+  margin-top: 1.5rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--secondary-color);
+  text-align: center;
+  font-size: 1.4rem;
+  color: var(--tetriary-color);
+}
+.footer-bottom .powered {
+  padding: 0 0.3rem;
+  color: var(--color-white);
+  font-weight: 600;
+  text-decoration: none;
+}
+.footer-bottom .powered:hover, .footer-bottom .powered:focus-visible {
+  color: var(--accent-color);
 }
 
-@media screen and (max-width: 1200px) {
-  .grid-container {
-    grid-template-columns: repeat(auto-fit, minmax(25rem, 1fr));
+@media (min-width: 700px) {
+  .footer-inner {
+    flex-direction: row;
+    justify-content: space-between;
+    text-align: left;
+  }
+  .footer-links {
+    flex-direction: row;
+    gap: 1.5rem;
   }
 }
-.card {
-  background-color: #fff;
+.container-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1rem;
+  align-self: center;
+  width: 80%;
+  padding: 2rem 0 2rem 0;
+}
+
+.list-group {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(30rem, 1fr));
+  padding-bottom: 2rem;
+  max-width: 130rem;
+}
+.list-group .group-title {
+  padding: 2rem;
+  margin: 2rem;
+  min-height: 100%;
+  border: 2px solid var(--primary-color);
+  border-radius: 1rem;
+}
+@media (max-width: 1500px) {
+  .list-group {
+    max-width: 90%;
+    gap: 1.5rem;
+  }
+}
+@media (max-width: 800px) {
+  .list-group {
+    grid-template-columns: 1fr;
+  }
+}
+
+.page-hero {
   width: 100%;
-  height: 40rem;
-  border-radius: 15px;
-  margin: 1rem;
-  box-shadow: 0 0 1rem rgba(0, 0, 0, 0.3);
-  transition: 0.2s ease-in-out;
-  max-width: 40rem;
-  position: relative;
+  border-radius: 1rem;
+  padding: 2rem;
+  margin: auto 2rem;
+  max-width: 130rem;
 }
-.card:hover {
-  box-shadow: 0 0 2rem rgba(0, 0, 0, 0.747);
+.page-hero h2 {
+  padding: 0 0 2rem 0;
 }
 
-.card-content {
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  height: 100%;
+.bg-dark-green {
+  background-color: var(--primary-color);
 }
 
-.card-title h2 {
+.text-color-white {
+  color: var(--color-white);
+}
+
+.feature-list {
+  list-style: none;
+  padding: 2rem;
+  margin: 2rem;
+  background-color: var(--primary-color);
+  color: var(--color-white);
+  border-radius: 1rem;
+  min-height: 100%;
+}
+.feature-list .title {
   font-size: 2rem;
+  margin: 0;
+}
+.feature-list li {
+  margin: 0.5rem 0;
+  font-size: 1.6rem;
+  display: flex;
+  align-items: center;
+}
+.feature-list input[type=checkbox] {
+  margin-right: 0.5em;
+  pointer-events: none;
+  accent-color: green;
+}
+@supports not (accent-color: green) {
+  .feature-list input[type=checkbox] {
+    appearance: none;
+    width: 1em;
+    height: 1em;
+    border: 2px solid green;
+    border-radius: 3px;
+    position: relative;
+    background: white;
+  }
+  .feature-list input[type=checkbox]:checked::after {
+    content: "";
+    position: absolute;
+    top: 0.1em;
+    left: 0.3em;
+    width: 0.25em;
+    height: 0.5em;
+    border: solid green;
+    border-width: 0 2px 2px 0;
+    transform: rotate(45deg);
+  }
+}
+
+.card {
+  display: flex;
+  flex-flow: column;
+  width: 100%;
+  max-width: 30rem;
+  margin: 0 auto;
+  color: var(--color-white);
+}
+.card .card-content {
+  position: relative;
+  flex: 1;
+  padding: 2rem;
+  border: 1px solid var(--accent-color);
+  border-block-start: none;
+  background-color: var(--primary-color);
+  border-radius: 1rem;
+}
+.card .card-link {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+}
+.card .card-title h2 {
+  margin: 1rem 0;
+  padding: 1rem 0;
+  font-size: 3rem;
+}
+.card .card-body {
+  padding: 1rem;
+  margin: 1rem;
+}
+.card button {
+  border-radius: 0.5em;
+  padding: 0.85em;
+  text-decoration: none;
+  color: var(--color-white);
+  display: flex;
+  align-items: center;
+  gap: 1em;
+  width: 100%;
+  text-align: left;
+  background: none;
+  border: none;
+  font: inherit;
+  cursor: pointer;
+}
+
+.img-skeleton {
+  position: relative;
+  overflow: hidden;
+  aspect-ratio: 3/2;
+  max-width: 40rem;
+  border-radius: 1rem;
+  background-color: var(--tetriary-color);
+}
+.img-skeleton--square {
+  aspect-ratio: 1;
+}
+.img-skeleton img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0;
+  transition: opacity 300ms ease;
+}
+.img-skeleton:not(.loaded) {
+  background: linear-gradient(100deg, var(--tetriary-color) 30%, rgba(255, 255, 255, 0.55) 50%, var(--tetriary-color) 70%);
+  background-size: 250% 100%;
+  animation: skeleton-shimmer 1.6s ease-in-out infinite;
+}
+.img-skeleton.loaded img {
+  opacity: 1;
+}
+
+@keyframes skeleton-shimmer {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .img-skeleton:not(.loaded) {
+    animation: none;
+  }
+}
+@media (max-width: 800px) {
+  body {
+    grid-template-columns: 1fr;
+  }
+  main {
+    padding: 0;
+    /* Must match #mobile-nav's own height below so the fixed bar never
+       covers the last bit of page content. */
+    padding-bottom: calc(68px + env(safe-area-inset-bottom, 0px));
+  }
+  .container {
+    border: none;
+    /* Not 0 - a bare heading/hint/link sitting directly in .container
+       (nothing else to give it any inset) would otherwise touch the
+       screen edge. Smaller than the desktop 2rem just to leave more
+       room for content on a narrow screen; .form-card/.detail-card
+       etc. carry their own 2rem padding regardless of this. */
+    padding: 1.5rem;
+  }
+  #sidebar {
+    display: none;
+  }
+  #mobile-nav {
+    display: grid;
+    /* auto-fit with a 0 minimum sizes tracks to however many items are
+       actually rendered - 5 for a signed-in user, 2 for a guest or a
+       logged-out visitor - rather than assuming a fixed count. */
+    grid-template-columns: repeat(auto-fit, minmax(0, 1fr));
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 40;
+    /* The base bar is taller than before for easier tapping, plus extra
+       room for the home-indicator/gesture-bar safe area on notched
+       phones (this is installable as a standalone app - see the
+       apple-mobile-web-app meta tags in base.html - so it can render
+       flush to the bottom edge instead of behind normal browser chrome).
+       env() resolves to 0 wherever there's no inset, so this is a no-op
+       on everything else. */
+    height: calc(68px + env(safe-area-inset-bottom, 0px));
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+    background-color: var(--primary-color);
+    border-top: 1px solid var(--secondary-color);
+  }
+  .mobile-nav-item-form {
+    /* Lets the <button class="mobile-nav-item"> inside this form act as
+       the grid item directly, matching the <a class="mobile-nav-item">
+       items around it, instead of the form itself taking up the cell. */
+    display: contents;
+  }
+  .mobile-nav-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.3em;
+    height: 100%;
+    padding: 0.4em 0.5em;
+    border: none;
+    background: none;
+    color: var(--color-white);
+    text-decoration: none;
+    text-align: center;
+    line-height: 1.2;
+    font: inherit;
+    font-size: 1.05rem;
+    cursor: pointer;
+  }
+  .mobile-nav-item svg {
+    fill: var(--color-white);
+  }
+  .mobile-nav-item:hover, .mobile-nav-item:focus-visible {
+    background-color: var(--secondary-color);
+  }
+  .mobile-nav-item[aria-expanded=true] {
+    background-color: var(--secondary-color);
+  }
+  #mobile-menu-overlay:not([hidden]) {
+    display: block;
+    position: fixed;
+    inset: 0;
+    z-index: 45;
+    background-color: rgba(27, 27, 23, 0.5);
+  }
+  #mobile-menu-drawer:not([hidden]) {
+    display: flex;
+    flex-direction: column;
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 50;
+    max-height: 70vh;
+    background-color: var(--primary-color);
+    color: var(--color-white);
+    border-top: 1px solid var(--secondary-color);
+    border-radius: 1em 1em 0 0;
+    padding-bottom: calc(1em + env(safe-area-inset-bottom, 0px));
+    overflow-y: auto;
+  }
+  .mobile-menu-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1em 1.5em;
+    border-bottom: 1px solid var(--secondary-color);
+    position: sticky;
+    top: 0;
+    background-color: var(--primary-color);
+  }
+  .mobile-menu-header h2 {
+    font-size: 1.8rem;
+  }
+  #mobile-menu-close {
+    border: none;
+    background: none;
+    padding: 0.5em;
+    border-radius: 0.5em;
+    cursor: pointer;
+  }
+  #mobile-menu-close svg {
+    fill: var(--color-white);
+  }
+  #mobile-menu-close:hover {
+    background-color: var(--secondary-color);
+  }
+  .mobile-menu-list {
+    list-style: none;
+  }
+  .mobile-menu-list li {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  }
+  .mobile-menu-list a,
+  .mobile-menu-list button {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    min-height: 48px;
+    padding: 0.85em 1.5em;
+    color: var(--color-white);
+    text-decoration: none;
+    background: none;
+    border: none;
+    font: inherit;
+    text-align: left;
+    cursor: pointer;
+  }
+  .mobile-menu-list a:hover, .mobile-menu-list a:focus-visible,
+  .mobile-menu-list button:hover,
+  .mobile-menu-list button:focus-visible {
+    background-color: var(--secondary-color);
+  }
+  .mobile-menu-account {
+    padding: 0.85em 1.5em;
+    color: var(--tetriary-color);
+    font-weight: 600;
+  }
+}
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-height: 44px;
+  margin: 0.5rem 0;
+  padding: 0.75em 1.5em;
+  border: none;
+  border-radius: 0.5em;
+  font: inherit;
+  font-weight: 600;
   text-align: center;
+  text-decoration: none;
+  cursor: pointer;
+  color: var(--color-white);
+  background-color: var(--secondary-color);
+}
+.btn:hover {
+  background-color: var(--primary-color);
+}
+
+.btn-primary {
+  background-color: var(--primary-color);
+}
+.btn-primary:hover {
+  background-color: var(--secondary-color);
+}
+
+.btn-danger {
+  background-color: var(--danger-color);
+}
+.btn-danger:hover {
+  background-color: var(--danger-color-hover);
+}
+
+.btn-large {
+  min-height: 52px;
+  font-size: 1.8rem;
+}
+
+@media (min-width: 700px) {
+  .btn {
+    width: auto;
+  }
+}
+.entity-list {
+  display: grid;
+  grid-template-columns: 1fr;
+  /* Grid rows stretch every cell in the row to match the tallest one
+     by default - without this, expanding one <details> card (e.g. on
+     the guest property page) also visually stretches whatever sits
+     next to it in the same row, even though that neighbor's own
+     content never changed. */
+  align-items: start;
+  gap: 1rem;
   margin: 1rem 0;
 }
 
-.card-body {
-  padding: 1rem;
+.entity-list-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  padding: 1.25rem;
+  min-height: 44px;
+  border: 1px solid var(--tetriary-color);
+  border-radius: 1rem;
+  text-decoration: none;
+  color: var(--color-black);
+  background-color: var(--color-white);
+}
+.entity-list-item:hover {
+  border-color: var(--secondary-color);
+}
+.entity-list-item .entity-list-title {
+  font-weight: 600;
+  font-size: 1.8rem;
+}
+/* Used-by items (guide-details.html) put the title itself in an <a>
+   next to a Remove button in the same card, instead of making the
+   whole card a link like every other entity-list-item - a link and a
+   button can't both be interactive descendants of one <a>. Without
+   this it'd fall back to the browser's default blue/underline. */
+a.entity-list-title {
+  color: var(--color-black);
+  text-decoration: none;
+}
+a.entity-list-title:hover {
+  text-decoration: underline;
+}
+.entity-list-item .entity-list-meta {
+  color: var(--primary-color);
+}
+
+.card-actions {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+.card-actions .btn {
+  width: auto;
   flex: 1;
 }
 
-.card-image img {
-  width: 100%;
-  height: 20rem;
-  -o-object-fit: cover;
-     object-fit: cover;
-  border-radius: 15px 15px 0 0;
+.entity-list-item-overdue {
+  border-color: var(--danger-color);
+}
+.entity-list-item-overdue .entity-list-meta {
+  color: var(--danger-color);
 }
 
-.card-link {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  z-index: 1; /* Ensures the link covers the entire card */
-}
-
-.guide-list-container {
-  max-width: 130rem;
-  margin: 0 auto;
-  padding: 20px;
-  font-family: Arial, sans-serif;
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 20px;
-  overflow-x: hidden;
-  box-sizing: border-box;
-}
-
-.guide-item {
-  background-color: #fff;
-  border-radius: 8px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  padding: 20px;
-  transition: transform 0.3s, box-shadow 0.3s;
+/* Collapsible tree nodes (guest property page: location -> appliances ->
+   guide links) built on native <details>/<summary> rather than sidebar-
+   style JS toggles, since these live in page content, not the nav - they
+   get keyboard/screen-reader support for free and need no script. */
+.tree-summary {
   display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  justify-content: flex-start;
-  width: 100%;
-  box-sizing: border-box;
-  height: 100%;
-  max-width: 100%;
-}
-.guide-item:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
-}
-
-.guide-title {
-  font-size: 24px;
-  font-weight: 600;
-  color: #2c3e50;
-  margin-bottom: 10px;
-  width: 100%;
-}
-.guide-title a {
-  text-decoration: none;
-  color: inherit;
-  transition: color 0.2s ease;
-}
-.guide-title a:hover {
-  color: #3498db;
-}
-
-.guide-description {
-  font-size: 16px;
-  color: #7f8c8d;
-  margin-bottom: 15px;
-  width: 100%;
-}
-
-.guide-dates {
-  font-size: 14px;
-  color: #95a5a6;
-  width: 100%;
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-}
-.guide-dates span {
-  display: block;
-}
-
-.qr-code-section {
-  margin-top: 20px;
-  width: 100%;
-}
-.qr-code-section h3 {
-  font-size: 18px;
-  color: #34495e;
-  margin-bottom: 10px;
-}
-.qr-code-section .qr-code-card {
-  display: flex;
-  justify-content: center;
   align-items: center;
-  background-color: #ecf0f1;
-  border-radius: 8px;
-  padding: 15px;
-  width: 100%;
-  max-width: 250px;
-  margin: 0 auto;
-  box-sizing: border-box;
+  gap: 0.75rem;
+  cursor: pointer;
+  list-style: none;
 }
-.qr-code-section .qr-code-card .qr-code-img {
-  max-width: 100%;
-  height: auto;
+.tree-summary::-webkit-details-marker {
+  display: none;
+}
+.tree-summary .entity-list-meta {
+  margin-right: auto;
+}
+.tree-chevron {
+  flex-shrink: 0;
+  margin-left: auto;
+  fill: currentColor;
+  transition: transform 0.15s ease;
+}
+details[open] > .tree-summary .tree-chevron {
+  transform: rotate(180deg);
+}
+.tree-node-body {
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--tetriary-color);
+}
+.tree-node-body > .entity-list {
+  margin: 0;
 }
 
-.guide-files-section {
-  margin-top: 20px;
-  width: 100%;
+@media (min-width: 700px) {
+  .entity-list {
+    grid-template-columns: repeat(auto-fill, minmax(28rem, 1fr));
+  }
 }
-.guide-files-section h3 {
-  font-size: 18px;
-  color: #34495e;
-  margin-bottom: 10px;
+.overdue {
+  color: var(--danger-color);
+  font-weight: 600;
 }
-.guide-files-section .guide-files-list {
-  list-style-type: none;
-  padding-left: 0;
+
+.filter-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin: 1rem 0;
 }
-.guide-files-section .guide-files-list .guide-file-item {
-  margin-bottom: 10px;
-}
-.guide-files-section .guide-files-list .guide-file-item .guide-file-link {
-  font-size: 16px;
-  color: #3498db;
+.filter-tabs a {
+  padding: 0.75em 1.25em;
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  border-radius: 0.5em;
   text-decoration: none;
+  color: var(--primary-color);
+  background-color: var(--color-white);
+  border: 1px solid var(--tetriary-color);
 }
-.guide-files-section .guide-files-list .guide-file-item .guide-file-link:hover {
-  text-decoration: underline;
-}
-
-.guide-files-section p {
-  font-size: 16px;
-  color: #7f8c8d;
-}
-
-hr {
-  margin-top: 40px;
-  border: 1px solid #ecf0f1;
+.filter-tabs a.active {
+  color: var(--color-white);
+  background-color: var(--primary-color);
 }
 
-@media (max-width: 600px) {
-  .guide-list-container {
-    grid-template-columns: 1fr;
-    padding: 10px;
-  }
-  .guide-item {
-    padding: 15px;
-  }
-  .guide-title {
-    font-size: 20px;
-  }
-  .guide-description {
-    font-size: 14px;
-  }
-  .guide-dates {
-    font-size: 12px;
-  }
+.detail-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.5rem;
+  margin: 1rem 0;
 }
-@media (max-width: 900px) {
-  .guide-list-container {
+
+@media (min-width: 700px) {
+  .detail-grid {
     grid-template-columns: repeat(2, 1fr);
   }
 }
-@media (min-width: 1300px) {
-  .guide-list-container {
-    grid-template-columns: repeat(4, 1fr);
-  }
-}
-.guide-detail-container {
-  max-width: 130rem;
-  margin: 0 auto;
-  padding: 20px;
-  box-sizing: border-box;
+.dashboard-section,
+.maintenance-section,
+.maintenance-history,
+.complete-task {
+  margin: 2rem 0;
 }
 
-.guide-detail-container h1 {
-  font-size: 2.5rem;
-  color: #34495e;
-  margin-bottom: 15px;
+/* width: 100% keeps these from shrink-wrapping to their own content
+   inside .container's flex layout - see the .container rule above. */
+.detail-card, .form-card {
+  width: 100%;
+  max-width: 60rem;
+  margin: 2rem auto;
+  padding: 2rem;
+  background-color: var(--color-white);
+  border: 1px solid var(--tetriary-color);
+  border-radius: 1rem;
 }
 
-.guide-detail-container h3 {
-  font-size: 1.75rem;
-  color: #2c3e50;
-  margin-top: 20px;
+.form-card form > div {
+  margin-bottom: 1.5rem;
+}
+.form-card form > div:last-of-type {
+  margin-bottom: 0;
+}
+.form-card label {
+  display: block;
+  margin-bottom: 0.4rem;
+  font-weight: 600;
+  color: var(--primary-color);
+}
+.form-card div:has(> input:required) label::after,
+.form-card div:has(> select:required) label::after,
+.form-card div:has(> textarea:required) label::after {
+  content: " *";
+  color: var(--accent-color);
+}
+.form-card .helptext {
+  margin: 0.25rem 0 0.5rem;
+  font-size: 1.4rem;
+  color: var(--secondary-color);
+}
+.form-card .errorlist {
+  list-style: none;
+  margin: 0.25rem 0 0.5rem;
+  padding: 0;
+  color: var(--danger-color);
+  font-size: 1.4rem;
+  font-weight: 600;
+}
+.form-card div:has(> .errorlist) input,
+.form-card div:has(> .errorlist) select,
+.form-card div:has(> .errorlist) textarea {
+  border-color: var(--danger-color);
+}
+.form-card input[type=text],
+.form-card input[type=email],
+.form-card input[type=password],
+.form-card input[type=number],
+.form-card input[type=date],
+.form-card input[type=url],
+.form-card input[type=tel],
+.form-card select,
+.form-card textarea {
+  width: 100%;
+  min-height: 44px;
+  padding: 0.6em 0.85em;
+  border: 1px solid var(--tetriary-color);
+  border-radius: 0.5em;
+  font: inherit;
+  font-size: 1.6rem;
+  background-color: var(--color-white);
+  color: var(--color-black);
+}
+.form-card input[type=text]:focus-visible,
+.form-card input[type=email]:focus-visible,
+.form-card input[type=password]:focus-visible,
+.form-card input[type=number]:focus-visible,
+.form-card input[type=date]:focus-visible,
+.form-card input[type=url]:focus-visible,
+.form-card input[type=tel]:focus-visible,
+.form-card select:focus-visible,
+.form-card textarea:focus-visible {
+  border-color: var(--accent-color);
+}
+.form-card textarea {
+  min-height: 8rem;
+  resize: vertical;
+}
+.form-card input[type=file] {
+  width: 100%;
+  padding: 0.5em 0;
+}
+.form-card input[type=checkbox] {
+  width: 1.6rem;
+  height: 1.6rem;
+  margin-right: 0.5em;
+  accent-color: var(--primary-color);
 }
 
-.guide-detail-container ul {
-  padding-left: 20px;
+.detail-card h1 {
+  font-size: 2.8rem;
+}
+.detail-card h3 {
+  margin: 1.5rem 0 0.5rem;
+  font-size: 1.8rem;
+  color: var(--primary-color);
+}
+.detail-card .card-actions {
+  margin-bottom: 1.5rem;
 }
 
-.guide-detail-container p {
-  font-size: 16px;
-  color: #7f8c8d;
-  margin-bottom: 15px;
+.detail-card-header {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+.detail-card-header .img-skeleton {
+  max-width: 16rem;
 }
 
-.guide-detail-container a {
-  text-decoration: none;
-  color: #3498db;
-  font-weight: 500;
+.detail-card-subtitle {
+  color: var(--secondary-color);
+  font-weight: 600;
 }
 
-.guide-detail-container a:hover {
-  text-decoration: underline;
+.detail-card-description {
+  margin-top: 1rem;
+  white-space: pre-line;
 }
 
-.guide-detail-container {
-  overflow-x: hidden;
-  padding: 20px;
+.timestamps {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 1.5rem;
+  margin-top: 1.5rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--tetriary-color);
+  color: var(--secondary-color);
+  font-size: 1.4rem;
+}
+.timestamps p {
+  margin: 0;
 }
 
-.guide-detail-container img {
-  max-width: 100%;
-  height: auto;
-}/*# sourceMappingURL=style.css.map */
+/* width: 100% - see the .container rule near the top of this file. */
+.page-section {
+  width: 100%;
+  max-width: 60rem;
+  margin: 2.5rem auto;
+}
+.page-section h2 {
+  margin-bottom: 1rem;
+  font-size: 2.2rem;
+  color: var(--primary-color);
+}
+.page-section .btn {
+  width: auto;
+  margin-bottom: 1rem;
+}
+
+.map-embed {
+  overflow: hidden;
+  border: 1px solid var(--tetriary-color);
+  border-radius: 1rem;
+  margin-bottom: 1rem;
+}
+.map-embed iframe {
+  display: block;
+}
+
+.page-section-hint {
+  margin-bottom: 1rem;
+  color: var(--primary-color);
+  font-size: 1.4rem;
+}
+
+.step-item {
+  position: relative;
+  padding-left: 3.5rem;
+}
+.step-item.dragging {
+  opacity: 0.5;
+}
+
+.step-item-drag-handle {
+  position: absolute;
+  top: 1.25rem;
+  left: 1rem;
+  padding: 0.5rem;
+  border: none;
+  background: none;
+  color: var(--tetriary-color);
+  cursor: grab;
+  touch-action: none;
+  user-select: none;
+}
+.step-item-drag-handle:active {
+  cursor: grabbing;
+}
+
+.step-reorder-controls {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 1rem;
+}
+.step-reorder-controls button {
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: 1px solid var(--tetriary-color);
+  border-radius: 0.5em;
+  background-color: var(--color-white);
+  color: var(--primary-color);
+  font: inherit;
+  font-size: 1.8rem;
+  cursor: pointer;
+}
+.step-reorder-controls button:hover, .step-reorder-controls button:focus-visible {
+  background-color: var(--secondary-color);
+  border-color: var(--secondary-color);
+  color: var(--color-white);
+}
+
+/*# sourceMappingURL=style.css.map */

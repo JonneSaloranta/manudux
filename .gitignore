@@ -3,6 +3,7 @@
 *.sqlite3
 staticfiles
 .env*
-migrations
+!.env.example
 __pycache__
 media/
+backups/

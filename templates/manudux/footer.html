@@ -1,13 +1,16 @@
 {% load i18n %}
 {% load static %}
 <footer>
-    <div class="row">
-        <a href="https://github.com/JonneSaloranta/manudux/issues">{% trans "Report an issue!" %}</a>
+    <div class="footer-inner">
+        <span class="footer-logo">Manudux</span>
+
+        <nav class="footer-links" aria-label="{% trans 'Footer' %}">
+            <a href="https://github.com/JonneSaloranta/manudux/issues">{% trans "Report an issue" %}</a>
+            <a href="https://github.com/JonneSaloranta/manudux">{% trans "Help us develop" %}</a>
+        </nav>
     </div>
-    <div class="row">
-        <a href="https://github.com/JonneSaloranta/manudux">{% trans "Help us develop!" %}</a>
-    </div>
-    <div class="row">
-        <p>{% trans "Powered By Manudux!" %}</p>
+
+    <div class="footer-bottom">
+        <p>{% trans "Powered By" %} <a class="powered" href="https://github.com/JonneSaloranta/manudux">Manudux</a> v{{ APP_VERSION }}</p>
     </div>
 </footer>

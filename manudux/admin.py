@@ -1,16 +1,25 @@
+import os
+
+from django.conf import settings
 from django.contrib import admin
 from django.core.files.storage import default_storage
-import os
+from django.shortcuts import redirect
+from django.urls import path, reverse
+
+from manudux.models.appliance_model import Appliance
+from manudux.models.appliancedocument_model import ApplianceDocument
+from manudux.models.appliancetype_model import ApplianceType
+from manudux.models.guestcode_model import GuestCode
 from manudux.models.guide_model import Guide
-from manudux.models.property_model import Property
 from manudux.models.guidefile_model import GuideFile
 from manudux.models.guidestep_model import GuideStep
 from manudux.models.location_model import Location
+from manudux.models.locationtype_model import LocationType
+from manudux.models.maintenancelog_model import MaintenanceLog
+from manudux.models.maintenancetask_model import MaintenanceTask
+from manudux.models.property_model import Property
 from manudux.models.property_type_model import PropertyType
-from django.conf import settings
-from django import forms
-from django.urls import path, reverse
-from django.shortcuts import redirect
+from manudux.models.propertydocument_model import PropertyDocument
 
 
 class LocationInline(admin.TabularInline):
@@ -18,9 +27,16 @@ class LocationInline(admin.TabularInline):
     extra = 1
 
 
-class PropertyInline(admin.TabularInline):
-    model = Property
-    extra = 1
+class PropertyDocumentInline(admin.TabularInline):
+    model = PropertyDocument
+    extra = 0
+    fields = ("name", "category", "file", "notes")
+
+
+class ApplianceDocumentInline(admin.TabularInline):
+    model = ApplianceDocument
+    extra = 0
+    fields = ("name", "category", "file", "notes")
 
 
 @admin.register(Property)
@@ -36,11 +52,11 @@ class PropertyAdmin(admin.ModelAdmin):
         "activated",
     )
     list_filter = ("created_at", "updated_at", "activated")
-    search_fields = ("name", "address", "city", "state", "zip_code")
+    search_fields = ("name", "address", "city", "state", "zip_code", "parcel_number")
     ordering = ("name", "created_at", "updated_at")
     date_hierarchy = "created_at"
     readonly_fields = ("created_at", "updated_at")
-    inlines = [LocationInline]
+    inlines = [LocationInline, PropertyDocumentInline]
 
     change_list_template = "admin/property_changelist.html"  # Custom admin template
 
@@ -90,58 +106,19 @@ class PropertyAdmin(admin.ModelAdmin):
 
 @admin.register(Location)
 class LocationAdmin(admin.ModelAdmin):
-    list_display = ("name", "property", "created_at", "updated_at", "activated")
-    list_filter = ("created_at", "updated_at", "activated")
+    list_display = (
+        "name",
+        "property",
+        "location_type",
+        "created_at",
+        "updated_at",
+        "activated",
+    )
+    list_filter = ("location_type", "created_at", "updated_at", "activated")
     search_fields = ("name", "property")
     ordering = ("name", "created_at", "updated_at")
     date_hierarchy = "created_at"
     readonly_fields = ("created_at", "updated_at")
-
-
-# @admin.register(Appliance)
-# class ApplianceAdmin(admin.ModelAdmin):
-#     list_display = ('name', 'location', 'created_at', 'updated_at', 'activated')
-#     list_filter = ('created_at', 'updated_at', 'activated')
-#     search_fields = ('name', 'location')
-#     ordering = ('name', 'created_at', 'updated_at')
-#     date_hierarchy = 'created_at'
-#     readonly_fields = ('created_at', 'updated_at')
-
-# @admin.register(Part)
-# class PartAdmin(admin.ModelAdmin):
-#     list_display = ('name', 'appliance', 'created_at', 'updated_at', 'activated')
-#     list_filter = ('created_at', 'updated_at', 'activated')
-#     search_fields = ('name', 'appliance')
-#     ordering = ('name', 'created_at', 'updated_at')
-#     date_hierarchy = 'created_at'
-#     readonly_fields = ('created_at', 'updated_at')
-
-# @admin.register(Generator)
-# class GeneratorAdmin(admin.ModelAdmin):
-#     list_display = ('name', 'generator', 'created_at', 'updated_at', 'activated')
-#     list_filter = ('created_at', 'updated_at', 'activated')
-#     search_fields = ('name', 'generator')
-#     ordering = ('name', 'created_at', 'updated_at')
-#     date_hierarchy = 'created_at'
-#     readonly_fields = ('created_at', 'updated_at')
-
-# @admin.register(Stock)
-# class StockAdmin(admin.ModelAdmin):
-#     list_display = ('name', 'location', 'created_at', 'updated_at', 'activated')
-#     list_filter = ('created_at', 'updated_at', 'activated')
-#     search_fields = ('name', 'location')
-#     ordering = ('name', 'created_at', 'updated_at')
-#     date_hierarchy = 'created_at'
-#     readonly_fields = ('created_at', 'updated_at')
-
-# @admin.register(StockItem)
-# class StockItemAdmin(admin.ModelAdmin):
-#     list_display = ('stock', 'part', 'quantity', 'condition', 'created_at', 'updated_at')
-#     list_filter = ('created_at', 'updated_at')
-#     search_fields = ('stock', 'part', 'quantity', 'condition')
-#     ordering = ('stock', 'part', 'created_at', 'updated_at')
-#     date_hierarchy = 'created_at'
-#     readonly_fields = ('created_at', 'updated_at')
 
 
 @admin.register(PropertyType)
@@ -151,7 +128,14 @@ class PropertyTypeAdmin(admin.ModelAdmin):
     ordering = ("name",)
 
 
-class GuideFileAdmin(admin.StackedInline):
+@admin.register(LocationType)
+class LocationTypeAdmin(admin.ModelAdmin):
+    list_display = ("name", "description")
+    search_fields = ("name", "description")
+    ordering = ("name",)
+
+
+class GuideFileInline(admin.StackedInline):
     model = GuideFile
     extra = 1
 
@@ -173,7 +157,7 @@ class GuideStepInline(admin.TabularInline):
 class GuideAdmin(admin.ModelAdmin):
     list_display = ("name", "description", "qr_code", "created_at", "updated_at")
     search_fields = ("name", "created_at", "updated_at")
-    inlines = [GuideStepInline, GuideFileAdmin]  # PropertyInline, LocationInline
+    inlines = [GuideStepInline, GuideFileInline]
 
 
 @admin.register(GuideFile)
@@ -190,3 +174,84 @@ class GuideStepAdmin(admin.ModelAdmin):
         "title",
         "description",
     )  # Allows searching by guide name, title, and description
+
+
+@admin.register(Appliance)
+class ApplianceAdmin(admin.ModelAdmin):
+    list_display = (
+        "name",
+        "location",
+        "appliance_type",
+        "brand",
+        "warranty_expires",
+        "activated",
+    )
+    list_filter = ("appliance_type", "activated", "brand")
+    search_fields = ("name", "brand", "model_number", "serial_number", "location__name")
+    ordering = ("name",)
+    readonly_fields = ("created_at", "updated_at")
+    inlines = [ApplianceDocumentInline]
+
+
+@admin.register(ApplianceType)
+class ApplianceTypeAdmin(admin.ModelAdmin):
+    list_display = ("name", "description")
+    search_fields = ("name", "description")
+    ordering = ("name",)
+
+
+@admin.register(ApplianceDocument)
+class ApplianceDocumentAdmin(admin.ModelAdmin):
+    list_display = ("name", "appliance", "category", "uploaded_at")
+    list_filter = ("category", "uploaded_at")
+    search_fields = ("name", "appliance__name", "notes")
+
+
+class MaintenanceLogInline(admin.TabularInline):
+    model = MaintenanceLog
+    extra = 0
+    fields = ("completed_at", "completed_by", "notes", "cost", "receipt")
+    readonly_fields = ("completed_at", "completed_by", "notes", "cost", "receipt")
+    can_delete = False
+
+    def has_add_permission(self, request, obj=None):
+        return False
+
+
+@admin.register(MaintenanceTask)
+class MaintenanceTaskAdmin(admin.ModelAdmin):
+    list_display = ("title", "property", "due_date", "priority", "is_done")
+    list_filter = ("priority", "is_done", "due_date")
+    search_fields = ("title", "property__name", "location__name", "appliance__name")
+    ordering = ("due_date",)
+    readonly_fields = ("last_completed_at", "created_at", "updated_at")
+    inlines = [MaintenanceLogInline]
+
+
+@admin.register(MaintenanceLog)
+class MaintenanceLogAdmin(admin.ModelAdmin):
+    list_display = (
+        "task_title",
+        "property",
+        "completed_at",
+        "completed_by",
+        "cost",
+        "receipt",
+    )
+    list_filter = ("completed_at",)
+    search_fields = ("task_title", "property__name", "notes")
+
+
+@admin.register(PropertyDocument)
+class PropertyDocumentAdmin(admin.ModelAdmin):
+    list_display = ("name", "property", "category", "uploaded_at")
+    list_filter = ("category", "uploaded_at")
+    search_fields = ("name", "property__name", "notes")
+
+
+@admin.register(GuestCode)
+class GuestCodeAdmin(admin.ModelAdmin):
+    list_display = ("name", "property", "code", "created_by", "created_at")
+    list_filter = ("created_at",)
+    search_fields = ("name", "property__name", "code")
+    readonly_fields = ("code", "created_at")

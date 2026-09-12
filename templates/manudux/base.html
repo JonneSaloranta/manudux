@@ -6,24 +6,30 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="Manudux">
+    <link rel="apple-touch-icon" href="/icons/icon-192.png">
+
+
     <title>{% block title %}Manudux{% endblock %}</title>
 
     <link rel="stylesheet" href="{% static 'manudux/css/style.css' %}">
+    <link rel="manifest" href="{% static 'manudux/ios/manifest.json' %}">
+    <script type="text/javascript" src="{% static 'manudux/js/scripts.js' %}" defer></script>
 </head>
 
 <body>
-
-    {% block navbar %}
     {% include "manudux/navbar.html" %}
-    {% endblock %}
 
-    {% block content %}
-    {% endblock %}
+    <main>
+        {% block content %}
+        {% endblock %}
+        {% include "manudux/footer.html" %}
+    </main>
 
-    {% block footer %}
-    {% include "manudux/footer.html" %}
-    {% endblock %}
 
 </body>
 

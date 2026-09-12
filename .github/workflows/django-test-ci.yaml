@@ -30,7 +30,95 @@ jobs:
             - name: Set up Python
               uses: actions/setup-python@v4
               with:
-                  python-version: "3.11"
+                  python-version: "3.12"
+
+            - name: Install dependencies
+              run: |
+                  python -m venv venv
+                  source venv/bin/activate
+                  pip install -r requirements.txt
+
+            - name: Ensure data directory exists
+              run: mkdir -p ./data
+
+            - name: Check for missing migrations
+              run: |
+                  source venv/bin/activate
+                  python manage.py makemigrations --check --dry-run
+
+            - name: Run migrations
+              run: |
+                  source venv/bin/activate
+                  python manage.py migrate --noinput
+
+            - name: Collect static files
+              run: |
+                  source venv/bin/activate
+                  python manage.py collectstatic --noinput
+
+            # --parallel dropped: Django's parallel test runner has a known
+            # class of "cannot pickle 'traceback' object" failures when a
+            # test's exception can't cross the multiprocessing boundary, and
+            # it surfaced intermittently on the GitHub-hosted runner without
+            # ever reproducing locally. The suite is fast enough serial.
+            - name: Run tests
+              run: |
+                  source venv/bin/activate
+                  python manage.py test --noinput
+
+    lint:
+        runs-on: ubuntu-latest
+
+        steps:
+            - name: Checkout code
+              uses: actions/checkout@v4
+
+            - name: Set up Python
+              uses: actions/setup-python@v4
+              with:
+                  python-version: "3.12"
+
+            - name: Install dependencies
+              run: |
+                  python -m venv venv
+                  source venv/bin/activate
+                  pip install -r requirements.txt
+
+            - name: Check formatting (black)
+              run: |
+                  source venv/bin/activate
+                  black --check .
+
+            - name: Lint (ruff)
+              run: |
+                  source venv/bin/activate
+                  ruff check .
+
+    accessibility:
+        runs-on: ubuntu-latest
+        environment: master_secrets
+        env:
+            SECRET_KEY: ${{ secrets.SECRET_KEY }}
+            DEBUG: "False"
+            ALLOWED_HOSTS: 127.0.0.1,localhost
+            INTERNAL_IPS: 127.0.0.1
+            TIME_ZONE: ${{ vars.TIME_ZONE }}
+            SITE_URL: http://127.0.0.1:8877
+            ALLOW_REGISTRATION: ${{ vars.ALLOW_REGISTRATION }}
+
+        steps:
+            - name: Checkout code
+              uses: actions/checkout@v4
+
+            - name: Set up Python
+              uses: actions/setup-python@v4
+              with:
+                  python-version: "3.12"
+
+            - name: Set up Node
+              uses: actions/setup-node@v4
+              with:
+                  node-version: "22"
 
             - name: Install dependencies
               run: |
@@ -44,10 +132,145 @@ jobs:
             - name: Run migrations
               run: |
                   source venv/bin/activate
-                  python manage.py makemigrations --noinput
                   python manage.py migrate --noinput
 
-            - name: Run tests
+            - name: Collect static files
               run: |
                   source venv/bin/activate
-                  python manage.py test --parallel --noinput
+                  python manage.py collectstatic --noinput
+
+            - name: Seed a throwaway user and sample data for scanning authenticated pages
+              run: |
+                  source venv/bin/activate
+                  A11Y_PASSWORD="$(python -c 'import secrets; print(secrets.token_urlsafe(16))')"
+                  echo "::add-mask::$A11Y_PASSWORD"
+                  echo "A11Y_PASSWORD=$A11Y_PASSWORD" >> "$GITHUB_ENV"
+                  A11Y_GUEST_CODE="$(python -c 'import secrets, string; print("".join(secrets.choice(string.ascii_uppercase + string.digits) for _ in range(8)))')"
+                  echo "::add-mask::$A11Y_GUEST_CODE"
+                  echo "A11Y_GUEST_CODE=$A11Y_GUEST_CODE" >> "$GITHUB_ENV"
+                  python manage.py shell -c "
+                  from django.contrib.auth.models import User
+                  from manudux.models import (
+                      Property, PropertyType, Location, LocationType, Appliance,
+                      ApplianceType, ApplianceDocument, MaintenanceTask, Guide, GuideStep,
+                      GuestCode,
+                  )
+                  from django.core.files.base import ContentFile
+                  User.objects.filter(username='a11y').delete()
+                  User.objects.create_superuser(username='a11y', email='a11y@example.com', password='$A11Y_PASSWORD')
+                  # Seed one of everything so list/card views render their real
+                  # markup during the scan, not just their empty states. The
+                  # property gets an address so its detail page's embedded
+                  # map also renders during the scan (see .pa11yci.json). The
+                  # guide gets a step so the drag/Move up/down reorder controls
+                  # render too. The appliance gets a document so its Documents
+                  # section renders too. Superuser so it can also reach the
+                  # staff-only pages (site-settings, users) during the scan.
+                  # The location/appliance are marked guest-visible and the
+                  # guest code is pinned to a known value so the guest-login
+                  # and guest-property pages can be scanned too.
+                  property_type = PropertyType.objects.create(name='A11y Test Property Type')
+                  location_type = LocationType.objects.create(name='A11y Test Location Type')
+                  appliance_type = ApplianceType.objects.create(name='A11y Test Appliance Type')
+                  p = Property.objects.create(
+                      name='A11y Test Property',
+                      address='Testikatu 1',
+                      city='Helsinki',
+                      state='Uusimaa',
+                      zip_code='00100',
+                      property_type=property_type,
+                  )
+                  guide = Guide.objects.create(name='A11y Test Guide')
+                  GuideStep.objects.create(
+                      guide=guide, step_number=1, title='A11y Test Step',
+                      description='Step description.',
+                  )
+                  l = Location.objects.create(
+                      name='A11y Test Location', property=p, location_type=location_type,
+                      guide=guide, guest_visible=True,
+                  )
+                  a = Appliance.objects.create(
+                      name='A11y Test Appliance', location=l, appliance_type=appliance_type,
+                      guest_visible=True,
+                  )
+                  ApplianceDocument.objects.create(
+                      name='A11y Test Document',
+                      appliance=a,
+                      file=ContentFile(b'%PDF-1.4 test', name='a11y-test.pdf'),
+                  )
+                  MaintenanceTask.objects.create(
+                      title='A11y Test Task', property=p, due_date='2030-01-01'
+                  )
+                  GuestCode.objects.create(name='A11y Test Guest', property=p, code='$A11Y_GUEST_CODE')
+                  "
+
+            - name: Start the app
+              run: |
+                  source venv/bin/activate
+                  gunicorn core.wsgi:application --bind 127.0.0.1:8877 --daemon --pid /tmp/gunicorn.pid
+                  sleep 3
+
+            - name: Run accessibility checks (pa11y-ci)
+              run: |
+                  sed -e "s/__A11Y_TEST_PASSWORD__/$A11Y_PASSWORD/" -e "s/__A11Y_TEST_GUEST_CODE__/$A11Y_GUEST_CODE/" .pa11yci.json > /tmp/pa11yci.json
+                  npx --yes pa11y-ci --config /tmp/pa11yci.json
+
+    docker-publish:
+        needs: [test, lint, accessibility]
+        if: github.ref == 'refs/heads/master' && github.event_name == 'push'
+        runs-on: ubuntu-latest
+        permissions:
+            contents: read
+            packages: write
+
+        steps:
+            - name: Checkout code
+              uses: actions/checkout@v4
+              with:
+                  fetch-depth: 0
+
+            - name: Check whether VERSION changed in this push
+              id: version_check
+              run: |
+                  if git diff --name-only "${{ github.event.before }}" "${{ github.event.after }}" | grep -qx "VERSION"; then
+                      echo "changed=true" >> "$GITHUB_OUTPUT"
+                  else
+                      echo "changed=false" >> "$GITHUB_OUTPUT"
+                  fi
+
+            - name: Read version
+              if: steps.version_check.outputs.changed == 'true'
+              id: version
+              run: echo "value=$(tr -d '[:space:]' < VERSION)" >> "$GITHUB_OUTPUT"
+
+            - name: Compute image name
+              if: steps.version_check.outputs.changed == 'true'
+              id: image
+              run: echo "name=ghcr.io/$(echo '${{ github.repository }}' | tr '[:upper:]' '[:lower:]')" >> "$GITHUB_OUTPUT"
+
+            - name: Set up Docker Buildx
+              if: steps.version_check.outputs.changed == 'true'
+              uses: docker/setup-buildx-action@v3
+
+            - name: Log in to GHCR
+              if: steps.version_check.outputs.changed == 'true'
+              uses: docker/login-action@v3
+              with:
+                  registry: ghcr.io
+                  username: ${{ github.actor }}
+                  password: ${{ secrets.GITHUB_TOKEN }}
+
+            - name: Build and push image
+              if: steps.version_check.outputs.changed == 'true'
+              uses: docker/build-push-action@v6
+              with:
+                  context: .
+                  file: ./dockerfile
+                  push: true
+                  tags: |
+                      ${{ steps.image.outputs.name }}:v${{ steps.version.outputs.value }}
+                      ${{ steps.image.outputs.name }}:latest
+
+            - name: No version bump
+              if: steps.version_check.outputs.changed == 'false'
+              run: echo "VERSION did not change in this push - nothing to publish."
